@@ -1,0 +1,45 @@
+{
+	"folders":
+	[
+		{
+			"path": ".",
+            "folder_exclude_patterns":
+            [
+                "__pycache__",
+            ]
+		}
+	],
+    "build_systems":
+    [
+        {
+            "cmd":
+            [
+                "python", "main.py"
+            ],
+            "file_regex": "^[ ]*File \"(...*?)\", line ([0-9]*)",
+            "name": "Run Project",
+            "quiet": true,
+            "shell": true,
+            "env": {"PYTHONIOENCODING": "utf8"},
+            "syntax": "Packages/Text/Plain text.tmLanguage",
+            "target": "exec",
+            "working_dir": "$project_path/"
+        },
+        {
+            "cmd":
+            [
+                "python", "unit_tests.py",
+                // "python", "unit_tests.py", "TestFiniteAutomata.test_automataWithoutAInitialState",
+                // "python", "unit_tests.py", "TestRegularGrammar.test_grammarWithPhiStatesConversion",
+            ],
+            "file_regex": "^[ ]*File \"(...*?)\", line ([0-9]*)",
+            "name": "Run Project Tests",
+            "quiet": true,
+            "shell": true,
+            "env": {"PYTHONIOENCODING": "utf8"},
+            "syntax": "Packages/Text/Plain text.tmLanguage",
+            "target": "exec",
+            "working_dir": "$project_path/"
+        }
+    ],
+}

@@ -1,0 +1,12 @@
+
+*.pyc
+*.sublime-workspace
+
+html
+
+**__pycache__
+
+*.docx
+*.tmp
+*.png
+*.pdf
