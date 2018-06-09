@@ -212,7 +212,7 @@ class ProgramWindow(QtWidgets.QMainWindow):
 
     @ignore_exceptions
     def handleGrammarBeautifing(self, qt_decorator_bug):
-        firstGrammar = RegularGrammar.load_from_text_lines( self.grammarTextEditWidget.toPlainText() )
+        firstGrammar = ChomskyGrammar.load_from_text_lines( self.grammarTextEditWidget.toPlainText() )
         firstGrammar.beautify( 0 )
 
         # log( 1, "firstGrammar: %s", firstGrammar )
@@ -220,7 +220,7 @@ class ProgramWindow(QtWidgets.QMainWindow):
 
     @ignore_exceptions
     def handleCalculateFirstAndFollow(self, qt_decorator_bug):
-        firstGrammar = RegularGrammar.load_from_text_lines( self.grammarTextEditWidget.toPlainText() )
+        firstGrammar = ChomskyGrammar.load_from_text_lines( self.grammarTextEditWidget.toPlainText() )
 
         fontOptions = self._getMainFontOptions()
         dialogTitle = "Enter a second grammar for Concatenation"
@@ -228,7 +228,7 @@ class ProgramWindow(QtWidgets.QMainWindow):
         ( inputString, isAccepted ) = InputStringDialog.getNewUserInput( self, fontOptions, self._openGrammar, dialogTypeName, dialogTitle )
 
         if isAccepted:
-            secondGrammar = RegularGrammar.load_from_text_lines( inputString )
+            secondGrammar = ChomskyGrammar.load_from_text_lines( inputString )
 
             firstGrammar.concatenate( secondGrammar )
             setTextWithoutCleaningHistory( self.grammarTextEditWidget, str( firstGrammar ) )
@@ -261,7 +261,7 @@ class ProgramWindow(QtWidgets.QMainWindow):
         if not isAccepted:
             return
 
-        firstGrammar = RegularGrammar.load_from_text_lines( self.grammarTextEditWidget.toPlainText() )
+        firstGrammar = ChomskyGrammar.load_from_text_lines( self.grammarTextEditWidget.toPlainText() )
 
         dialog = StringOutputDialog( self, self._getMainFontOptions(), self._getFileDialogOptions(), isToStop )
         dialog.appendText( wrap_text( """

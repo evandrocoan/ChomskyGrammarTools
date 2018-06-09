@@ -85,7 +85,7 @@ class DynamicIterationSet(object):
 #     production
 #       terminal  a
 #   end_symbol
-class RegularGrammarTreeTransformer( lark.Transformer ):
+class ChomskyGrammarTreeTransformer( lark.Transformer ):
     """
         Transforms the AST (Abstract Syntax Tree) nodes into meaningful string representations,
         allowing simple recursive parsing parsing of the AST tree.
@@ -337,20 +337,26 @@ def getCleanSpaces(inputText, minimiumLength=0, lineCutTrigger=""):
     return clean_lines
 
 
-def wrap_text(text, wrap_at_80=False):
+def wrap_text(text, wrap_at_80=False, trim_tabs=False, trim_spaces=False):
     """
-        1. Remove both input texts indentation, trailing white spaces
+        1. Remove input text leading common indentation, trailing white spaces
         2. Remove leading '+' symbols and replace tabs with 2 spaces.
-        3. Wraps big lists on 80 characters
+        3. Wraps big lists on 80 characters.
     """
     clean_lines = []
-    dedent_lines = textwrap.dedent( text.replace( '\t', '  ' ) ).strip( '\n' )
 
-    for line in dedent_lines.split( '\n' ):
-        line = line.rstrip( ' ' ).lstrip( '+' )
-        clean_lines.append( line )
+    if trim_tabs:
+        text = text.replace( '\t', '  ' )
 
-    dedent_lines = textwrap.dedent( "\n".join( clean_lines ) )
+    dedent_lines = textwrap.dedent( text ).strip( '\n' )
+
+    if trim_spaces:
+
+        for line in dedent_lines.split( '\n' ):
+            line = line.rstrip( ' ' ).lstrip( '+' )
+            clean_lines.append( line )
+
+        dedent_lines = textwrap.dedent( "\n".join( clean_lines ) )
 
     if wrap_at_80:
         clean_lines.clear()

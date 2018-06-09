@@ -18,7 +18,7 @@ log = getLogger( 127, os.path.basename( os.path.dirname( os.path.abspath ( __fil
 log( 1, "Importing " + __name__ )
 
 
-class RegularGrammar():
+class ChomskyGrammar():
     """
         Regular grammar object. Example grammar:
         S -> aA | bB | a | b | &
@@ -27,18 +27,19 @@ class RegularGrammar():
     """
 
     _parser = lark.Lark( r"""
-        productions   : empty_line* ( non_terminal_start "->" non_terminals end_symbol )* non_terminal_start "->" non_terminals end_symbol?
+        productions   : new_line* ( space* non_terminal_start space* "->" space* non_terminals space* end_symbol )* space* non_terminal_start space* "->" space* non_terminals space* end_symbol?
         non_terminals : production ( "|" production )*
-        production    : epsilon | terminal non_terminal?
+        production    : space* ( ( epsilon | terminal | non_terminal )+ space+ )* ( epsilon | terminal | non_terminal )+ space*
 
         // Forces them to appear in the tree as branches
-        epsilon         : [] | "&"
-        end_symbol      : ";" NEWLINE+ | NEWLINE+
-        terminal        : SIGNED_NUMBER | LCASE_LETTER
-        non_terminal    : ( dash_phi_hyphen | UCASE_LETTER )+ ( ( dash_phi_hyphen | UCASE_LETTER ) | DIGIT | quote )*
-        empty_line      : NEWLINE
+        epsilon         : [] | "&"+
+        end_symbol      : ";"* space* new_line ( new_line | space )*
+        terminal        : ( SIGNED_NUMBER | LCASE_LETTER | dash_phi_hyphen )+
+        non_terminal    : UCASE_LETTER+ ( UCASE_LETTER | DIGIT | quote )*
+        new_line        : NEWLINE
         quote           : "'"
         dash_phi_hyphen : "-"
+        space           : " "
 
         // Rename the start symbol, so when parsing the tree it is simple to find it
         non_terminal_start : non_terminal
@@ -61,7 +62,7 @@ class RegularGrammar():
         %import common.WS_INLINE
 
         // Set to ignore white spaces
-        %ignore WS_INLINE
+        // %ignore WS_INLINE
     """, start='productions' )
 
     @classmethod
@@ -133,9 +134,9 @@ class RegularGrammar():
 
                         productions[current_level].add( node )
 
-        new_tree = RegularGrammarTreeTransformer().transform( AST )
+        new_tree = ChomskyGrammarTreeTransformer().transform( AST )
         parse_tree( new_tree, 0, len( new_tree.children ) )
-        grammar = RegularGrammar( initial_symbol, productions )
+        grammar = ChomskyGrammar( initial_symbol, productions )
 
         log( 4, "\n%s", new_tree.pretty() )
         log( 4, "Result initial_symbol: %s", initial_symbol )

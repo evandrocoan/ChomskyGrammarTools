@@ -26,8 +26,8 @@ class TestingUtilities(unittest.TestCase):
             Remove both input texts indentation and trailing white spaces, then assertEquals() both
             of the inputs.
         """
-        goal = wrap_text( goal )
-        results = wrap_text( results )
+        goal = wrap_text( goal, trim_tabs=True, trim_spaces=True )
+        results = wrap_text( results, trim_tabs=True, trim_spaces=True )
 
         # print( goal.encode( 'ascii' ) )
         # print( results.encode( 'ascii' ) )
