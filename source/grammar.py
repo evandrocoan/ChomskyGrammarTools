@@ -235,6 +235,11 @@ class ChomskyGrammar():
 
             @return a dictionary with the first for each non terminal start symbol
         """
-        self.assure_existing_symbols()
-        return "not implemented yet"
+        first = {}
+        production_keys = self.productions.keys()
+
+        for start_symbol in production_keys:
+            first[start_symbol] = set()
+
+        return first
 

@@ -26,9 +26,30 @@ class TestChomskyGrammar(TestingUtilities):
             A -> aA | &
         """ ) )
 
+        self.assertEqual(
+        {
+        }, firstGrammar.first() )
+
+    def test_grammarSingleAmbiguityCase(self):
+        firstGrammar = ChomskyGrammar.parse( wrap_text(
+        """
+            S -> S S | &
+        """ ) )
+
         self.assertTextEqual(
         """
-        """, firstGrammar.first() )
+            + productions
+            +   non_terminal_start
+            +     non_terminal  S
+            +   non_terminals
+            +     production
+            +       non_terminal  S
+            +       space
+            +       non_terminal  S
+            +       space
+            +     production
+            +       epsilon
+        """, firstGrammar.pretty() )
 
     def test_grammarInvalidNonTerminalException(self):
 
