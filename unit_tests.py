@@ -8,6 +8,8 @@ from source.grammar import ChomskyGrammar
 
 from source.utilities import wrap_text
 from source.utilities import getCleanSpaces
+from source.utilities import ChomskyGrammarTreeTransformer
+
 from source.testing_utilities import TestingUtilities
 
 
@@ -16,7 +18,72 @@ class TestChomskyGrammar(TestingUtilities):
         Tests the Grammar class.
     """
 
-    def test_grammarTreeParsingSandAABBAndBCb(self):
+    def test_grammarTransformationParsingComplexSingleProduction(self):
+        firstGrammar = ChomskyGrammar.parse( wrap_text(
+        """
+            S -> aABbbCC1aAbA BC | ba | c
+        """ ) )
+        firstGrammar = ChomskyGrammarTreeTransformer().transform( firstGrammar )
+
+        self.assertTextEqual(
+        """
+            + productions
+            +   S
+            +   space
+            +   non_terminals
+            +     a AB bb CC 1a A b A BC
+            +     ba
+            +     c
+        """, firstGrammar.pretty() )
+
+    def test_grammarInputParsingComplexSingleProduction(self):
+        firstGrammar = ChomskyGrammar.parse( wrap_text(
+        """
+            S -> aABbbCC1aAbA BC | ba | c
+        """ ) )
+
+        self.assertTextEqual(
+        """
+            + productions
+            +   non_terminal_start
+            +     non_terminal  S
+            +   space
+            +   non_terminals
+            +     production
+            +       space
+            +       terminal  a
+            +       non_terminal
+            +         A
+            +         B
+            +       terminal
+            +         b
+            +         b
+            +       non_terminal
+            +         C
+            +         C
+            +       terminal
+            +         1
+            +         a
+            +       non_terminal  A
+            +       terminal  b
+            +       non_terminal  A
+            +       space
+            +       non_terminal
+            +         B
+            +         C
+            +       space
+            +     production
+            +       space
+            +       terminal
+            +         b
+            +         a
+            +       space
+            +     production
+            +       space
+            +       terminal  c
+        """, firstGrammar.pretty() )
+
+    def test_grammarTreeParsingComplexSingleProduction(self):
         firstGrammar = ChomskyGrammar.load_from_text_lines(
         """
             S -> aABbbCC1aAbA BC | ba | c
@@ -27,7 +94,7 @@ class TestChomskyGrammar(TestingUtilities):
             + S -> a AB bb CC 1a A b A BC | ba | c
         """, str( firstGrammar ) )
 
-    def test_grammarInputParsingSandAABBAndBCb(self):
+    def test_grammarInputParsingABandB(self):
         firstGrammar = ChomskyGrammar.parse( wrap_text(
         """
             S -> aABb BC | b
@@ -57,7 +124,7 @@ class TestChomskyGrammar(TestingUtilities):
             +       terminal  b
         """, firstGrammar.pretty() )
 
-    def test_grammarTreeParsingSDoubleSSandEpsilonProduction(self):
+    def test_grammarTreeParsingSSandEpsilon(self):
         firstGrammar = ChomskyGrammar.load_from_text_lines(
         """
             S -> SS SSS | &
@@ -68,7 +135,7 @@ class TestChomskyGrammar(TestingUtilities):
             + S -> & | SS SSS
         """, str( firstGrammar ) )
 
-    def test_grammarInputParsingSDoubleSSandEpsilonProduction(self):
+    def test_grammarInputParsingSSandEpsilon(self):
         firstGrammar = ChomskyGrammar.parse(
         """
             S -> S SS | &
