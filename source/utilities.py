@@ -113,7 +113,7 @@ class ChomskyGrammarTreeTransformer(lark.Transformer):
         new_production.add( non_terminal[0] )
         return new_production
 
-    def terminal(self, _terminal):
+    def terminal(self, _terminals):
         return self._parse_symbols( _terminals, Terminal )
 
     def non_terminal(self, _non_terminals):

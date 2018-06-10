@@ -16,7 +16,18 @@ class TestChomskyGrammar(TestingUtilities):
         Tests the Grammar class.
     """
 
-    def test_grammarInputParsing(self):
+    def test_grammarTreeParsingSandAABBAndBCb(self):
+        firstGrammar = ChomskyGrammar.load_from_text_lines(
+        """
+            S -> aABbbCC1aAbA BC | ba | c
+        """ )
+
+        self.assertTextEqual(
+        """
+            + S -> a AB bb CC 1a A b A BC | ba | c
+        """, str( firstGrammar ) )
+
+    def test_grammarInputParsingSandAABBAndBCb(self):
         firstGrammar = ChomskyGrammar.parse( wrap_text(
         """
             S -> aABb BC | b
