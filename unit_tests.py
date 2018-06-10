@@ -36,6 +36,22 @@ class TestChomskyGrammar(TestingUtilities):
             +     c
         """, firstGrammar.pretty() )
 
+        self.assertTextEqual( wrap_text(
+        """
+            + Tree(productions, [{locked: False, sequence: 0, productions: [{locked: True,
+            + symbols: S, sequence: 0, len: 1, str: S}]}, Tree(space, []), Tree(non_terminals,
+            + [{locked: False, sequence: 9, productions: [{locked: True, symbols: a, sequence:
+            + 1, len: 1, str: a}, {locked: True, symbols: AB, sequence: 2, len: 2, str: AB},
+            + {locked: True, symbols: bb, sequence: 3, len: 2, str: bb}, {locked: True,
+            + symbols: CC, sequence: 4, len: 2, str: CC}, {locked: True, symbols: 1a,
+            + sequence: 5, len: 2, str: 1a}, {locked: True, symbols: A, sequence: 6, len: 1,
+            + str: A}, {locked: True, symbols: b, sequence: 7, len: 1, str: b}, {locked: True,
+            + symbols: A, sequence: 8, len: 1, str: A}, {locked: True, symbols: BC, sequence:
+            + 9, len: 2, str: BC}]}, {locked: False, sequence: 1, productions: [{locked: True,
+            + symbols: ba, sequence: 1, len: 2, str: ba}]}, {locked: False, sequence: 1,
+            + productions: [{locked: True, symbols: c, sequence: 1, len: 1, str: c}]}])])
+        """, wrap_at_80=True, trim_spaces=True ), wrap_text( str( firstGrammar ), wrap_at_80=True ) )
+
     def test_grammarInputParsingComplexSingleProduction(self):
         firstGrammar = ChomskyGrammar.parse( wrap_text(
         """
