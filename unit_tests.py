@@ -18,6 +18,29 @@ class TestChomskyGrammar(TestingUtilities):
         Tests the Grammar class.
     """
 
+    def test_grammarFirstSinpleCase(self):
+        firstGrammar = ChomskyGrammar.load_from_text_lines( wrap_text(
+        """
+            S -> Ab | A Bc
+            B -> bB | Ad | &
+            A -> aA | &
+        """ ) )
+
+        self.assertTextEqual(
+        """
+        """, firstGrammar.first() )
+
+    def test_grammarInvalidNonTerminalException(self):
+
+        with self.assertRaisesRegex( RuntimeError, "Invalid Non Terminal `D` added to the grammar" ):
+            firstGrammar = ChomskyGrammar.load_from_text_lines( wrap_text(
+            """
+                S -> Ab | A Dc
+                B -> bB | Ad | &
+                A -> aA | &
+            """ ) )
+            firstGrammar.assure_existing_symbols()
+
     def test_grammarTransformationParsingComplexSingleProduction(self):
         firstGrammar = ChomskyGrammar.parse( wrap_text(
         """
@@ -38,19 +61,18 @@ class TestChomskyGrammar(TestingUtilities):
 
         self.assertTextEqual( wrap_text(
         """
-            + Tree(productions, [{locked: False, sequence: 0, productions: [{locked: True,
-            + symbols: S, sequence: 0, len: 1, str: S}]}, Tree(space, []), Tree(non_terminals,
-            + [{locked: False, sequence: 9, productions: [{locked: True, symbols: a, sequence:
-            + 1, len: 1, str: a}, {locked: True, symbols: AB, sequence: 2, len: 2, str: AB},
-            + {locked: True, symbols: bb, sequence: 3, len: 2, str: bb}, {locked: True,
-            + symbols: CC, sequence: 4, len: 2, str: CC}, {locked: True, symbols: 1a,
-            + sequence: 5, len: 2, str: 1a}, {locked: True, symbols: A, sequence: 6, len: 1,
-            + str: A}, {locked: True, symbols: b, sequence: 7, len: 1, str: b}, {locked: True,
-            + symbols: A, sequence: 8, len: 1, str: A}, {locked: True, symbols: BC, sequence:
-            + 9, len: 2, str: BC}]}, {locked: False, sequence: 1, productions: [{locked: True,
-            + symbols: ba, sequence: 1, len: 2, str: ba}]}, {locked: False, sequence: 1,
-            + productions: [{locked: True, symbols: c, sequence: 1, len: 1, str: c}]}])])
-        """, wrap_at_80=True, trim_spaces=True ), wrap_text( str( firstGrammar ), wrap_at_80=True ) )
+            + Tree(productions, [{locked: False, symbols: [{locked: True, symbols: S, sequence: 0, len: 1, str:
+            + S}], sequence: 0}, Tree(space, []), Tree(non_terminals, [{locked: False, symbols: [{locked: True,
+            + symbols: a, sequence: 1, len: 1, str: a}, {locked: True, symbols: AB, sequence: 2, len: 2, str: AB},
+            + {locked: True, symbols: bb, sequence: 3, len: 2, str: bb}, {locked: True, symbols: CC, sequence: 4,
+            + len: 2, str: CC}, {locked: True, symbols: 1a, sequence: 5, len: 2, str: 1a}, {locked: True, symbols:
+            + A, sequence: 6, len: 1, str: A}, {locked: True, symbols: b, sequence: 7, len: 1, str: b}, {locked:
+            + True, symbols: A, sequence: 8, len: 1, str: A}, {locked: True, symbols: BC, sequence: 9, len: 2,
+            + str: BC}], sequence: 9}, {locked: False, symbols: [{locked: True, symbols: ba, sequence: 1, len: 2,
+            + str: ba}], sequence: 1}, {locked: False, symbols: [{locked: True, symbols: c, sequence: 1, len: 1,
+            + str: c}], sequence: 1}])])
+
+        """, trim_spaces=True ), wrap_text( str( firstGrammar ), wrap_at_80=True ) )
 
     def test_grammarInputParsingComplexSingleProduction(self):
         firstGrammar = ChomskyGrammar.parse( wrap_text(
@@ -102,12 +124,20 @@ class TestChomskyGrammar(TestingUtilities):
     def test_grammarTreeParsingComplexSingleProduction(self):
         firstGrammar = ChomskyGrammar.load_from_text_lines(
         """
-            S -> aABbbCC1aAbA BC | ba | c
+            S  -> aABbbCC1aAbA BC | ba | c
+            A  -> &
+            AB -> &
+            BC -> &
+            CC -> &
         """ )
 
         self.assertTextEqual(
         """
-            + S -> a AB bb CC 1a A b A BC | ba | c
+            +  S -> a AB bb CC 1a A b A BC | ba | c
+            +  A -> &
+            + AB -> &
+            + BC -> &
+            + CC -> &
         """, str( firstGrammar ) )
 
     def test_grammarInputParsingABandB(self):
@@ -143,12 +173,16 @@ class TestChomskyGrammar(TestingUtilities):
     def test_grammarTreeParsingSSandEpsilon(self):
         firstGrammar = ChomskyGrammar.load_from_text_lines(
         """
-            S -> SS SSS | &
+            S   -> SS SSS | &
+            SS  -> &
+            SSS -> &
         """ )
 
         self.assertTextEqual(
         """
-            + S -> & | SS SSS
+            +   S -> & | SS SSS
+            +  SS -> &
+            + SSS -> &
         """, str( firstGrammar ) )
 
     def test_grammarInputParsingSSandEpsilon(self):

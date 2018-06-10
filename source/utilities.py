@@ -238,6 +238,13 @@ class ChomskyGrammarSymbol(LockableType):
         self.symbols = str( symbols )
         self.sequence = sequence
 
+    def __lt__(self, other):
+
+        if type( self ) is type( other ):
+            return self.sequence < other.sequence
+
+        return False
+
     def __len__(self):
         length = len( self.symbols )
 
@@ -282,16 +289,43 @@ class Production(LockableType):
 
     def __init__(self, start_sequence=0):
         super().__init__()
+        self.symbols = []
         self.sequence = start_sequence
-        self.productions = []
 
     def __str__(self):
-        productions = []
+        symbols_str = []
 
-        for production in self.productions:
-            productions.append( str( production ) )
+        for symbol in self.symbols:
+            symbols_str.append( str( symbol ) )
 
-        return " ".join( productions )
+        return " ".join( symbols_str )
+
+    def __lt__(self, other):
+
+        if type( self ) is type( other ):
+            return str( self ) < str( other )
+
+        return False
+
+    def __len__(self):
+        lengths = []
+
+        for symbol in self.symbols:
+            lengths.append( len( symbol ) )
+
+        return sum( lengths )
+
+    def lock(self):
+        """
+            Block further changes to this object attributes and save its length for faster access.
+        """
+
+        if self.locked:
+            return
+
+        self.len = len( self )
+        self.__len__ = lambda : self.len
+        super().lock()
 
     def add(self, symbol):
 
@@ -305,7 +339,23 @@ class Production(LockableType):
         symbol.sequence = self.sequence
 
         symbol.lock()
-        self.productions.append( symbol )
+        self.symbols.append( symbol )
+
+    def _get_symbols(self, symbolType):
+        symbols = []
+
+        for symbol in self.symbols:
+
+            if type( symbol ) is symbolType:
+                symbols.append( symbol )
+
+        return symbols
+
+    def get_terminals(self):
+        return self._get_symbols( Terminal )
+
+    def get_non_terminals(self):
+        return self._get_symbols( NonTerminal )
 
 
 class UpdateGeneretedSentenceThread(QtCore.QThread):
@@ -515,11 +565,12 @@ def getCleanSpaces(inputText, minimumLength=0, lineCutTrigger="", keepSpaceSepat
     return clean_lines
 
 
-def wrap_text(text, wrap_at_80=False, trim_tabs=False, trim_spaces=False):
+def wrap_text(text, wrap_at_80=False, trim_tabs=False, trim_spaces=False, trim_lines=False):
     """
         1. Remove input text leading common indentation, trailing white spaces
-        2. Remove leading '+' symbols and replace tabs with 2 spaces.
-        3. Wraps big lists on 80 characters.
+        2. If `wrap_at_80`, wraps big lists on 80 characters.
+        3. If `trim_spaces`, remove leading '+' symbols and if `trim_tabs` replace tabs with 2 spaces.
+        4. If `trim_lines`, remove all new line characters.
     """
     clean_lines = []
 
@@ -540,10 +591,13 @@ def wrap_text(text, wrap_at_80=False, trim_tabs=False, trim_spaces=False):
         clean_lines.clear()
 
         for line in dedent_lines.split( '\n' ):
-            line = textwrap.fill( line, width=80 )
+            line = textwrap.fill( line, width=100 )
             clean_lines.append( line )
 
         dedent_lines = "\n".join( clean_lines )
+
+    if trim_lines:
+        dedent_lines = "".join( dedent_lines.split( '\n' ) )
 
     return dedent_lines
 

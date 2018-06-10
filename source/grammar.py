@@ -179,6 +179,7 @@ class ChomskyGrammar():
         log( 4, "Result initial_symbol: %s", grammar.initial_symbol )
         log( 4, "Result productions:    %s", grammar.productions )
         log( 4, "Result grammar:        %s", grammar )
+        grammar.assure_existing_symbols()
         return grammar
 
     def add(self, start_symbol, production):
@@ -196,4 +197,47 @@ class ChomskyGrammar():
             self.productions[start_symbol] = set()
 
         self.productions[start_symbol].add( production )
+
+    def get_non_terminals(self, symbol):
+        """
+            Given a start symbol as S, return all its non_terminal's reachable from it.
+        """
+        return self.get_non_terminals_composition( self.productions[symbol] )
+
+    @staticmethod
+    def get_non_terminals_composition(productions):
+        """
+            For each production in `productions`, get all NonTerminal's they are composed.
+        """
+        symbol_non_terminals = set()
+
+        for symbol in productions:
+            non_terminals = symbol.get_non_terminals()
+            symbol_non_terminals.update( non_terminals )
+
+        return symbol_non_terminals
+
+    def assure_existing_symbols(self):
+        """
+            Checks whether the grammar uses non existent non terminal symbols as `S -> Aa | a`.
+        """
+        production_keys = self.productions.keys()
+        start_non_terminals = self.get_non_terminals_composition( production_keys )
+
+        for non_terminal_start in production_keys:
+            non_terminals = self.get_non_terminals( non_terminal_start )
+
+            for non_terminal in non_terminals:
+
+                if non_terminal not in start_non_terminals:
+                    raise RuntimeError( "Invalid Non Terminal `%s` added to the grammar: \n%s" % ( non_terminal, self ) )
+
+    def first(self):
+        """
+            Calculate this grammar first set for each non terminal.
+
+            @return a dictionary with the first for each non terminal start symbol
+        """
+        self.assure_existing_symbols()
+        return "not implemented yet"
 
