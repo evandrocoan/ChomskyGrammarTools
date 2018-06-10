@@ -4,7 +4,7 @@
 import lark
 
 _parser = lark.Lark( r"""
-    productions   : new_line* non_terminal_start "->" non_terminals end_symbol?
+    productions   : non_terminal_start "->" non_terminals end_symbol?
     non_terminals : production
     production    : ( ( epsilon | terminal | non_terminal )+ space )+
 

@@ -52,7 +52,6 @@ class TestChomskyGrammar(TestingUtilities):
         """
             + productions
             +   S
-            +   space
             +   non_terminals
             +     a AB bb CC 1a A b A BC
             +     ba
@@ -62,16 +61,15 @@ class TestChomskyGrammar(TestingUtilities):
         self.assertTextEqual( wrap_text(
         """
             + Tree(productions, [{locked: False, symbols: [{locked: True, symbols: S, sequence: 0, len: 1, str:
-            + S}], sequence: 0}, Tree(space, []), Tree(non_terminals, [{locked: False, symbols: [{locked: True,
-            + symbols: a, sequence: 1, len: 1, str: a}, {locked: True, symbols: AB, sequence: 2, len: 2, str: AB},
-            + {locked: True, symbols: bb, sequence: 3, len: 2, str: bb}, {locked: True, symbols: CC, sequence: 4,
-            + len: 2, str: CC}, {locked: True, symbols: 1a, sequence: 5, len: 2, str: 1a}, {locked: True, symbols:
-            + A, sequence: 6, len: 1, str: A}, {locked: True, symbols: b, sequence: 7, len: 1, str: b}, {locked:
+            + S}], sequence: 0}, Tree(non_terminals, [{locked: False, symbols: [{locked: True, symbols: a,
+            + sequence: 1, len: 1, str: a}, {locked: True, symbols: AB, sequence: 2, len: 2, str: AB}, {locked:
+            + True, symbols: bb, sequence: 3, len: 2, str: bb}, {locked: True, symbols: CC, sequence: 4, len: 2,
+            + str: CC}, {locked: True, symbols: 1a, sequence: 5, len: 2, str: 1a}, {locked: True, symbols: A,
+            + sequence: 6, len: 1, str: A}, {locked: True, symbols: b, sequence: 7, len: 1, str: b}, {locked:
             + True, symbols: A, sequence: 8, len: 1, str: A}, {locked: True, symbols: BC, sequence: 9, len: 2,
             + str: BC}], sequence: 9}, {locked: False, symbols: [{locked: True, symbols: ba, sequence: 1, len: 2,
             + str: ba}], sequence: 1}, {locked: False, symbols: [{locked: True, symbols: c, sequence: 1, len: 1,
             + str: c}], sequence: 1}])])
-
         """, trim_spaces=True ), wrap_text( str( firstGrammar ), wrap_at_80=True ) )
 
     def test_grammarInputParsingComplexSingleProduction(self):
@@ -85,10 +83,8 @@ class TestChomskyGrammar(TestingUtilities):
             + productions
             +   non_terminal_start
             +     non_terminal  S
-            +   space
             +   non_terminals
             +     production
-            +       space
             +       terminal  a
             +       non_terminal
             +         A
@@ -111,13 +107,10 @@ class TestChomskyGrammar(TestingUtilities):
             +         C
             +       space
             +     production
-            +       space
             +       terminal
             +         b
             +         a
-            +       space
             +     production
-            +       space
             +       terminal  c
         """, firstGrammar.pretty() )
 
@@ -151,22 +144,18 @@ class TestChomskyGrammar(TestingUtilities):
             + productions
             +   non_terminal_start
             +     non_terminal  S
-            +   space
             +   non_terminals
             +     production
-            +       space
             +       terminal  a
             +       non_terminal
             +         A
             +         B
             +       terminal  b
-            +       space
             +       non_terminal
             +         B
             +         C
             +       space
             +     production
-            +       space
             +       terminal  b
         """, firstGrammar.pretty() )
 
@@ -196,24 +185,10 @@ class TestChomskyGrammar(TestingUtilities):
             + productions
             +   new_line
             +
-            +   space
-            +   space
-            +   space
-            +   space
-            +   space
-            +   space
-            +   space
-            +   space
-            +   space
-            +   space
-            +   space
-            +   space
             +   non_terminal_start
             +     non_terminal  S
-            +   space
             +   non_terminals
             +     production
-            +       space
             +       non_terminal  S
             +       space
             +       non_terminal
@@ -221,19 +196,9 @@ class TestChomskyGrammar(TestingUtilities):
             +         S
             +       space
             +     production
-            +       space
             +       epsilon
             +   end_symbol
             +     new_line
-            +
-            +     space
-            +     space
-            +     space
-            +     space
-            +     space
-            +     space
-            +     space
-            +     space
         """, firstGrammar.pretty() )
 
     # def test_grammarGenerateSentencesOfnAsSize5(self):
