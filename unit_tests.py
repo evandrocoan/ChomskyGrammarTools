@@ -46,6 +46,17 @@ class TestChomskyGrammar(TestingUtilities):
             +       terminal  b
         """, firstGrammar.pretty() )
 
+    def test_grammarTreeParsingSDoubleSSandEpsilonProduction(self):
+        firstGrammar = ChomskyGrammar.load_from_text_lines(
+        """
+            S -> SS SSS | &
+        """ )
+
+        self.assertTextEqual(
+        """
+            + S -> & | SS SSS
+        """, str( firstGrammar ) )
+
     def test_grammarInputParsingSDoubleSSandEpsilonProduction(self):
         firstGrammar = ChomskyGrammar.parse(
         """

@@ -11,10 +11,14 @@ from typing import Dict, Set
 
 from .utilities import getCleanSpaces
 
+from .utilities import Production
+from .utilities import Terminal
+from .utilities import NonTerminal
 from .utilities import DynamicIterationSet
+from .utilities import ChomskyGrammarTreeTransformer
 
-# level 2 -
-log = getLogger( 127, os.path.basename( os.path.dirname( os.path.abspath ( __file__ ) ) ) )
+# level 4 - Abstract Syntax Tree Parsing
+log = getLogger( 127-4, os.path.basename( os.path.dirname( os.path.abspath ( __file__ ) ) ) )
 log( 1, "Importing " + __name__ )
 
 
@@ -72,14 +76,54 @@ class ChomskyGrammar():
         """
         return cls._parser.parse( inputGrammar )
 
+    def __str__(self):
+        """
+            Returns a formatted Automata Transition Table formatted as:
+                 Q0' -> &    | a Q1 | b Q2
+                 Q0  -> a Q1 | b Q2
+                 Q1  -> b    | b Q0
+                 Q2  -> a    | a Q0
+        """
+        grammar_lines = []
+        biggest = self._get_table_biggest_elements()
+
+        def create_grammar_line(non_terminal_start, productions):
+            productions_string = []
+
+            for production in productions:
+                productions_string.append( str( production ) )
+
+            log( 4, "productions:        %s", productions )
+            log( 4, "productions_string: %s", productions_string )
+            return "{:>{biggest}} -> {}".format( str( non_terminal_start ), " | ".join( sorted( productions_string ) ), biggest=biggest )
+
+        if self.initial_symbol in self.productions:
+            grammar_lines.append( create_grammar_line( self.initial_symbol, self.productions[self.initial_symbol] ) )
+
+        else:
+            raise RuntimeError( "Your grammar has an invalid initial_symbol! %s, %s" % ( self.initial_symbol, self.productions ) )
+
+        for non_terminal in sorted( set( self.productions.keys() ) - {self.initial_symbol} ):
+            grammar_lines.append( create_grammar_line( non_terminal, self.productions[non_terminal] ) )
+
+        return "\n".join( grammar_lines )
+
+    def _get_table_biggest_elements(self):
+        biggest_label_length = 0
+
+        for production in self.productions.keys():
+            production_length = len( str( production ) )
+
+            if production_length > biggest_label_length:
+                biggest_label_length = production_length
+
+        log( 4, "biggest_label_length: %s", biggest_label_length )
+        return biggest_label_length
+
     def __init__(self, initial_symbol="", productions=None):
         # {'1': {( 'a', '' ), ( 'a', 'A' )}}
         self.productions = productions if productions else {}
         self.initial_symbol = initial_symbol
-
-        self.non_terminal_counter = 0
-        self.generated_non_terminals = DynamicIterationSet()
-        self.last_non_terminal_length = 0
 
     def __len__(self):
         return len( self.productions )
@@ -92,23 +136,21 @@ class ChomskyGrammar():
                 1 -> a | a2 | b | b2
                 2 -> a | a2 | b | b2
         """
-        AST = cls.parse( "\n".join( getCleanSpaces( input_text_form ) ) )
-        log( 4, "\n%s", AST.pretty() )
+        AST = cls.parse( "\n".join( getCleanSpaces( input_text_form, keepSpaceSepators=True ) ) )
+        grammar = ChomskyGrammar()
 
         # initial_symbol: 1
         # productions:    {'1': {'b', 'a2', 'b2', 'a'}, '2': {'b', 'a2', 'b2', 'a'}}
-        productions = {}
-        initial_symbol = ''
+        log( 4, "\n%s", AST.pretty() )
 
-        # S -> a S | a | b S
+        # S -> S SS | &
         current_level = ''
 
         def parse_tree(tree, level, children_count):
             level_name = tree.data
 
-            nonlocal productions
+            nonlocal grammar
             nonlocal current_level
-            nonlocal initial_symbol
 
             for node in tree.children:
 
@@ -124,23 +166,34 @@ class ChomskyGrammar():
                         if level == 0:
                             current_level = node
 
-                            if len( initial_symbol ) == 0:
-                                initial_symbol = current_level
+                            if len( grammar.initial_symbol ) == 0:
+                                grammar.initial_symbol = current_level
 
                     if level_name == 'non_terminals':
-
-                        if current_level not in productions:
-                            productions[current_level] = set()
-
-                        productions[current_level].add( node )
+                        grammar.add( current_level, node )
 
         new_tree = ChomskyGrammarTreeTransformer().transform( AST )
         parse_tree( new_tree, 0, len( new_tree.children ) )
-        grammar = ChomskyGrammar( initial_symbol, productions )
 
         log( 4, "\n%s", new_tree.pretty() )
-        log( 4, "Result initial_symbol: %s", initial_symbol )
-        log( 4, "Result productions:    %s", productions )
+        log( 4, "Result initial_symbol: %s", grammar.initial_symbol )
+        log( 4, "Result productions:    %s", grammar.productions )
         log( 4, "Result grammar:        %s", grammar )
         return grammar
+
+    def add(self, start_symbol, production):
+
+        if type( start_symbol ) is not Production:
+            raise RuntimeError( "Your start_symbol is not an instance of Production! %s, %s" % ( start_symbol, production ) )
+
+        if type( production ) is not Production:
+            raise RuntimeError( "Your production is not an instance of Production! %s, %s" % ( start_symbol, production ) )
+
+        production.lock()
+        start_symbol.lock()
+
+        if start_symbol not in self.productions:
+            self.productions[start_symbol] = set()
+
+        self.productions[start_symbol].add( production )
 

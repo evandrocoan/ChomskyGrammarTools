@@ -19,7 +19,9 @@ from time import sleep
 from threading import Lock
 
 from debug_tools import getLogger
-log = getLogger( 127, os.path.basename( os.path.dirname( os.path.abspath ( __file__ ) ) ) )
+
+# level 4 - Abstract Syntax Tree Parsing
+log = getLogger( 127-4, os.path.basename( os.path.dirname( os.path.abspath ( __file__ ) ) ) )
 
 HISTORY_KEY_LINE = "-- Grammar History"
 
@@ -85,7 +87,7 @@ class DynamicIterationSet(object):
 #     production
 #       terminal  a
 #   end_symbol
-class ChomskyGrammarTreeTransformer( lark.Transformer ):
+class ChomskyGrammarTreeTransformer(lark.Transformer):
     """
         Transforms the AST (Abstract Syntax Tree) nodes into meaningful string representations,
         allowing simple recursive parsing parsing of the AST tree.
@@ -106,10 +108,16 @@ class ChomskyGrammarTreeTransformer( lark.Transformer ):
     """
 
     def non_terminal_start(self, non_terminal):
-        return str( non_terminal[0] )
+        log( 4, 'non_terminal: %s', non_terminal )
+        new_production = Production()
+        new_production.add( non_terminal[0] )
+        return new_production
 
     def terminal(self, _terminal):
-        return str( _terminal[0] )
+        return self._parse_symbols( _terminals, Terminal )
+
+    def non_terminal(self, _non_terminals):
+        return self._parse_symbols( _non_terminals, NonTerminal )
 
     def epsilon(self, _terminal):
         return self._parse_symbol( _terminal, '&' )
@@ -123,26 +131,131 @@ class ChomskyGrammarTreeTransformer( lark.Transformer ):
     def _parse_symbol(self, _terminal, default):
 
         if len( _terminal ):
-            return str( _terminal[0] )
+            return Terminal( _terminal )
 
-        return default
+        return Terminal( default )
 
-    def non_terminal(self, _non_terminals):
+    def _parse_symbols(self, _symbols, Type):
+        log( 4, 'productions: %s, type: %s', _symbols, Type )
         results = []
-        # log( 1, 'productions: %s', _non_terminals )
 
-        for _non_terminal in _non_terminals:
-            results.append( str( _non_terminal[0] ) )
+        for _symbol in _symbols:
+            results.append( str( _symbol ) )
 
-        return "".join( results )
+        symbol = Type( "".join( results ) )
+        log( 4, "results: %s", results )
+        log( 4, "symbol:  %s", symbol )
+        return symbol
 
     def production(self, productions):
-        # log( 1, 'productions: %s', productions )
+        log( 4, 'productions: %s', productions )
+        new_production = Production()
 
-        if len( productions ) > 1:
-            return ( str( productions[0] ), str( productions[1] ) )
+        for production in productions:
 
-        return ( str( productions[0] ), '' )
+            if isinstance( production, ( Terminal, NonTerminal ) ):
+                new_production.add( production )
+
+        log( 4, "new_production: %s", new_production )
+        return new_production
+
+
+class LockableType(object):
+
+    def __init__(self):
+        """
+            How to handle call to __setattr__ from __init__?
+            https://stackoverflow.com/questions/3870982/how-to-handle-call-to-setattr-from-init
+        """
+        super().__setattr__('locked', False)
+
+    def __setattr__(self, name, value):
+        """
+            Block attributes from being changed after it is activated.
+            https://stackoverflow.com/questions/17020115/how-to-use-setattr-correctly-avoiding-infinite-recursion
+        """
+
+        if self.locked:
+            raise AttributeError( "Attributes cannot be changed after `locked` is set to True!" )
+
+        else:
+            super().__setattr__( name, value )
+
+    def __eq__(self, other):
+
+        if type( self ) is type( other ):
+            return hash( self ) == hash( other )
+
+        return False
+
+    def __repr__(self):
+        return self.__str__()
+
+    def __hash__(self):
+        return self._hash
+
+    def lock(self):
+
+        if self.locked:
+            return
+
+        self._str = str( self )
+        self.__str__ = lambda : self._str
+
+        self._hash = hash( self.__str__() )
+        self.locked = True
+
+
+class NonTerminal(LockableType):
+
+    def __init__(self, symbols, sequence=0):
+        super().__init__()
+        self.symbols = str( symbols )
+        self.sequence = sequence
+
+    def __str__(self):
+        return "%s" % self.symbols
+
+
+class Terminal(LockableType):
+
+    def __init__(self, symbols, sequence=0):
+        super().__init__()
+        self.symbols = str( symbols )
+        self.sequence = sequence
+
+    def __str__(self):
+        return "%s" % self.symbols
+
+
+class Production(LockableType):
+
+    def __init__(self):
+        super().__init__()
+        self.sequence = 0
+        self.productions = []
+
+    def __str__(self):
+        productions = []
+
+        for production in self.productions:
+            productions.append( str( production ) )
+
+        return " ".join( productions )
+
+    def add(self, symbol):
+
+        if type( symbol ) not in ( Terminal, NonTerminal ):
+            raise RuntimeError( "You can only add Terminal's and NonTerminal's in a Production object! %s" % symbol )
+
+        if symbol.locked:
+            raise RuntimeError( "You symbol already belongs to some other production! %s" % symbol )
+
+        self.sequence += 1
+        symbol.sequence = self.sequence
+
+        symbol.lock()
+        self.productions.append( symbol )
 
 
 class UpdateGeneretedSentenceThread(QtCore.QThread):
@@ -306,22 +419,35 @@ def setTextWithoutCleaningHistory(textWidget, textToSet):
     horizontalScrollBar.setValue( horizontalScrollBar.minimum() )
 
 
-def getCleanSpaces(inputText, minimiumLength=0, lineCutTrigger=""):
+def getCleanSpaces(inputText, minimumLength=0, lineCutTrigger="", keepSpaceSepators=False):
     """
         Removes spaces and comments from the input expression.
-    """
-    removeNewSpaces = re.sub( r"\t| ", "", inputText )
-    lineCutTriggerNew = re.sub( r"\t| ", "", lineCutTrigger )
 
-    # log( 1, "%s", inputText, minimiumLength=0 )
+        `minimumLength` of a line to not be ignored
+        `lineCutTrigger` all lines after a line starting with this string will be ignored
+        `keepSpaceSepators` it will keep at a single space between sentences as `S S`, given `S    S`
+    """
+
+    if keepSpaceSepators:
+        removeNewSpaces = ' '.join( inputText.split( ' ' ) )
+        lineCutTriggerNew = ' '.join( lineCutTrigger.split( ' ' ) ).strip( ' ' )
+
+    else:
+        removeNewSpaces = re.sub( r"\t| ", "", inputText )
+        lineCutTriggerNew = re.sub( r"\t| ", "", lineCutTrigger )
+
+    # log( 1, "%s", inputText, minimumLength=0 )
     lines = removeNewSpaces.split( "\n" )
     clean_lines = []
 
     for line in lines:
 
-        if minimiumLength:
+        if keepSpaceSepators:
+            line = line.strip( ' ' )
 
-            if len( line ) < minimiumLength:
+        if minimumLength:
+
+            if len( line ) < minimumLength:
                 continue
 
         if lineCutTrigger:
