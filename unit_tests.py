@@ -41,13 +41,16 @@ class TestChomskyGrammar(TestingUtilities):
             + productions
             +   non_terminal_start
             +     non_terminal  S
+            +   space
             +   non_terminals
             +     production
+            +       space
             +       non_terminal  S
             +       space
             +       non_terminal  S
             +       space
             +     production
+            +       space
             +       epsilon
         """, firstGrammar.pretty() )
 
