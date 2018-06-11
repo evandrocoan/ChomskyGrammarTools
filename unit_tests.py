@@ -98,7 +98,7 @@ class TestChomskyGrammar(TestingUtilities):
 
         """, trim_spaces=True ), wrap_text( str( firstGrammar ), wrap_at_80=True ) )
 
-    def test_grammarInputParsingComplexSingleProduction(self):
+    def test_grammarTreeParsingComplexSingleProduction(self):
         firstGrammar = ChomskyGrammar.parse( wrap_text(
         """
             S -> aABbbCC1aAbA BC | ba | c
@@ -145,7 +145,7 @@ class TestChomskyGrammar(TestingUtilities):
             +       terminal  c
         """, firstGrammar.pretty() )
 
-    def test_grammarTreeParsingComplexSingleProduction(self):
+    def test_grammarInputParsingComplexSingleProduction(self):
         firstGrammar = ChomskyGrammar.load_from_text_lines(
         """
             S  -> aABbbCC1aAbA BC | ba | c
@@ -164,7 +164,22 @@ class TestChomskyGrammar(TestingUtilities):
             + CC -> &
         """, str( firstGrammar ) )
 
-    def test_grammarInputParsingABandB(self):
+    def test_grammarInputParsingSymbolMerging(self):
+        firstGrammar = ChomskyGrammar.load_from_text_lines(
+        """
+            S -> a b cd | AccD | Ac cD
+            A -> &
+            D -> &
+        """ )
+
+        self.assertTextEqual(
+        """
+            + S -> A cc D | abcd
+            + A -> &
+            + D -> &
+        """, str( firstGrammar ) )
+
+    def test_grammarTreeParsingABandB(self):
         firstGrammar = ChomskyGrammar.parse( wrap_text(
         """
             S -> aABb BC | b
@@ -194,7 +209,54 @@ class TestChomskyGrammar(TestingUtilities):
             +       terminal  b
         """, firstGrammar.pretty() )
 
-    def test_grammarTreeParsingSSandEpsilon(self):
+    def test_grammarInputParsingEmptyEpsilon(self):
+        firstGrammar = ChomskyGrammar.load_from_text_lines(
+        """
+             S ->
+            SS -> S |
+        """ )
+
+        self.assertTextEqual(
+        """
+            +  S -> &
+            + SS -> & | S
+        """, str( firstGrammar ) )
+
+    def test_grammarTreeParsingEmptyEpsilon(self):
+        firstGrammar = ChomskyGrammar.parse( wrap_text(
+        """
+             S ->
+            SS -> S |
+        """ ) )
+
+        self.assertTextEqual(
+        """
+            + productions
+            +   space
+            +   non_terminal_start
+            +     non_terminal  S
+            +   space
+            +   non_terminals
+            +     production
+            +       epsilon
+            +   end_symbol
+            +     new_line
+            +
+            +   non_terminal_start
+            +     non_terminal
+            +       S
+            +       S
+            +   space
+            +   non_terminals
+            +     production
+            +       space
+            +       non_terminal  S
+            +       space
+            +     production
+            +       epsilon
+        """, firstGrammar.pretty() )
+
+    def test_grammarInputParsingSSandEpsilon(self):
         firstGrammar = ChomskyGrammar.load_from_text_lines(
         """
             S   -> SS SSS | &
@@ -209,7 +271,7 @@ class TestChomskyGrammar(TestingUtilities):
             + SSS -> &
         """, str( firstGrammar ) )
 
-    def test_grammarInputParsingSSandEpsilon(self):
+    def test_grammarTreeParsingSSandEpsilon(self):
         firstGrammar = ChomskyGrammar.parse(
         """
             S -> S SS | &

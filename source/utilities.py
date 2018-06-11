@@ -328,6 +328,10 @@ class Production(LockableType):
         super().lock()
 
     def add(self, symbol):
+        """
+            Add a new symbol to the production. If the last added symbol and the current at a
+            Terminal one, the old terminal is going to be removed and merged into the new one.
+        """
 
         if type( symbol ) not in ( Terminal, NonTerminal ):
             raise RuntimeError( "You can only add Terminal's and NonTerminal's in a Production object! %s" % symbol )
@@ -337,9 +341,21 @@ class Production(LockableType):
 
         self.sequence += 1
         symbol.sequence = self.sequence
+        self._merge_terminals( symbol )
 
         symbol.lock()
         self.symbols.append( symbol )
+
+    def _merge_terminals(self, new_symbol):
+
+        if type( new_symbol ) is Terminal:
+
+            if len( self.symbols ):
+                last_symbol = self.symbols[-1]
+
+                if type( last_symbol ) is Terminal:
+                    new_symbol.symbols = last_symbol.symbols + new_symbol.symbols
+                    del self.symbols[-1]
 
     def _get_symbols(self, symbolType):
         symbols = []
