@@ -29,8 +29,7 @@
             "cmd":
             [
                 "python", "unit_tests.py",
-                // "python", "unit_tests.py", "TestFiniteAutomata.test_automataWithoutAInitialState",
-                // "python", "unit_tests.py", "TestChomskyGrammar.test_grammarWithPhiStatesConversion",
+                // "python", "unit_tests.py", "TestChomskyGrammar.test_grammarProductionsDictionaryKeyError",
             ],
             "file_regex": "^[ ]*File \"(...*?)\", line ([0-9]*)",
             "name": "Run Project Tests",

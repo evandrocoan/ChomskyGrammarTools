@@ -10,6 +10,7 @@ import lark
 from typing import Dict, Set
 
 from .utilities import getCleanSpaces
+from .utilities import epsilon_production
 
 from .utilities import Production
 from .utilities import Terminal
@@ -198,6 +199,12 @@ class ChomskyGrammar():
 
         self.productions[start_symbol].add( production )
 
+    def has_production(self, start_symbol, production):
+        """
+            Returns True if the `start_symbol` has the given `production`.
+        """
+        return production in self.productions[start_symbol]
+
     def get_non_terminals(self, symbol):
         """
             Given a start symbol as S, return all its non_terminal's reachable from it.
@@ -241,8 +248,38 @@ class ChomskyGrammar():
         first = {}
         production_keys = self.productions.keys()
 
+        def get_first(start_symbol):
+            start_productions = self.productions[start_symbol]
+
+            if start_symbol not in first:
+                first[start_symbol] = set()
+
+            for production in start_productions:
+
+                # If there is a Production X → Y1Y2..Yk then add first(Y1Y2..Yk) to first(X)
+                for symbol in production:
+
+                    # If X is a terminal then First(X) is just X!
+                    # If there is a Production X → ε then add ε to first(X)
+                    if type( symbol ) is Terminal:
+                        first[start_symbol].add( symbol )
+                        break
+
+                    if type( symbol ) is NonTerminal:
+                        get_first( symbol )
+                        Production.copy_productions_except_epsilon( first[symbol], first[start_symbol] )
+
+                        if self.has_production( symbol, epsilon_production ):
+
+                            # If First(Y1) First(Y2)..First(Yk) all contain ε, then add ε to First(Y1Y2..Yk) as well
+                            if Production.is_last_production( symbol, production ):
+                                first[start_symbol].add( epsilon_production )
+
+                        else:
+                            break
+
         for start_symbol in production_keys:
-            first[start_symbol] = set()
+            get_first( start_symbol )
 
         return first
 

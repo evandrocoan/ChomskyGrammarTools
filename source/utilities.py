@@ -168,6 +168,7 @@ class LockableType(object):
         After locking, ts string representation attribute is going to be saved as an attribute and
         returned when needed.
     """
+    USE_STRING = True
 
     def __init__(self):
         """
@@ -183,19 +184,26 @@ class LockableType(object):
         """
 
         if self.locked:
-            raise AttributeError( "Attributes cannot be changed after `locked` is set to True!" )
+            raise AttributeError( "Attributes cannot be changed after `locked` is set to True! %s" % self.__repr__() )
 
         else:
             super().__setattr__( name, value )
 
     def __eq__(self, other):
 
-        if type( self ) is type( other ):
+        if isinstance( self, LockableType ) is isinstance( other, LockableType ):
             return hash( self ) == hash( other )
 
         return False
 
+    def __hash__(self):
+        return self._hash
+
     def __repr__(self):
+
+        if self.USE_STRING:
+            return self.__str__()
+
         valid_attributes = self.__dict__.keys()
         clean_attributes = []
 
@@ -204,10 +212,27 @@ class LockableType(object):
             if not attribute.startswith( '_' ):
                 clean_attributes.append( "{}: {}".format( attribute, self.__dict__[attribute] ) )
 
-        return '{' + ", ".join( clean_attributes ) + '}'
+        return "%s %s." % ( self.__class__.__name__, ", ".join( clean_attributes ) )
 
-    def __hash__(self):
-        return self._hash
+    def __str__(self):
+        """
+            Python does not allow to dynamically/monkey patch its build in functions. Then, we create
+            out own function and call it from the built-in function.
+        """
+        return self._str()
+
+    def __len__(self):
+        """
+            Python does not allow to dynamically/monkey patch its build in functions. Then, we create
+            out own function and call it from the built-in function.
+        """
+        return self._len()
+
+    def _str(self):
+        return super().__str__()
+
+    def _len(self):
+        raise TypeError( "object of type '%s' has no len()" % self.__class__.__name__ )
 
     def lock(self):
         """
@@ -219,9 +244,9 @@ class LockableType(object):
             return
 
         self.str = str( self )
-        self.__str__ = lambda : self.str
+        self._str = lambda : self.str
 
-        self._hash = hash( self.__str__() )
+        self._hash = hash( self._str() )
         self.locked = True
 
 
@@ -233,30 +258,53 @@ class ChomskyGrammarSymbol(LockableType):
         when needed.
     """
 
-    def __init__(self, symbols, sequence=0):
+    def __init__(self, symbols, sequence=0, lock=False):
+        """
+            A full featured Chomsky Grammar symbol able to compose a production or start symbol.
+
+            `symbols` a string representing this symbol
+            `sequence` is a integer representing the symbol sort order in a production.
+            `lock` if True, the object will be immediately locked upon creation.
+        """
         super().__init__()
-        self.symbols = str( symbols )
+        self.str = str( symbols )
+
+        self.check_consistency()
         self.sequence = sequence
+        self.has_epsilon = False
+
+        if lock:
+            self.lock()
+
+    def check_consistency(self):
+        """
+            Assures the symbol has meaning, i.e., is not empty.
+        """
+
+        if not self.str:
+            raise RuntimeError( "Invalid symbol creation! Symbol with no length: `%s` (%s)" % self.str, sequence )
 
     def __lt__(self, other):
 
         if type( self ) is type( other ):
-            return self.sequence < other.sequence
+            return str( self ) < str( other )
 
-        return False
+        raise TypeError( "'<' not supported between instances of '%s' and '%s'" % (
+                self.__class__.__name__, other.__class__.__name__ ) )
 
-    def __len__(self):
-        length = len( self.symbols )
+    def _len(self):
+        length = len( self.str )
 
-        for symbol in self.symbols:
+        for symbol in self.str:
 
             if symbol == '&':
                 length -= 1
+                self.has_epsilon = True
 
         return length
 
-    def __str__(self):
-        return "%s" % self.symbols
+    def _str(self):
+        return self.str
 
     def lock(self):
         """
@@ -267,15 +315,30 @@ class ChomskyGrammarSymbol(LockableType):
             return
 
         self.len = len( self )
-        self.__len__ = lambda : self.len
+        self._len = lambda : self.len
+
+        self.trim_epsilons()
+        self.check_consistency()
         super().lock()
 
+    def trim_epsilons(self):
+        """
+            Merges the epsilon symbol with other symbols, because the epsilon symbol has not
+            meaning, unless it is alone.
+        """
 
-class NonTerminal(ChomskyGrammarSymbol):
-    """
-        Represents a non terminal symbol on an ChomskyGrammar.
-    """
-    pass
+        if len( self ):
+            new_symbols = []
+
+            for symbol in self.str:
+
+                if symbol != '&':
+                    new_symbols.append( symbol )
+
+            self.str = "".join( new_symbols )
+
+        else:
+            self.str = self.str[0]
 
 
 class Terminal(ChomskyGrammarSymbol):
@@ -285,12 +348,52 @@ class Terminal(ChomskyGrammarSymbol):
     pass
 
 
+class NonTerminal(ChomskyGrammarSymbol):
+    """
+        Represents a non terminal symbol on an ChomskyGrammar.
+    """
+    def _len(self):
+        return 1
+
+
 class Production(LockableType):
 
-    def __init__(self, start_sequence=0):
+    def __init__(self, sequence=0, symbols=[], lock=False):
+        """
+            A full featured Chomsky Grammar production.
+
+            `sequence` the index of the first symbol of the symbol's sequence
+            `symbols` a list of initial symbols to add to the production
+            `lock` if True, the object will be immediately locked upon creation
+        """
         super().__init__()
         self.symbols = []
-        self.sequence = start_sequence
+
+        if not isinstance( sequence, int ):
+            raise RuntimeError( "The sequence parameter must to be an integer! %s" % sequence )
+
+        self.sequence = sequence
+        self.has_epsilon = False
+
+        if symbols:
+
+            for symbol in symbols:
+                self.add( symbol )
+
+        if lock:
+            self.lock()
+
+    def __setattr__(self, name, value):
+        """
+            Block attributes from being changed after it is activated.
+            https://stackoverflow.com/questions/17020115/how-to-use-setattr-correctly-avoiding-infinite-recursion
+        """
+
+        if self.locked and name != 'index':
+            raise AttributeError( "Attributes cannot be changed after `locked` is set to True! %s" % self.__repr__() )
+
+        else:
+            object.__setattr__( self, name, value )
 
     def __str__(self):
         symbols_str = []
@@ -307,13 +410,29 @@ class Production(LockableType):
 
         return False
 
-    def __len__(self):
+    def _len(self):
         lengths = []
 
         for symbol in self.symbols:
             lengths.append( len( symbol ) )
 
         return sum( lengths )
+
+    def __getitem__(self, key):
+        return self.symbols[key]
+
+    def __iter__(self):
+        self.index = 0
+        return self
+
+    def __next__(self):
+        index = self.index
+
+        if self.index < len( self.symbols ):
+            self.index += 1
+            return self.symbols[index]
+
+        raise StopIteration
 
     def lock(self):
         """
@@ -324,25 +443,41 @@ class Production(LockableType):
             return
 
         self.len = len( self )
-        self.__len__ = lambda : self.len
+        self._len = lambda : self.len
+
+        self.check_consistency()
         super().lock()
+
+    def check_consistency(self):
+        """
+            Assures the symbol has meaning, i.e., is not empty.
+        """
+
+        if not self.symbols:
+            raise RuntimeError( "Invalid production creation! Production with no length: `%s` (%s)" % self.symbols, sequence )
 
     def add(self, symbol):
         """
-            Add a new symbol to the production. If the last added symbol and the current at a
-            Terminal one, the old terminal is going to be removed and merged into the new one.
+            Add a new symbol to the production. If the last added symbol and the current are
+            Terminal ones, the old terminal is going to be removed and merged into the new one.
         """
 
         if type( symbol ) not in ( Terminal, NonTerminal ):
             raise RuntimeError( "You can only add Terminal's and NonTerminal's in a Production object! %s" % symbol )
 
-        if symbol.locked:
-            raise RuntimeError( "You symbol already belongs to some other production! %s" % symbol )
+        # Epsilon symbols have length 0
+        if len( symbol ) == 0:
 
-        self.sequence += 1
+            if self.has_epsilon:
+                return
+
+            else:
+                self.has_epsilon = True
+
+        if not self._merge_terminals( symbol ):
+            self.sequence += 1
+
         symbol.sequence = self.sequence
-        self._merge_terminals( symbol )
-
         symbol.lock()
         self.symbols.append( symbol )
 
@@ -354,8 +489,11 @@ class Production(LockableType):
                 last_symbol = self.symbols[-1]
 
                 if type( last_symbol ) is Terminal:
-                    new_symbol.symbols = last_symbol.symbols + new_symbol.symbols
+                    new_symbol.str = last_symbol.str + new_symbol.str
                     del self.symbols[-1]
+                    return True
+
+        return False
 
     def _get_symbols(self, symbolType):
         symbols = []
@@ -368,10 +506,43 @@ class Production(LockableType):
         return symbols
 
     def get_terminals(self):
+        """
+            Get all Terminal's this symbol is composed by, on their respective sequence/ordering.
+        """
         return self._get_symbols( Terminal )
 
     def get_non_terminals(self):
+        """
+            Get all NonTerminal's this symbol is composed by, on their respective sequence/ordering.
+        """
         return self._get_symbols( NonTerminal )
+
+    @staticmethod
+    def is_last_production(symbol, production):
+        """
+            Checks whether the a given symbol is the last in a production.
+
+            `production` is a list of Terminal's and NonTerminal's, and `symbol` is a NonTerminal.
+            The last `production` element has its sequence number equal to the production's list
+            size.
+        """
+        return symbol.sequence >= production[-1].sequence
+
+    @staticmethod
+    def copy_productions_except_epsilon(source, destine):
+        """
+            Copy all productions from one productions set to another, except the epsilon_terminal.
+        """
+
+        for production in source:
+
+            if production != epsilon_production:
+                destine.add( production )
+
+
+# Standard/common symbols used
+epsilon_terminal = Terminal( '&' )
+epsilon_production = Production( symbols=[epsilon_terminal], lock=True )
 
 
 class UpdateGeneretedSentenceThread(QtCore.QThread):
@@ -481,6 +652,17 @@ def trimMessage(message):
     return "\n".join( clean_message )
 
 
+def sort_dictionary_lists(dictionary):
+    """
+        Give a dictionary, call `sorted` on all its elements.
+    """
+
+    for key, value in dictionary.items():
+        dictionary[key] = sorted( value )
+
+    return dictionary
+
+
 def ignore_exceptions(function_to_decorate):
     """
         Decorator to catch any exceptions threw and show them to the user on a dialog/message box.
@@ -581,14 +763,17 @@ def getCleanSpaces(inputText, minimumLength=0, lineCutTrigger="", keepSpaceSepat
     return clean_lines
 
 
-def wrap_text(text, wrap_at_80=False, trim_tabs=False, trim_spaces=False, trim_lines=False):
+def wrap_text(text, wrap=0, trim_tabs=False, trim_spaces=False, trim_lines=False):
     """
         1. Remove input text leading common indentation, trailing white spaces
-        2. If `wrap_at_80`, wraps big lists on 80 characters.
+        2. If `wrap`, wraps big lists on 80 characters.
         3. If `trim_spaces`, remove leading '+' symbols and if `trim_tabs` replace tabs with 2 spaces.
         4. If `trim_lines`, remove all new line characters.
     """
     clean_lines = []
+
+    if not isinstance( text, str ):
+        text = str( text )
 
     if trim_tabs:
         text = text.replace( '\t', '  ' )
@@ -603,11 +788,11 @@ def wrap_text(text, wrap_at_80=False, trim_tabs=False, trim_spaces=False, trim_l
 
         dedent_lines = textwrap.dedent( "\n".join( clean_lines ) )
 
-    if wrap_at_80:
+    if wrap:
         clean_lines.clear()
 
         for line in dedent_lines.split( '\n' ):
-            line = textwrap.fill( line, width=100 )
+            line = textwrap.fill( line, width=wrap )
             clean_lines.append( line )
 
         dedent_lines = "\n".join( clean_lines )

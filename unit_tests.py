@@ -3,11 +3,19 @@
 
 import lark
 import unittest
+from collections import OrderedDict
 
 from source.grammar import ChomskyGrammar
 
 from source.utilities import wrap_text
 from source.utilities import getCleanSpaces
+from source.utilities import sort_dictionary_lists
+
+from source.utilities import Production
+from source.utilities import Terminal
+from source.utilities import NonTerminal
+
+from source.utilities import LockableType
 from source.utilities import ChomskyGrammarTreeTransformer
 
 from source.testing_utilities import TestingUtilities
@@ -18,6 +26,23 @@ class TestChomskyGrammar(TestingUtilities):
         Tests the Grammar class.
     """
 
+    def test_grammarProductionsDictionaryKeyError(self):
+        LockableType.USE_STRING = False
+
+        non_terminal_A = NonTerminal( 'A' )
+        production_A = Production( 0, [non_terminal_A], True )
+
+        # print( "production_A:", hash( production_A ) )
+        # print( "non_terminal_A:", hash( non_terminal_A ) )
+
+        dictionary = {}
+        dictionary[production_A] = 'cow'
+
+        self.assertTextEqual(
+        """
+            cow
+        """, dictionary[non_terminal_A] )
+
     def test_grammarFirstSinpleCase(self):
         firstGrammar = ChomskyGrammar.load_from_text_lines( wrap_text(
         """
@@ -25,10 +50,12 @@ class TestChomskyGrammar(TestingUtilities):
             B -> bB | Ad | &
             A -> aA | &
         """ ) )
+        first = firstGrammar.first()
 
-        self.assertEqual(
-        {
-        }, firstGrammar.first() )
+        self.assertTextEqual(
+        """
+            + {S: [a, b, c, d], A: [&, a], B: [&, a, b, d]}
+        """, sort_dictionary_lists( first ) )
 
     def test_grammarSingleAmbiguityCase(self):
         firstGrammar = ChomskyGrammar.parse( wrap_text(
@@ -66,6 +93,8 @@ class TestChomskyGrammar(TestingUtilities):
             firstGrammar.assure_existing_symbols()
 
     def test_grammarTransformationParsingComplexSingleProduction(self):
+        LockableType.USE_STRING = False
+
         firstGrammar = ChomskyGrammar.parse( wrap_text(
         """
             S -> aABbbCC1aAbA BC | ba | c
@@ -85,18 +114,20 @@ class TestChomskyGrammar(TestingUtilities):
 
         self.assertTextEqual( wrap_text(
         """
-            + Tree(productions, [{locked: False, symbols: [{locked: True, symbols: S, sequence: 0, len: 1, str:
-            + S}], sequence: 0}, Tree(space, []), Tree(non_terminals, [{locked: False, symbols: [{locked: True,
-            + symbols: a, sequence: 1, len: 1, str: a}, {locked: True, symbols: AB, sequence: 2, len: 2, str: AB},
-            + {locked: True, symbols: bb, sequence: 3, len: 2, str: bb}, {locked: True, symbols: CC, sequence: 4,
-            + len: 2, str: CC}, {locked: True, symbols: 1a, sequence: 5, len: 2, str: 1a}, {locked: True, symbols:
-            + A, sequence: 6, len: 1, str: A}, {locked: True, symbols: b, sequence: 7, len: 1, str: b}, {locked:
-            + True, symbols: A, sequence: 8, len: 1, str: A}, {locked: True, symbols: BC, sequence: 9, len: 2,
-            + str: BC}], sequence: 9}, {locked: False, symbols: [{locked: True, symbols: ba, sequence: 1, len: 2,
-            + str: ba}], sequence: 1}, {locked: False, symbols: [{locked: True, symbols: c, sequence: 1, len: 1,
-            + str: c}], sequence: 1}])])
-
-        """, trim_spaces=True ), wrap_text( str( firstGrammar ), wrap_at_80=True ) )
+            + Tree(productions, [Production locked: False, symbols: [NonTerminal locked: True, str: S, sequence:
+            + 0, has_epsilon: False, len: 1.], sequence: 0, has_epsilon: False., Tree(space, []),
+            + Tree(non_terminals, [Production locked: False, symbols: [Terminal locked: True, str: a, sequence: 1,
+            + has_epsilon: False, len: 1., NonTerminal locked: True, str: AB, sequence: 2, has_epsilon: False,
+            + len: 1., Terminal locked: True, str: bb, sequence: 3, has_epsilon: False, len: 2., NonTerminal
+            + locked: True, str: CC, sequence: 4, has_epsilon: False, len: 1., Terminal locked: True, str: 1a,
+            + sequence: 5, has_epsilon: False, len: 2., NonTerminal locked: True, str: A, sequence: 6,
+            + has_epsilon: False, len: 1., Terminal locked: True, str: b, sequence: 7, has_epsilon: False, len:
+            + 1., NonTerminal locked: True, str: A, sequence: 8, has_epsilon: False, len: 1., NonTerminal locked:
+            + True, str: BC, sequence: 9, has_epsilon: False, len: 1.], sequence: 9, has_epsilon: False.,
+            + Production locked: False, symbols: [Terminal locked: True, str: ba, sequence: 1, has_epsilon: False,
+            + len: 2.], sequence: 1, has_epsilon: False., Production locked: False, symbols: [Terminal locked:
+            + True, str: c, sequence: 1, has_epsilon: False, len: 1.], sequence: 1, has_epsilon: False.])])
+        """, trim_spaces=True ), wrap_text( str( firstGrammar ), wrap=100 ) )
 
     def test_grammarTreeParsingComplexSingleProduction(self):
         firstGrammar = ChomskyGrammar.parse( wrap_text(
