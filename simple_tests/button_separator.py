@@ -61,6 +61,7 @@ class ProgramWindow(QtWidgets.QMainWindow):
         self.verticalGridLayout.addWidget( self.open          , 4 , 0)
         self.verticalGridLayout.addWidget( self.save          , 5 , 0)
         self.verticalGridLayout.setSpacing( 0 )
+        self.verticalGridLayout.setRowMinimumHeight(3, 20)
         self.verticalGridLayout.setAlignment(Qt.AlignTop)
 
         self.innerLayout = QHBoxLayout()

@@ -35,7 +35,6 @@ from grammar.grammar import ChomskyGrammar
 from grammar.symbols import HISTORY_KEY_LINE
 
 from user_interface.sentences_generation import run_function_async
-from user_interface.sentences_generation import UpdateGeneretedSentenceThread
 
 from grammar.utilities import wrap_text
 from grammar.utilities import ignore_exceptions
@@ -226,77 +225,17 @@ class ProgramWindow(QtWidgets.QMainWindow):
     def handleCalculateFirstAndFollow(self, qt_decorator_bug):
         isToStop = [False]
 
-        def function():
-            firstGrammar = ChomskyGrammar.load_from_text_lines( self.grammarTextEditWidget.toPlainText() )
-            function.results = dictionary_to_string( firstGrammar.first() )
-
-        function.isToStop = isToStop
-        dialog = StringOutputDialog( self, self._getMainFontOptions(), self._getFileDialogOptions(), isToStop )
-        dialog.appendText( wrap_text( """
+        results_dialog = StringOutputDialog( self, self._getMainFontOptions(), self._getFileDialogOptions(), isToStop )
+        results_dialog.appendText( wrap_text( """
             The computed FIRST for the given grammar is:
         """ ) )
 
-        run_function_async( function, dialog )
+        def function():
+            firstGrammar = ChomskyGrammar.load_from_text_lines( self.grammarTextEditWidget.toPlainText() )
+            function.results = dictionary_to_string( firstGrammar.first() ) + "\n\nComputation completed successfully!"
 
-    @ignore_exceptions
-    def handleEnumerateAutomataSentencesOfN(self, qt_decorator_bug):
-        self.handleEnumerateAutomataSentences( True )
-
-    @ignore_exceptions
-    def handleEnumerateAutomataSentencesUntilN(self, qt_decorator_bug):
-        self.handleEnumerateAutomataSentences( False )
-
-    def handleEnumerateAutomataSentences(self, only_maximum_sentences=False):
-        """
-            PyQt5 Signals and Threading
-            https://stackoverflow.com/questions/40537026/pyqt5-signals-and-threading
-
-            QTextEdit: How to dynamically update in PyQt without crashing GUI
-            https://stackoverflow.com/questions/24371274/qtextedit-how-to-dynamically-update-in-pyqt-without-crashing-gui
-
-            Why does PySide implicitely create object members from class members for Signals?
-            https://stackoverflow.com/questions/15025686/why-does-pyside-implicitely-create-object-members-from-class-members-for-signals
-        """
-        isToStop = [False]
-
-        fontOptions = self._getMainFontOptions()
-        ( maximumSentenceSize, isAccepted ) = InputIntegerDialog.getNewUserInput( self, fontOptions )
-
-        if not isAccepted:
-            return
-
-        firstGrammar = ChomskyGrammar.load_from_text_lines( self.grammarTextEditWidget.toPlainText() )
-
-        dialog = StringOutputDialog( self, self._getMainFontOptions(), self._getFileDialogOptions(), isToStop )
-        dialog.appendText( wrap_text( """
-            The following Grammar:
-            %s
-
-            Generates(ed) the following words with(until) size %s:
-        """ ) % ( firstGrammar, maximumSentenceSize ) )
-
-        # create the updating thread and connect
-        # it's received signal to append
-        # every received chunk of data/text will be appended to the text
-        qtUpdateThread = UpdateGeneretedSentenceThread( firstGrammar, maximumSentenceSize, isToStop )
-        qtUpdateThread.only_maximum_sentences = only_maximum_sentences
-        qtUpdateThread.send_string_signal.connect( dialog.appendText )
-
-        qtUpdateThread.disable_stop_button_signal.connect( dialog.disableStopButton )
-        qtUpdateThread.start()
-
-        # Autoscroll PyQT QTextWidget
-        # https://stackoverflow.com/questions/7778726/autoscroll-pyqt-qtextwidget
-        verticalScrollBar = dialog.textEditWidget.verticalScrollBar()
-        horizontalScrollBar = dialog.textEditWidget.horizontalScrollBar()
-
-        verticalScrollBar.setValue( horizontalScrollBar.maximum() )
-        horizontalScrollBar.setValue( horizontalScrollBar.minimum() )
-
-        # Block QMainWindow while child widget is alive, pyqt
-        # https://stackoverflow.com/questions/22410663/block-qmainwindow-while-child-widget-is-alive-pyqt
-        dialog.setWindowModality( Qt.ApplicationModal )
-        dialog.show()
+        function.isToStop = isToStop
+        run_function_async( function, results_dialog )
 
 
 if __name__ == "__main__":
