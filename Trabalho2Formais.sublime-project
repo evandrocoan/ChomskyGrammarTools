@@ -28,8 +28,8 @@
         {
             "cmd":
             [
-                "python", "unit_tests.py",
-                // "python", "unit_tests.py", "TestChomskyGrammar.test_grammarProductionsDictionaryKeyError",
+                // "python", "unit_tests.py",
+                "python", "unit_tests.py", "TestChomskyGrammar.test_grammarChapter5FirstExample1",
             ],
             "file_regex": "^[ ]*File \"(...*?)\", line ([0-9]*)",
             "name": "Run Project Tests",

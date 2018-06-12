@@ -246,9 +246,11 @@ class ChomskyGrammar():
             @return a dictionary with the first for each non terminal start symbol
         """
         first = {}
+        visited_symbols = set()
         production_keys = self.productions.keys()
 
         def get_first(start_symbol):
+            visited_symbols.add( start_symbol._hash )
             start_productions = self.productions[start_symbol]
 
             if start_symbol not in first:
@@ -266,6 +268,9 @@ class ChomskyGrammar():
                         break
 
                     if type( symbol ) is NonTerminal:
+                        if symbol._hash in visited_symbols:
+                            continue
+
                         get_first( symbol )
                         Production.copy_productions_except_epsilon( first[symbol], first[start_symbol] )
 

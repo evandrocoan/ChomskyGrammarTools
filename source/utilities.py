@@ -160,6 +160,10 @@ class ChomskyGrammarTreeTransformer(lark.Transformer):
         return new_production
 
 
+# An unique identifier for any created LockableType object
+initial_hash = random.getrandbits( 32 )
+
+
 class LockableType(object):
     """
         An object type which can have its attributes changes locked/blocked after its `lock()`
@@ -176,6 +180,10 @@ class LockableType(object):
             https://stackoverflow.com/questions/3870982/how-to-handle-call-to-setattr-from-init
         """
         super().__setattr__('locked', False)
+        global initial_hash
+
+        initial_hash += 1
+        self._hash = initial_hash
 
     def __setattr__(self, name, value):
         """
@@ -194,7 +202,8 @@ class LockableType(object):
         if isinstance( self, LockableType ) is isinstance( other, LockableType ):
             return hash( self ) == hash( other )
 
-        return False
+        raise TypeError( "'=' not supported between instances of '%s' and '%s'" % (
+                self.__class__.__name__, other.__class__.__name__ ) )
 
     def __hash__(self):
         return self._hash
@@ -286,7 +295,7 @@ class ChomskyGrammarSymbol(LockableType):
 
     def __lt__(self, other):
 
-        if type( self ) is type( other ):
+        if isinstance( other, LockableType ):
             return str( self ) < str( other )
 
         raise TypeError( "'<' not supported between instances of '%s' and '%s'" % (
@@ -405,10 +414,11 @@ class Production(LockableType):
 
     def __lt__(self, other):
 
-        if type( self ) is type( other ):
+        if isinstance( other, LockableType ):
             return str( self ) < str( other )
 
-        return False
+        raise TypeError( "'<' not supported between instances of '%s' and '%s'" % (
+                self.__class__.__name__, other.__class__.__name__ ) )
 
     def _len(self):
         lengths = []
