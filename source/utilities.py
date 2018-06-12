@@ -542,12 +542,21 @@ class Production(LockableType):
     def copy_productions_except_epsilon(source, destine):
         """
             Copy all productions from one productions set to another, except the epsilon_terminal.
+
+            Return `True` when the item was added in the destine, `False` when is already exists on
+            destine.
         """
+        is_copied = False
 
         for production in source:
 
             if production != epsilon_production:
-                destine.add( production )
+
+                if production not in destine:
+                    destine.add( production )
+                    is_copied = True
+
+        return is_copied
 
 
 # Standard/common symbols used

@@ -245,46 +245,50 @@ class ChomskyGrammar():
 
             @return a dictionary with the first for each non terminal start symbol
         """
-        first = {}
         visited_symbols = set()
         production_keys = self.productions.keys()
 
-        def get_first(start_symbol):
-            visited_symbols.add( start_symbol._hash )
-            start_productions = self.productions[start_symbol]
+        first = {}
+        current_count = 0
+        processed_symbols = -1
 
-            if start_symbol not in first:
-                first[start_symbol] = set()
+        # Create the initial FIRST's sets
+        for symbol in sorted( production_keys ):
+            first[symbol] = set()
 
-            for production in start_productions:
+        while processed_symbols != current_count:
+            processed_symbols = current_count
 
-                # If there is a Production X → Y1Y2..Yk then add first(Y1Y2..Yk) to first(X)
-                for symbol in production:
+            for start_symbol in production_keys:
+                start_productions = self.productions[start_symbol]
 
-                    # If X is a terminal then First(X) is just X!
-                    # If there is a Production X → ε then add ε to first(X)
-                    if type( symbol ) is Terminal:
-                        first[start_symbol].add( symbol )
-                        break
+                for production in start_productions:
 
-                    if type( symbol ) is NonTerminal:
-                        if symbol._hash in visited_symbols:
-                            continue
+                    # If there is a Production X → Y1Y2..Yk then add first(Y1Y2..Yk) to first(X)
+                    for symbol in production:
 
-                        get_first( symbol )
-                        Production.copy_productions_except_epsilon( first[symbol], first[start_symbol] )
+                        # If X is a terminal then First(X) is just X!
+                        # If there is a Production X → ε then add ε to first(X)
+                        if type( symbol ) is Terminal:
 
-                        if self.has_production( symbol, epsilon_production ):
-
-                            # If First(Y1) First(Y2)..First(Yk) all contain ε, then add ε to First(Y1Y2..Yk) as well
-                            if Production.is_last_production( symbol, production ):
-                                first[start_symbol].add( epsilon_production )
-
-                        else:
+                            if symbol not in first[start_symbol]:
+                                first[start_symbol].add( symbol )
+                                current_count += 1
                             break
 
-        for start_symbol in production_keys:
-            get_first( start_symbol )
+                        if type( symbol ) is NonTerminal:
+
+                            if Production.copy_productions_except_epsilon( first[symbol], first[start_symbol] ):
+                                current_count += 1
+
+                            if self.has_production( symbol, epsilon_production ):
+
+                                # If First(Y1) First(Y2)..First(Yk) all contain ε, then add ε to First(Y1Y2..Yk) as well
+                                if Production.is_last_production( symbol, production ):
+                                    first[start_symbol].add( epsilon_production )
+
+                            else:
+                                break
 
         return first
 

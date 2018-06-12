@@ -75,7 +75,7 @@ class TestChomskyGrammar(TestingUtilities):
 
         self.assertTextEqual(
         """
-            + {S: [a, b, c, d], A: [&, a], B: [a, b, c, d], C: [&, c]}
+            + {A: [&, a], B: [a, b, c, d], C: [&, c], S: [a, b, c, d]}
         """, sort_dictionary_lists( first ) )
 
     def test_grammarChapter5FirstExample1(self):
@@ -89,7 +89,7 @@ class TestChomskyGrammar(TestingUtilities):
 
         self.assertTextEqual(
         """
-            + {S: [a, b, c, d], A: [&, a], B: [&, a, b, d]}
+            + {A: [&, a], B: [&, a, b, d], S: [a, b, c, d]}
         """, sort_dictionary_lists( first ) )
 
     def test_grammarSingleAmbiguityCase(self):
