@@ -10,9 +10,9 @@ import PyQt5
 # from PyQt5.QtCore import *
 # from PyQt5.QtWidgets import *
 
-from source.input_string_dialog import InputStringDialog
-from source.string_output_dialog import StringOutputDialog
-from source.input_integer_dialog import InputIntegerDialog
+from user_interface.string_input_dialog import InputStringDialog
+from user_interface.string_output_dialog import StringOutputDialog
+from user_interface.integer_input_dialog import InputIntegerDialog
 
 from PyQt5 import QtGui
 from PyQt5 import QtCore
@@ -31,14 +31,15 @@ from PyQt5.QtWidgets import QGroupBox
 from PyQt5.QtWidgets import QVBoxLayout
 from PyQt5.QtWidgets import QFileDialog
 
-from source.utilities import wrap_text
-from source.utilities import HISTORY_KEY_LINE
-from source.utilities import ignore_exceptions
+from grammar.symbols import HISTORY_KEY_LINE
 
-from source.utilities import trimMessage
-from source.utilities import getCleanSpaces
-from source.utilities import UpdateGeneretedSentenceThread
-from source.utilities import setTextWithoutCleaningHistory
+from user_interface.sentences_generation import UpdateGeneretedSentenceThread
+
+from grammar.utilities import wrap_text
+from grammar.utilities import ignore_exceptions
+from grammar.utilities import setTextWithoutCleaningHistory
+from grammar.utilities import trimMessage
+from grammar.utilities import getCleanSpaces
 
 from debug_tools import getLogger
 

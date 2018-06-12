@@ -9,14 +9,16 @@ from debug_tools import getLogger
 import lark
 from typing import Dict, Set
 
-from .utilities import getCleanSpaces
-from .utilities import epsilon_production
+from .symbols import Terminal
+from .symbols import NonTerminal
 
-from .utilities import Production
-from .utilities import Terminal
-from .utilities import NonTerminal
+from .production import Production
+from .production import epsilon_production
+
+from .utilities import getCleanSpaces
 from .utilities import DynamicIterationSet
-from .utilities import ChomskyGrammarTreeTransformer
+
+from .tree_transformer import ChomskyGrammarTreeTransformer
 
 # level 4 - Abstract Syntax Tree Parsing
 log = getLogger( 127-4, os.path.basename( os.path.dirname( os.path.abspath ( __file__ ) ) ) )
@@ -285,8 +287,8 @@ class ChomskyGrammar():
                             if Production.copy_productions_except_epsilon( first[symbol], first[start_symbol] ):
                                 current_count += 1
 
+                            # log( 1, "symbol: %s, production: %-6s, first: %s", symbol, production, first[symbol] )
                             if epsilon_production in first[symbol]:
-                                # log( 1, "symbol: %s, production: %-6s, first: %s", symbol, production, first[symbol] )
 
                                 # If First(Y1) First(Y2)..First(Yk) all contain ε, then add ε to First(Y1Y2..Yk) as well
                                 if Production.is_last_production( symbol, production ):

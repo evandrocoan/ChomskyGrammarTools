@@ -7,20 +7,20 @@ import lark
 import unittest
 from collections import OrderedDict
 
-from source.grammar import ChomskyGrammar
+from grammar.grammar import ChomskyGrammar
 
-from source.utilities import wrap_text
-from source.utilities import getCleanSpaces
-from source.utilities import sort_dictionary_lists
+from grammar.utilities import wrap_text
+from grammar.utilities import getCleanSpaces
+from grammar.utilities import sort_dictionary_lists
 
-from source.utilities import Production
-from source.utilities import Terminal
-from source.utilities import NonTerminal
+from grammar.symbols import Terminal
+from grammar.symbols import NonTerminal
 
-from source.utilities import LockableType
-from source.utilities import ChomskyGrammarTreeTransformer
+from grammar.production import Production
+from grammar.lockable_type import LockableType
+from grammar.tree_transformer import ChomskyGrammarTreeTransformer
 
-from source.testing_utilities import TestingUtilities
+from grammar.testing_utilities import TestingUtilities
 
 
 class TestChomskyGrammar(TestingUtilities):

@@ -23,7 +23,7 @@
             "env": {"PYTHONIOENCODING": "utf8"},
             "syntax": "Packages/Text/Plain text.tmLanguage",
             "target": "exec",
-            "working_dir": "$project_path/"
+            "working_dir": "$project_path/source"
         },
         {
             "cmd":
@@ -38,7 +38,7 @@
             "env": {"PYTHONIOENCODING": "utf8"},
             "syntax": "Packages/Text/Plain text.tmLanguage",
             "target": "exec",
-            "working_dir": "$project_path/"
+            "working_dir": "$project_path/source"
         }
     ],
 }

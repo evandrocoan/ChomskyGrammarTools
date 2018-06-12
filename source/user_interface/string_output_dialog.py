@@ -31,9 +31,9 @@ from debug_tools import getLogger
 log = getLogger( 127, 'string_output_dialog' )
 log( 1, "Importing " + __name__ )
 
-from .utilities import wrap_text
-from .utilities import ignore_exceptions
-from .utilities import setTextWithoutCleaningHistory
+from grammar.utilities import wrap_text
+from grammar.utilities import ignore_exceptions
+from grammar.utilities import setTextWithoutCleaningHistory
 
 
 class StringOutputDialog(QMainWindow):
