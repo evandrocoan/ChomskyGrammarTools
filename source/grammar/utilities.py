@@ -78,6 +78,43 @@ def sort_dictionary_lists(dictionary):
     return dictionary
 
 
+def get_largest_item_size(iterable):
+    """
+        Given a iterable, get the size/length of its largest key value.
+    """
+    largest_key = 0
+
+    for key in iterable:
+
+        if len( key ) > largest_key:
+            largest_key = len( key )
+
+    return largest_key
+
+
+def dictionary_to_string(dictionary):
+    """
+        Given a dictionary with a list for each string key, call `sort_dictionary_lists()` and
+        return a string representation by line of its entries.
+    """
+    strings = []
+    elements_strings = []
+
+    dictionary = sort_dictionary_lists( dictionary )
+    largest_key = get_largest_item_size( dictionary.keys() ) + 1
+
+    for key, values in dictionary.items():
+        elements_strings.clear()
+
+        for item in values:
+            elements_strings.append( "{}".format( str( item ) ) )
+
+        strings.append( "{:>{largest_key}}: {}".format( str( key ), " ".join( elements_strings ),
+                largest_key=largest_key ) )
+
+    return "\n".join( strings )
+
+
 def ignore_exceptions(function_to_decorate):
     """
         Decorator to catch any exceptions threw and show them to the user on a dialog/message box.

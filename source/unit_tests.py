@@ -11,7 +11,7 @@ from grammar.grammar import ChomskyGrammar
 
 from grammar.utilities import wrap_text
 from grammar.utilities import getCleanSpaces
-from grammar.utilities import sort_dictionary_lists
+from grammar.utilities import dictionary_to_string
 
 from grammar.symbols import Terminal
 from grammar.symbols import NonTerminal
@@ -59,8 +59,10 @@ class TestChomskyGrammar(TestingUtilities):
 
         self.assertTextEqual(
         """
-            + {A: [&, a], B: [&, a, b, d], S: [a, b, c, d]}
-        """, sort_dictionary_lists( first ) )
+            + A: & a
+            + B: & a b d
+            + S: a b c d
+        """, dictionary_to_string( first ) )
 
     def test_grammarChapter5FollowExample1IsTheSameAsFirstExample2(self):
         firstGrammar = ChomskyGrammar.load_from_text_lines( wrap_text(
@@ -74,8 +76,11 @@ class TestChomskyGrammar(TestingUtilities):
 
         self.assertTextEqual(
         """
-            + {A: [&, a], B: [a, b, c, d], C: [&, c], S: [a, b, c, d]}
-        """, sort_dictionary_lists( first ) )
+            + A: & a
+            + B: a b c d
+            + C: & c
+            + S: a b c d
+        """, dictionary_to_string( first ) )
 
     def test_grammarChapter5FollowExample2(self):
         firstGrammar = ChomskyGrammar.load_from_text_lines( wrap_text(
@@ -90,8 +95,12 @@ class TestChomskyGrammar(TestingUtilities):
 
         self.assertTextEqual(
         """
-            + {E: [(, id], E': [&, +], F: [(, id], T: [(, id], T': [&, *]}
-        """, sort_dictionary_lists( first ) )
+            +  E: ( id
+            + E': & +
+            +  F: ( id
+            +  T: ( id
+            + T': & *
+        """, dictionary_to_string( first ) )
 
     def test_grammarChapter5FollowExample4(self):
         firstGrammar = ChomskyGrammar.load_from_text_lines( wrap_text(
@@ -106,8 +115,11 @@ class TestChomskyGrammar(TestingUtilities):
 
         self.assertTextEqual(
         """
-            + {A: [&, a, b, c], B: [&, a, b, c], C: [&, c], S: [&, a, b, c, e]}
-        """, sort_dictionary_lists( first ) )
+            + A: & a b c
+            + B: & a b c
+            + C: & c
+            + S: & a b c e
+        """, dictionary_to_string( first ) )
 
     def test_grammarSingleAmbiguityCase(self):
         firstGrammar = ChomskyGrammar.parse( wrap_text(
