@@ -48,20 +48,18 @@ class TestChomskyGrammar(TestingUtilities):
             cow
         """, dictionary[non_terminal_A] )
 
-    def test_grammarChapter5FollowExample4(self):
+    def test_grammarChapter5FirstExample1(self):
         firstGrammar = ChomskyGrammar.load_from_text_lines( wrap_text(
         """
-            S -> A C | C e B | B a
-            A -> a A | B C
-            C -> c C | &
-            B -> b B | A B | &
+            S -> Ab | A Bc
+            B -> bB | Ad | &
+            A -> aA | &
         """ ) )
-        # sys.setrecursionlimit( 2000 )
         first = firstGrammar.first()
 
         self.assertTextEqual(
         """
-            + {A: [&, a, b, c], B: [&, a, b, c], C: [&, c], S: [&, a, b, c, e]}
+            + {A: [&, a], B: [&, a, b, d], S: [a, b, c, d]}
         """, sort_dictionary_lists( first ) )
 
     def test_grammarChapter5FollowExample1(self):
@@ -79,18 +77,20 @@ class TestChomskyGrammar(TestingUtilities):
             + {A: [&, a], B: [a, b, c, d], C: [&, c], S: [a, b, c, d]}
         """, sort_dictionary_lists( first ) )
 
-    def test_grammarChapter5FirstExample1(self):
+    def test_grammarChapter5FollowExample4(self):
         firstGrammar = ChomskyGrammar.load_from_text_lines( wrap_text(
         """
-            S -> Ab | A Bc
-            B -> bB | Ad | &
-            A -> aA | &
+            S -> A C | C e B | B a
+            A -> a A | B C
+            C -> c C | &
+            B -> b B | A B | &
         """ ) )
+        # sys.setrecursionlimit( 2000 )
         first = firstGrammar.first()
 
         self.assertTextEqual(
         """
-            + {A: [&, a], B: [&, a, b, d], S: [a, b, c, d]}
+            + {A: [&, a, b, c], B: [&, a, b, c], C: [&, c], S: [&, a, b, c, e]}
         """, sort_dictionary_lists( first ) )
 
     def test_grammarSingleAmbiguityCase(self):
