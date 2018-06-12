@@ -83,13 +83,14 @@ class TestChomskyGrammar(TestingUtilities):
             E  -> T E'
             E' -> + T E' | &
             T  -> F T'
-            T' -> * F T'
+            T' -> * F T' | &
             F  -> ( E ) | id
         """ ) )
         first = firstGrammar.first()
 
         self.assertTextEqual(
         """
+            + {E: [(, id], E': [&, +], F: [(, id], T: [(, id], T': [&, *]}
         """, sort_dictionary_lists( first ) )
 
     def test_grammarChapter5FollowExample4(self):
