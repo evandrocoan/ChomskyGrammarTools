@@ -39,7 +39,7 @@ class ChomskyGrammar():
         // Forces them to appear in the tree as branches
         epsilon         : [] | "&"+
         end_symbol      : ";"* space* new_line ( new_line | space )*
-        terminal        : ( SIGNED_NUMBER | LCASE_LETTER | dash_phi_hyphen | star | plus | open_paren | close_paren )+
+        terminal        : ( DIGIT | LCASE_LETTER | dash_phi_hyphen | star | plus | open_paren | close_paren )+
         non_terminal    : UCASE_LETTER+ ( UCASE_LETTER | DIGIT | quote )*
         new_line        : NEWLINE
         quote           : "'"
@@ -47,8 +47,8 @@ class ChomskyGrammar():
         space           : " "
         star            : "*"
         plus            : "+"
-        close_paren     : "("
-        open_paren      : ")"
+        open_paren      : "("
+        close_paren     : ")"
 
         // Rename the start symbol, so when parsing the tree it is simple to find it
         non_terminal_start : non_terminal

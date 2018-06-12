@@ -232,6 +232,9 @@ class LockableType(object):
 
             return string
 
+        return self._get_repr()
+
+    def _get_repr(self):
         valid_attributes = self.__dict__.keys()
         clean_attributes = []
 
@@ -240,7 +243,7 @@ class LockableType(object):
             if not attribute.startswith( '_' ):
                 clean_attributes.append( "{}: {}".format( attribute, self.__dict__[attribute] ) )
 
-        return "%s %s." % ( self.__class__.__name__, ", ".join( clean_attributes ) )
+        return "%s %s;" % ( self.__class__.__name__, ", ".join( clean_attributes ) )
 
     def __str__(self):
         """
@@ -249,15 +252,19 @@ class LockableType(object):
         """
         return self._str()
 
+    def _str(self):
+
+        if self._USE_STRING:
+            return super().__str__()
+
+        return self._get_repr()
+
     def __len__(self):
         """
             Python does not allow to dynamically/monkey patch its build in functions. Then, we create
             out own function and call it from the built-in function.
         """
         return self._len()
-
-    def _str(self):
-        return super().__str__()
 
     def _len(self):
         raise TypeError( "object of type '%s' has no len()" % self.__class__.__name__ )
