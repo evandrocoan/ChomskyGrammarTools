@@ -128,6 +128,18 @@ class ChomskyGrammarTreeTransformer(lark.Transformer):
     def dash_phi_hyphen(self, _terminal):
         return self._parse_symbol( _terminal, "-" )
 
+    def plus(self, _terminal):
+        return self._parse_symbol( _terminal, "+" )
+
+    def star(self, _terminal):
+        return self._parse_symbol( _terminal, "*" )
+
+    def open_paren(self, _terminal):
+        return self._parse_symbol( _terminal, "(" )
+
+    def close_paren(self, _terminal):
+        return self._parse_symbol( _terminal, ")" )
+
     def _parse_symbol(self, _terminal, default):
 
         if len( _terminal ):
@@ -172,7 +184,9 @@ class LockableType(object):
         After locking, ts string representation attribute is going to be saved as an attribute and
         returned when needed.
     """
-    USE_STRING = True
+
+    _USE_STRING = True
+    _EMQUOTE_STRING = False
 
     def __init__(self):
         """
@@ -210,8 +224,13 @@ class LockableType(object):
 
     def __repr__(self):
 
-        if self.USE_STRING:
-            return self.__str__()
+        if self._USE_STRING:
+            string = self.__str__()
+
+            if self._EMQUOTE_STRING:
+                return emquote_string( string )
+
+            return string
 
         valid_attributes = self.__dict__.keys()
         clean_attributes = []
@@ -669,6 +688,22 @@ def trimMessage(message):
         clean_message.append( line )
 
     return "\n".join( clean_message )
+
+
+def emquote_string(string):
+    """
+        Return a string escape into single or double quotes accordingly to its contents.
+    """
+    is_single = "'" in string
+    is_double = '"' in string
+
+    if is_single and is_double:
+        return '"{}"'.format( string.replace( "'", "\\'" ) )
+
+    if is_single:
+        return '"{}"'.format( string )
+
+    return "'{}'".format( string )
 
 
 def sort_dictionary_lists(dictionary):

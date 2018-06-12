@@ -29,10 +29,10 @@ class TestChomskyGrammar(TestingUtilities):
     """
 
     def tearDown(self):
-        LockableType.USE_STRING = True
+        LockableType._USE_STRING = True
 
     def test_grammarProductionsDictionaryKeyError(self):
-        LockableType.USE_STRING = False
+        LockableType._USE_STRING = False
 
         non_terminal_A = NonTerminal( 'A' )
         production_A = Production( 0, [non_terminal_A], True )
@@ -62,7 +62,7 @@ class TestChomskyGrammar(TestingUtilities):
             + {A: [&, a], B: [&, a, b, d], S: [a, b, c, d]}
         """, sort_dictionary_lists( first ) )
 
-    def test_grammarChapter5FollowExample1(self):
+    def test_grammarChapter5FollowExample1IsTheSameAsFirstExample2(self):
         firstGrammar = ChomskyGrammar.load_from_text_lines( wrap_text(
         """
             S -> A B C
@@ -75,6 +75,21 @@ class TestChomskyGrammar(TestingUtilities):
         self.assertTextEqual(
         """
             + {A: [&, a], B: [a, b, c, d], C: [&, c], S: [a, b, c, d]}
+        """, sort_dictionary_lists( first ) )
+
+    def test_grammarChapter5FollowExample2(self):
+        firstGrammar = ChomskyGrammar.load_from_text_lines( wrap_text(
+        """
+            E  -> T E'
+            E' -> + T E' | &
+            T  -> F T'
+            T' -> * F T'
+            F  -> ( E ) | id
+        """ ) )
+        first = firstGrammar.first()
+
+        self.assertTextEqual(
+        """
         """, sort_dictionary_lists( first ) )
 
     def test_grammarChapter5FollowExample4(self):
@@ -129,7 +144,7 @@ class TestChomskyGrammar(TestingUtilities):
             firstGrammar.assure_existing_symbols()
 
     def test_grammarTransformationParsingComplexSingleProduction(self):
-        LockableType.USE_STRING = False
+        LockableType._USE_STRING = False
 
         firstGrammar = ChomskyGrammar.parse( wrap_text(
         """
