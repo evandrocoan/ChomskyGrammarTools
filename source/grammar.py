@@ -281,11 +281,15 @@ class ChomskyGrammar():
                             if Production.copy_productions_except_epsilon( first[symbol], first[start_symbol] ):
                                 current_count += 1
 
-                            if self.has_production( symbol, epsilon_production ):
+                            if epsilon_production in first[symbol]:
+                                # log( 1, "symbol: %s, production: %-6s, first: %s", symbol, production, first[symbol] )
 
                                 # If First(Y1) First(Y2)..First(Yk) all contain ε, then add ε to First(Y1Y2..Yk) as well
                                 if Production.is_last_production( symbol, production ):
-                                    first[start_symbol].add( epsilon_production )
+
+                                    if epsilon_production not in first[start_symbol]:
+                                        first[start_symbol].add( epsilon_production )
+                                        current_count += 1
 
                             else:
                                 break

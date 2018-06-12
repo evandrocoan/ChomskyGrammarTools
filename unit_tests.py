@@ -61,6 +61,7 @@ class TestChomskyGrammar(TestingUtilities):
 
         self.assertTextEqual(
         """
+            + {A: [&, a, b, c], B: [&, a, b, c], C: [&, c], S: [&, a, b, c, e]}
         """, sort_dictionary_lists( first ) )
 
     def test_grammarChapter5FollowExample1(self):

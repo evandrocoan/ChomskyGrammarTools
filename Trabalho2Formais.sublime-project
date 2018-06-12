@@ -29,7 +29,7 @@
             "cmd":
             [
                 "python", "unit_tests.py",
-                // "python", "unit_tests.py", "TestChomskyGrammar.test_grammarChapter5FirstExample1",
+                // "python", "unit_tests.py", "TestChomskyGrammar.test_grammarChapter5FollowExample4",
             ],
             "file_regex": "^[ ]*File \"(...*?)\", line ([0-9]*)",
             "name": "Run Project Tests",
