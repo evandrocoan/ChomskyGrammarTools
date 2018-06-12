@@ -1,7 +1,9 @@
 #! /usr/bin/env python
 # -*- coding: utf-8 -*-
 
+import sys
 import lark
+
 import unittest
 from collections import OrderedDict
 
@@ -26,6 +28,9 @@ class TestChomskyGrammar(TestingUtilities):
         Tests the Grammar class.
     """
 
+    def tearDown(self):
+        LockableType.USE_STRING = True
+
     def test_grammarProductionsDictionaryKeyError(self):
         LockableType.USE_STRING = False
 
@@ -43,7 +48,37 @@ class TestChomskyGrammar(TestingUtilities):
             cow
         """, dictionary[non_terminal_A] )
 
-    def test_grammarFirstSinpleCase(self):
+    def test_grammarChapter5FollowExample4(self):
+        firstGrammar = ChomskyGrammar.load_from_text_lines( wrap_text(
+        """
+            S -> A C | C e B | B a
+            A -> a A | B C
+            C -> c C | &
+            B -> b B | A B | &
+        """ ) )
+        # sys.setrecursionlimit( 2000 )
+        first = firstGrammar.first()
+
+        self.assertTextEqual(
+        """
+        """, sort_dictionary_lists( first ) )
+
+    def test_grammarChapter5FollowExample1(self):
+        firstGrammar = ChomskyGrammar.load_from_text_lines( wrap_text(
+        """
+            S -> A B C
+            A -> aA | &
+            B -> bB | A Cd
+            C -> cC | &
+        """ ) )
+        first = firstGrammar.first()
+
+        self.assertTextEqual(
+        """
+            + {S: [a, b, c, d], A: [&, a], B: [a, b, c, d], C: [&, c]}
+        """, sort_dictionary_lists( first ) )
+
+    def test_grammarChapter5FirstExample1(self):
         firstGrammar = ChomskyGrammar.load_from_text_lines( wrap_text(
         """
             S -> Ab | A Bc

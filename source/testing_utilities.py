@@ -17,7 +17,6 @@ class TestingUtilities(unittest.TestCase):
         Unit Tests for the Finite Automata
     """
 
-    @classmethod
     def setUp(self):
         self.maxDiff = None
 

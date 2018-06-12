@@ -389,11 +389,11 @@ class Production(LockableType):
             https://stackoverflow.com/questions/17020115/how-to-use-setattr-correctly-avoiding-infinite-recursion
         """
 
-        if self.locked and name != 'index':
+        if self.locked:
             raise AttributeError( "Attributes cannot be changed after `locked` is set to True! %s" % self.__repr__() )
 
         else:
-            object.__setattr__( self, name, value )
+            super().__setattr__( name, value )
 
     def __str__(self):
         symbols_str = []
@@ -422,14 +422,14 @@ class Production(LockableType):
         return self.symbols[key]
 
     def __iter__(self):
-        self.index = 0
+        self.__dict__['index'] = 0
         return self
 
     def __next__(self):
         index = self.index
 
         if self.index < len( self.symbols ):
-            self.index += 1
+            self.__dict__['index'] += 1
             return self.symbols[index]
 
         raise StopIteration
