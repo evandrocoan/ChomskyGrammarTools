@@ -31,8 +31,10 @@ from PyQt5.QtWidgets import QGroupBox
 from PyQt5.QtWidgets import QVBoxLayout
 from PyQt5.QtWidgets import QFileDialog
 
+from grammar.grammar import ChomskyGrammar
 from grammar.symbols import HISTORY_KEY_LINE
 
+from user_interface.sentences_generation import run_function_async
 from user_interface.sentences_generation import UpdateGeneretedSentenceThread
 
 from grammar.utilities import wrap_text
@@ -40,6 +42,7 @@ from grammar.utilities import ignore_exceptions
 from grammar.utilities import setTextWithoutCleaningHistory
 from grammar.utilities import trimMessage
 from grammar.utilities import getCleanSpaces
+from grammar.utilities import dictionary_to_string
 
 from debug_tools import getLogger
 
@@ -78,7 +81,7 @@ class ProgramWindow(QtWidgets.QMainWindow):
 
         # https://github.com/GNOME/adwaita-icon-theme
         # https://code.google.com/archive/p/faenza-icon-theme/
-        self.mainApplicationIcon = QtGui.QIcon( "login.png" )
+        self.mainApplicationIcon = QtGui.QIcon( "../login.png" )
 
         # PyQt4 set windows taskbar icon
         # https://stackoverflow.com/questions/12432637/pyqt4-set-windows-taskbar-icon
@@ -221,19 +224,19 @@ class ProgramWindow(QtWidgets.QMainWindow):
 
     @ignore_exceptions
     def handleCalculateFirstAndFollow(self, qt_decorator_bug):
-        firstGrammar = ChomskyGrammar.load_from_text_lines( self.grammarTextEditWidget.toPlainText() )
+        isToStop = [False]
 
-        fontOptions = self._getMainFontOptions()
-        dialogTitle = "Enter a second grammar for Concatenation"
-        dialogTypeName = "Grammar (Concatenation)"
-        ( inputString, isAccepted ) = InputStringDialog.getNewUserInput( self, fontOptions, self._openGrammar, dialogTypeName, dialogTitle )
+        def function():
+            firstGrammar = ChomskyGrammar.load_from_text_lines( self.grammarTextEditWidget.toPlainText() )
+            function.results = dictionary_to_string( firstGrammar.first() )
 
-        if isAccepted:
-            secondGrammar = ChomskyGrammar.load_from_text_lines( inputString )
+        function.isToStop = isToStop
+        dialog = StringOutputDialog( self, self._getMainFontOptions(), self._getFileDialogOptions(), isToStop )
+        dialog.appendText( wrap_text( """
+            The computed FIRST for the given grammar is:
+        """ ) )
 
-            firstGrammar.concatenate( secondGrammar )
-            setTextWithoutCleaningHistory( self.grammarTextEditWidget, str( firstGrammar ) )
-
+        run_function_async( function, dialog )
 
     @ignore_exceptions
     def handleEnumerateAutomataSentencesOfN(self, qt_decorator_bug):
