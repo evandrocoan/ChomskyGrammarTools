@@ -228,7 +228,7 @@ class ProgramWindow(QtWidgets.QMainWindow):
         results_dialog = StringOutputDialog( self, self._getMainFontOptions(), self._getFileDialogOptions(), isToStop )
         results_dialog.appendText( wrap_text( """
             The computed FIRST for the given grammar is:
-        """ ) )
+        """ ) + '\n' )
 
         def function():
             firstGrammar = ChomskyGrammar.load_from_text_lines( self.grammarTextEditWidget.toPlainText() )

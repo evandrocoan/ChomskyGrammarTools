@@ -55,18 +55,24 @@ class RunFunctionAsyncThread(QtCore.QThread):
             def run(self):
                 self.function()
 
-        process_thread = ProcessThread( self.parent(), self.function )
-        process_thread.start()
+        self.process_thread = ProcessThread( self.parent(), self.function )
+        self.process_thread.start()
 
-        self.sleep( 1 )
         force_first_run = self.force_first_run
+        self.sleep( 1 )
 
-        while process_thread.isRunning() or force_first_run:
+        while self.process_thread.isRunning() or force_first_run:
             force_first_run = False
             self.waiting( self )
 
+            if not self.function.isToStop[0]:
+                self.sleep( 1 )
+
+                if self.process_thread.isRunning():
+                    self.process_thread.terminate()
+
         # If it was not stopped by the close event setting isToStop, then append the success message
-        process_thread.wait()
+        self.process_thread.wait()
 
         if not self.function.isToStop[0]:
             self.disable_stop_button_signal.emit()
@@ -90,7 +96,9 @@ def run_function_async(function, results_dialog):
     # https://stackoverflow.com/questions/22410663/block-qmainwindow-while-child-widget-is-alive-pyqt
     results_dialog.setWindowModality( Qt.ApplicationModal )
     results_dialog.show()
+
     set_scroll_to_maximum( results_dialog.textEditWidget )
+    return qtUpdateThread
 
 
 def set_scroll_to_maximum(textEdit):
