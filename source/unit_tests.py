@@ -102,6 +102,28 @@ class TestChomskyGrammar(TestingUtilities):
             + T': & *
         """, dictionary_to_string( first ) )
 
+    def test_grammarChapter5FollowExample3(self):
+        firstGrammar = ChomskyGrammar.load_from_text_lines( wrap_text(
+        """
+            S -> Ab C D | E F
+            A -> aA | &
+            C -> E C F | c
+            D -> C D | dD d | &
+            E -> eE | &
+            F -> F S | fF | g
+        """ ) )
+        first = firstGrammar.first()
+
+        self.assertTextEqual(
+        """
+            + A: & a
+            + C: c e
+            + D: & c d e
+            + E: & e
+            + F: f g
+            + S: a b e f g
+        """, dictionary_to_string( first ) )
+
     def test_grammarChapter5FollowExample4(self):
         firstGrammar = ChomskyGrammar.load_from_text_lines( wrap_text(
         """
