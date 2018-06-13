@@ -29,7 +29,7 @@
             "cmd":
             [
                 "python", "unit_tests.py",
-                // "python", "unit_tests.py", "TestChomskyGrammar.test_grammarTransformationTreeParsingParenStarPlusSymbols",
+                // "python", "unit_tests.py", "TestChomskyGrammar.test_grammarChapter5FollowExample1IsTheSameAsFirstExample2",
             ],
             "file_regex": "^[ ]*File \"(...*?)\", line ([0-9]*)",
             "name": "Run Project Tests",
@@ -38,6 +38,20 @@
             "env": {"PYTHONIOENCODING": "utf8"},
             "syntax": "Packages/Text/Plain text.tmLanguage",
             "target": "exec",
+            "working_dir": "$project_path/source"
+        },
+        {
+            "cmd":
+            [
+                "python", "unit_tests.py", "{test_class}.{test_func}",
+            ],
+            "file_regex": "^[ ]*File \"(...*?)\", line ([0-9]*)",
+            "name": "Run Single Test",
+            "quiet": true,
+            "shell": true,
+            "env": {"PYTHONIOENCODING": "utf8"},
+            "syntax": "Packages/Text/Plain text.tmLanguage",
+            "target": "run_python_tests",
             "working_dir": "$project_path/source"
         }
     ],
