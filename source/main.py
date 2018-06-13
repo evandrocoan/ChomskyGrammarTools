@@ -231,8 +231,12 @@ class ProgramWindow(QtWidgets.QMainWindow):
         """ ) + '\n' )
 
         def function():
+            results = []
             firstGrammar = ChomskyGrammar.load_from_text_lines( self.grammarTextEditWidget.toPlainText() )
-            function.results = dictionary_to_string( firstGrammar.first() ) + "\n\nComputation completed successfully!"
+
+            results.append( dictionary_to_string( firstGrammar.first() ) )
+            results.append( "\n\nComputation completed successfully!" )
+            function.results = "".join( results )
 
         function.isToStop = isToStop
         run_function_async( function, results_dialog )
