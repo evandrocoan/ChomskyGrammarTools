@@ -14,6 +14,7 @@ from .symbols import NonTerminal
 
 from .production import Production
 from .production import epsilon_production
+from .production import end_of_string_terminal
 
 from .utilities import getCleanSpaces
 from .utilities import DynamicIterationSet
@@ -247,19 +248,18 @@ class ChomskyGrammar():
 
     def first(self):
         """
-            Calculate this grammar first set for each non terminal.
+            Calculate this grammar FIRST's set for each non terminal.
 
             @return a dictionary with the first for each non terminal start symbol
         """
-        visited_symbols = set()
+        first = {}
         production_keys = self.productions.keys()
 
-        first = {}
         current_count = 0
         processed_symbols = -1
 
         # Create the initial FIRST's sets
-        for symbol in sorted( production_keys ):
+        for symbol in production_keys:
             first[symbol] = set()
 
         while processed_symbols != current_count:
@@ -291,7 +291,7 @@ class ChomskyGrammar():
                             if epsilon_production in first[symbol]:
 
                                 # If First(Y1) First(Y2)..First(Yk) all contain ε, then add ε to First(Y1Y2..Yk) as well
-                                if Production.is_last_production( symbol, production ):
+                                if production.is_last( symbol ):
 
                                     if epsilon_production not in first[start_symbol]:
                                         first[start_symbol].add( epsilon_production )
@@ -301,4 +301,78 @@ class ChomskyGrammar():
                                 break
 
         return first
+
+    def get_first_from(self, symbols, first=None ):
+        """
+            Given a list of `symbols` get their FIRST symbols set.
+        """
+        following_first = set()
+
+        if not first:
+            first = self.first()
+
+        for symbol in symbols:
+
+            if type( symbol ) is Terminal:
+                following_first.add( symbol )
+
+            if type( symbol ) is NonTerminal:
+                following_first.update( first[symbol] )
+
+        return following_first
+
+    def follow(self, first=None):
+        """
+            Calculate this grammar FOLLOW's set for each non terminal.
+
+            @return a dictionary with the first for each non terminal start symbol
+        """
+        follow = {}
+        production_keys = self.productions.keys()
+
+        current_count = 0
+        processed_symbols = -1
+
+        if not first:
+            first = self.first()
+
+        # Create the initial FOLLOW's sets
+        for symbol in production_keys:
+            follow[symbol] = set()
+
+        # First put $ (the end of input marker) in Follow(S) (S is the start symbol)
+        follow[self.initial_symbol].add( end_of_string_terminal )
+
+        while processed_symbols != current_count:
+            processed_symbols = current_count
+
+            for start_symbol in production_keys:
+                start_productions = self.productions[start_symbol]
+
+                for production in start_productions:
+
+                    # If there is a production A → aBb, (where a can be a whole string) then
+                    # everything in FIRST(b) except for ε is placed in FOLLOW(B).
+                    for current_symbol in production:
+
+                        if type( current_symbol ) is NonTerminal:
+                            next_symbol = production.peek_next()
+
+                            if next_symbol:
+                                following_first = self.get_first_from( production.following_symbols(), first )
+
+                                if Production.copy_productions_except_epsilon( following_first, follow[current_symbol] ):
+                                    current_count += 1
+
+                                if epsilon_production in following_first:
+
+                                    if Production.copy_productions_except_epsilon( follow[start_symbol], follow[current_symbol] ):
+                                        current_count += 1
+
+                            else:
+
+                                if Production.copy_productions_except_epsilon( follow[start_symbol], follow[current_symbol] ):
+                                    current_count += 1
+
+        return follow
 

@@ -15,10 +15,13 @@ log = getLogger( 127-4, os.path.basename( os.path.dirname( os.path.abspath ( __f
 
 
 class Production(LockableType):
+    """
+        A full featured Chomsky Grammar production.
+    """
 
     def __init__(self, sequence=0, symbols=[], lock=False):
         """
-            A full featured Chomsky Grammar production.
+            Creates a new fresh production.
 
             `sequence` the index of the first symbol of the symbol's sequence
             `symbols` a list of initial symbols to add to the production
@@ -54,6 +57,9 @@ class Production(LockableType):
             super().__setattr__( name, value )
 
     def __str__(self):
+        """
+            Return a nice string representation of this set.
+        """
         symbols_str = []
 
         for symbol in self.symbols:
@@ -62,6 +68,9 @@ class Production(LockableType):
         return " ".join( symbols_str )
 
     def __lt__(self, other):
+        """
+            Operator less than used when comparing production's objects.
+        """
 
         if isinstance( other, LockableType ):
             return str( self ) < str( other )
@@ -78,20 +87,57 @@ class Production(LockableType):
         return sum( lengths )
 
     def __getitem__(self, key):
+        """
+            Called by Python automatically when indexing a production as in object[index].
+        """
         return self.symbols[key]
 
     def __iter__(self):
-        self.__dict__['index'] = 0
+        """
+            Called by Python automatically when iterating over this set and python wants to start
+            the iteration process.
+        """
+        self.__dict__['index'] = -1
         return self
 
     def __next__(self):
-        index = self.index
+        """
+            Return the next item immediate for the current iteration.
+        """
+        index = self.index + 1
 
-        if self.index < len( self.symbols ):
-            self.__dict__['index'] += 1
+        if index < len( self.symbols ):
+            self.__dict__['index'] = index
             return self.symbols[index]
 
         raise StopIteration
+
+    def peek_next(self, lookahead=1):
+        """
+            Inside a item iteration, allow to the next nth element given by `lookahead`. If the
+            search goes past end or it is the last item, return None.
+        """
+        index = self.index + lookahead
+
+        if index < len( self.symbols ):
+            return self.symbols[index]
+
+        return None
+
+    def following_symbols(self):
+        """
+            Similar to `peek_next()` but get all the following symbols until the end of the
+            production. Return an empty list when there are not remaining symbols.
+        """
+        index = self.index + 1
+        remaining_count = len( self.symbols )
+        following_symbols = []
+
+        while index < remaining_count:
+            following_symbols.append( self.symbols[index] )
+            index += 1
+
+        return following_symbols
 
     def lock(self):
         """
@@ -176,8 +222,7 @@ class Production(LockableType):
         """
         return self._get_symbols( NonTerminal )
 
-    @staticmethod
-    def is_last_production(symbol, production):
+    def is_last(self, symbol):
         """
             Checks whether the a given symbol is the last in a production.
 
@@ -185,7 +230,7 @@ class Production(LockableType):
             The last `production` element has its sequence number equal to the production's list
             size.
         """
-        return symbol.sequence >= production[-1].sequence
+        return symbol.sequence >= self.symbols[-1].sequence
 
     @staticmethod
     def copy_productions_except_epsilon(source, destine):
@@ -211,4 +256,6 @@ class Production(LockableType):
 # Standard/common symbols used
 epsilon_terminal = Terminal( '&' )
 epsilon_production = Production( symbols=[epsilon_terminal], lock=True )
+
+end_of_string_terminal = Terminal( '$', lock=True )
 

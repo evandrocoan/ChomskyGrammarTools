@@ -52,16 +52,16 @@ class TestChomskyGrammar(TestingUtilities):
         firstGrammar = ChomskyGrammar.load_from_text_lines( wrap_text(
         """
             S -> Ab | A Bc
-            B -> bB | Ad | &
             A -> aA | &
+            B -> bB | Ad | &
         """ ) )
         first = firstGrammar.first()
 
         self.assertTextEqual(
         """
+            + S: a b c d
             + A: & a
             + B: & a b d
-            + S: a b c d
         """, dictionary_to_string( first ) )
 
     def test_grammarChapter5FollowExample1IsTheSameAsFirstExample2(self):
@@ -73,14 +73,23 @@ class TestChomskyGrammar(TestingUtilities):
             C -> cC | &
         """ ) )
         first = firstGrammar.first()
+        follow = firstGrammar.follow( first )
 
         self.assertTextEqual(
         """
+            + S: a b c d
             + A: & a
             + B: a b c d
             + C: & c
-            + S: a b c d
         """, dictionary_to_string( first ) )
+
+        self.assertTextEqual(
+        """
+            + S: $
+            + A: $ a b c d
+            + B: $ c
+            + C: $ d
+        """, dictionary_to_string( follow ) )
 
     def test_grammarChapter5FollowExample2(self):
         firstGrammar = ChomskyGrammar.load_from_text_lines( wrap_text(
@@ -97,9 +106,9 @@ class TestChomskyGrammar(TestingUtilities):
         """
             +  E: ( id
             + E': & +
-            +  F: ( id
             +  T: ( id
             + T': & *
+            +  F: ( id
         """, dictionary_to_string( first ) )
 
     def test_grammarChapter5FollowExample3(self):
@@ -116,12 +125,12 @@ class TestChomskyGrammar(TestingUtilities):
 
         self.assertTextEqual(
         """
+            + S: a b e f g
             + A: & a
             + C: c e
             + D: & c d e
             + E: & e
             + F: f g
-            + S: a b e f g
         """, dictionary_to_string( first ) )
 
     def test_grammarChapter5FollowExample4(self):
@@ -129,18 +138,18 @@ class TestChomskyGrammar(TestingUtilities):
         """
             S -> A C | C e B | B a
             A -> a A | B C
-            C -> c C | &
             B -> b B | A B | &
+            C -> c C | &
         """ ) )
         # sys.setrecursionlimit( 2000 )
         first = firstGrammar.first()
 
         self.assertTextEqual(
         """
+            + S: & a b c e
             + A: & a b c
             + B: & a b c
             + C: & c
-            + S: & a b c e
         """, dictionary_to_string( first ) )
 
     def test_grammarSingleAmbiguityCase(self):

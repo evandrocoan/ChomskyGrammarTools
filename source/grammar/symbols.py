@@ -4,7 +4,6 @@
 import os
 
 from .lockable_type import LockableType
-
 from debug_tools import getLogger
 
 # level 4 - Abstract Syntax Tree Parsing
