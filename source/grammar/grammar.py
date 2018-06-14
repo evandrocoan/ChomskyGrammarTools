@@ -264,6 +264,38 @@ class ChomskyGrammar():
                 if non_terminal not in start_non_terminals:
                     raise RuntimeError( "Invalid Non Terminal `%s` added to the grammar: \n%s" % ( non_terminal, self ) )
 
+    def convert_to_epsilon_free(self):
+        pass
+
+    def left_recursion(self):
+        """
+            Determines whether this grammar has left recursion on any of its start non terminal's
+            symbols.
+        """
+        left_recursion = {}
+        return left_recursion
+
+    def has_left_recursion(self):
+        """
+            Determines whether this grammar has left recursion on any of its start non terminal's
+            symbols.
+        """
+        return bool( not self.left_recursion() )
+
+    def factors(self):
+        """
+            Returns a dictionary with this grammar nondeterministic factors set for each non
+            deterministic non terminal start symbol.
+        """
+        factors = {}
+        return factors
+
+    def is_factored(self):
+        """
+            Determines whether this grammar is factored, i.e., deterministic or nondeterministic.
+        """
+        return bool( not self.factors() )
+
     def first_non_terminal(self):
         """
             Calculates the start production symbols non terminal's FIRST set.

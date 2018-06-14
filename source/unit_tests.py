@@ -31,22 +31,64 @@ class TestChomskyGrammar(TestingUtilities):
     def tearDown(self):
         LockableType._USE_STRING = True
 
-    def test_grammarProductionsDictionaryKeyError(self):
-        LockableType._USE_STRING = False
-
-        non_terminal_A = NonTerminal( 'A' )
-        production_A = Production( 0, [non_terminal_A], True )
-
-        # print( "production_A:", hash( production_A ) )
-        # print( "non_terminal_A:", hash( non_terminal_A ) )
-
-        dictionary = {}
-        dictionary[production_A] = 'cow'
+    def test_grammarHasLeftRecursionCalculationOfChapter5FirstExample1(self):
+        firstGrammar = ChomskyGrammar.load_from_text_lines( wrap_text(
+        """
+            S -> Ab | A Bc
+            A -> aA | &
+            B -> bB | Ad | &
+        """ ) )
 
         self.assertTextEqual(
         """
-            cow
-        """, dictionary[non_terminal_A] )
+            not implemented yet
+        """, dictionary_to_string( firstGrammar.left_recursion() ) )
+
+        self.assertFalse( firstGrammar.has_left_recursion() )
+
+    # def test_grammarHasLeftRecursionCalculationOfChapter5FirstExample1(self):
+    #     firstGrammar = ChomskyGrammar.load_from_text_lines( wrap_text(
+    #     """
+    #         S -> Ab | A Bc
+    #         A -> aA | &
+    #         B -> bB | Ad | &
+    #     """ ) )
+
+    #     self.assertTextEqual(
+    #     """
+    #         not implemented yet
+    #     """, dictionary_to_string( firstGrammar.left_recursion() ) )
+
+    #     self.assertFalse( firstGrammar.has_left_recursion() )
+
+    # def test_grammarIsFactoredCalculationOfChapter5FirstExample1(self):
+    #     firstGrammar = ChomskyGrammar.load_from_text_lines( wrap_text(
+    #     """
+    #         S -> Ab | A Bc
+    #         A -> aA | &
+    #         B -> bB | Ad | &
+    #     """ ) )
+
+    #     self.assertTextEqual(
+    #     """
+    #         not implemented yet
+    #     """, dictionary_to_string( firstGrammar.factors() ) )
+
+    #     self.assertFalse( firstGrammar.is_factored() )
+
+    # def test_grammarNonTerminalFirstCalculationOfChapter5FirstExample1(self):
+    #     firstGrammar = ChomskyGrammar.load_from_text_lines( wrap_text(
+    #     """
+    #         S -> Ab | A Bc
+    #         A -> aA | &
+    #         B -> bB | Ad | &
+    #     """ ) )
+    #     first_non_terminal = firstGrammar.first_non_terminal()
+
+    #     self.assertTextEqual(
+    #     """
+    #         not implemented yet
+    #     """, dictionary_to_string( first_non_terminal ) )
 
     def test_grammarFirstCalculationOfChapter5FirstExample1(self):
         firstGrammar = ChomskyGrammar.load_from_text_lines( wrap_text(
@@ -79,20 +121,6 @@ class TestChomskyGrammar(TestingUtilities):
             + A: $ a b d
             + B: c
         """, dictionary_to_string( follow ) )
-
-    def test_grammarNonTerminalFirstCalculationOfChapter5FirstExample1(self):
-        firstGrammar = ChomskyGrammar.load_from_text_lines( wrap_text(
-        """
-            S -> Ab | A Bc
-            A -> aA | &
-            B -> bB | Ad | &
-        """ ) )
-        first_non_terminal = firstGrammar.first_non_terminal()
-
-        self.assertTextEqual(
-        """
-            not implemented yet
-        """, dictionary_to_string( first_non_terminal ) )
 
     def test_grammarFirstCalculationOfChapter5FollowExample1(self):
         firstGrammar = ChomskyGrammar.load_from_text_lines( wrap_text(
@@ -251,6 +279,23 @@ class TestChomskyGrammar(TestingUtilities):
             + B: $ a b c
             + C: $ a b c e
         """, dictionary_to_string( follow ) )
+
+    def test_grammarProductionsDictionaryKeyError(self):
+        LockableType._USE_STRING = False
+
+        non_terminal_A = NonTerminal( 'A' )
+        production_A = Production( 0, [non_terminal_A], True )
+
+        # print( "production_A:", hash( production_A ) )
+        # print( "non_terminal_A:", hash( non_terminal_A ) )
+
+        dictionary = {}
+        dictionary[production_A] = 'cow'
+
+        self.assertTextEqual(
+        """
+            cow
+        """, dictionary[non_terminal_A] )
 
     def test_grammarSingleAmbiguityCase(self):
         firstGrammar = ChomskyGrammar.parse( wrap_text(
