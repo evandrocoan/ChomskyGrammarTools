@@ -227,14 +227,18 @@ class ProgramWindow(QtWidgets.QMainWindow):
 
         results_dialog = StringOutputDialog( self, self._getMainFontOptions(), self._getFileDialogOptions(), isToStop )
         results_dialog.appendText( wrap_text( """
-            The computed FIRST for the given grammar is:
+            The computed FIRST and FOLLOW for the given grammar are:
         """ ) + '\n' )
 
         def function():
             results = []
             firstGrammar = ChomskyGrammar.load_from_text_lines( self.grammarTextEditWidget.toPlainText() )
+            first = firstGrammar.first()
+            follow = firstGrammar.follow( first )
 
-            results.append( dictionary_to_string( firstGrammar.first() ) )
+            results.append( dictionary_to_string( first ) )
+            results.append( "\n\n" )
+            results.append( dictionary_to_string( follow ) )
             results.append( "\n\nComputation completed successfully!" )
             function.results = "".join( results )
 
