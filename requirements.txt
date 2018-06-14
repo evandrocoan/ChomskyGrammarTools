@@ -2,3 +2,4 @@ pyqt5
 pydot
 lark-parser
 debug_tools
+doxypypy
