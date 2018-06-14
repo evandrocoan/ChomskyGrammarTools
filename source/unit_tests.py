@@ -56,6 +56,7 @@ class TestChomskyGrammar(TestingUtilities):
             B -> bB | Ad | &
         """ ) )
         first = firstGrammar.first()
+        follow = firstGrammar.follow( first )
 
         self.assertTextEqual(
         """
@@ -63,6 +64,13 @@ class TestChomskyGrammar(TestingUtilities):
             + A: & a
             + B: & a b d
         """, dictionary_to_string( first ) )
+
+        self.assertTextEqual(
+        """
+            + S: $
+            + A: $ a b d
+            + B: c
+        """, dictionary_to_string( follow ) )
 
     def test_grammarChapter5FollowExample1IsTheSameAsFirstExample2(self):
         firstGrammar = ChomskyGrammar.load_from_text_lines( wrap_text(
@@ -132,6 +140,7 @@ class TestChomskyGrammar(TestingUtilities):
             F -> F S | fF | g
         """ ) )
         first = firstGrammar.first()
+        follow = firstGrammar.follow( first )
 
         self.assertTextEqual(
         """
@@ -143,6 +152,16 @@ class TestChomskyGrammar(TestingUtilities):
             + F: f g
         """, dictionary_to_string( first ) )
 
+        self.assertTextEqual(
+        """
+            + S: $ a b c d e f g
+            + A: b
+            + C: $ a b c d e f g
+            + D: $ a b c d e f g
+            + E: c e f g
+            + F: $ a b c d e f g
+        """, dictionary_to_string( follow ) )
+
     def test_grammarChapter5FollowExample4(self):
         firstGrammar = ChomskyGrammar.load_from_text_lines( wrap_text(
         """
@@ -153,6 +172,7 @@ class TestChomskyGrammar(TestingUtilities):
         """ ) )
         # sys.setrecursionlimit( 2000 )
         first = firstGrammar.first()
+        follow = firstGrammar.follow( first )
 
         self.assertTextEqual(
         """
@@ -161,6 +181,14 @@ class TestChomskyGrammar(TestingUtilities):
             + B: & a b c
             + C: & c
         """, dictionary_to_string( first ) )
+
+        self.assertTextEqual(
+        """
+            + S: $
+            + A: $ a b c
+            + B: $ a b c
+            + C: $ a b c e
+        """, dictionary_to_string( follow ) )
 
     def test_grammarSingleAmbiguityCase(self):
         firstGrammar = ChomskyGrammar.parse( wrap_text(

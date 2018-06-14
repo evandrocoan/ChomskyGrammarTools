@@ -333,9 +333,11 @@ class ChomskyGrammar():
 
             if type( symbol ) is Terminal:
                 following_first.add( symbol )
+                break
 
             if type( symbol ) is NonTerminal:
                 following_first.update( first[symbol] )
+                break
 
         return following_first
 
@@ -380,16 +382,19 @@ class ChomskyGrammar():
                                 following_first = self.get_first_from( production.following_symbols(), first )
 
                                 if Production.copy_productions_except_epsilon( following_first, follow[current_symbol] ):
+                                    # log( 1, "1. start_symbol: %s, current_symbol: %s, next_symbol: %-4s, Adding: %s", start_symbol, current_symbol, next_symbol, following_first )
                                     current_count += 1
 
                                 if epsilon_production in following_first:
 
                                     if Production.copy_productions_except_epsilon( follow[start_symbol], follow[current_symbol] ):
+                                        # log( 1, "2. start_symbol: %s, current_symbol: %s, next_symbol: %-4s, Adding: %s", start_symbol, current_symbol, next_symbol, follow[start_symbol] )
                                         current_count += 1
 
                             else:
 
                                 if Production.copy_productions_except_epsilon( follow[start_symbol], follow[current_symbol] ):
+                                    # log( 1, "3. start_symbol: %s, current_symbol: %s, next_symbol: %-4s, Adding: %s", start_symbol, current_symbol, next_symbol, follow[start_symbol] )
                                     current_count += 1
 
         return follow
