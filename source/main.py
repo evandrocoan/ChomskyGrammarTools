@@ -34,7 +34,7 @@ from PyQt5.QtWidgets import QFileDialog
 from grammar.grammar import ChomskyGrammar
 from grammar.symbols import HISTORY_KEY_LINE
 
-from user_interface.sentences_generation import run_function_async
+from grammar.sentences_generation import run_function_async
 
 from grammar.utilities import wrap_text
 from grammar.utilities import ignore_exceptions

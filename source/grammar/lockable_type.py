@@ -17,7 +17,7 @@ class LockableType(object):
         An object type which can have its attributes changes locked/blocked after its `lock()`
         method being called.
 
-        After locking, ts string representation attribute is going to be saved as an attribute and
+        After locking, its string representation attribute is going to be saved as an attribute and
         returned when needed.
     """
 
