@@ -20,6 +20,7 @@ involving the following checks / operations:
 
 ## II - Observations:
 1. Represent the GLC in a textual way, following the pattern of the examples below:
+
     ### a)
     ```
     E -> E + T | E-T | T
@@ -35,6 +36,7 @@ involving the following checks / operations:
     T1 -> * F T1 | &
      F -> (E) | id
     ```
+
 2. Leave a blank space between the symbols on the right.
 3. Represent non-terminals by capital letter (followed by 0 or + digits).
 4. Represent terminals with one or more contiguous characters (any characters,

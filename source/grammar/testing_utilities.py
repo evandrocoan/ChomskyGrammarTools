@@ -14,10 +14,15 @@ from .utilities import wrap_text
 
 class TestingUtilities(unittest.TestCase):
     """
-        Unit Tests for the Finite Automata
+        Holds common features across all Unit Tests.
     """
 
     def setUp(self):
+        """
+            Called right before each Unit Test is ran.
+        """
+
+        ## Set the maximum size of the assertion error message when Unit Test fail
         self.maxDiff = None
 
     def assertTextEqual(self, goal, results):

@@ -28,13 +28,21 @@ class Production(LockableType):
             `lock` if True, the object will be immediately locked upon creation
         """
         super().__init__()
+
+        ## A list of Terminal's and NonTerminal's this production is composed
         self.symbols = []
 
         if not isinstance( sequence, int ):
             raise RuntimeError( "The sequence parameter must to be an integer! %s" % sequence )
 
+        ## The last symbols' sequence starting from 1
         self.sequence = sequence
+
+        ## Whether this production has some Epsilon symbol or not
         self.has_epsilon = False
+
+        ## Caches the length of this symbol, useful after its changes have been locked by `lock()`
+        self.len = 0
 
         if symbols:
 
@@ -69,7 +77,9 @@ class Production(LockableType):
 
     def __lt__(self, other):
         """
-            Operator less than used when comparing production's objects.
+            Operator less than `<` used when comparing production's objects.
+
+            A symbol is compared explicitly by its string representation.
         """
 
         if isinstance( other, LockableType ):

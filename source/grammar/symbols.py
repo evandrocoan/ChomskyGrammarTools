@@ -29,11 +29,19 @@ class ChomskyGrammarSymbol(LockableType):
             `lock` if True, the object will be immediately locked upon creation.
         """
         super().__init__()
-        self.str = str( symbols )
 
+        ## The string representation of this symbol
+        self.str = str( symbols )
         self.check_consistency()
+
+        ## The position of this symbol from the start of the production beginning at 1
         self.sequence = sequence
+
+        ## Whether this symbol has an epsilon terminal
         self.has_epsilon = False
+
+        ## Caches the length of this symbol, useful after its changes have been locked by `lock()`
+        self.len = 0
 
         if lock:
             self.lock()
@@ -47,6 +55,11 @@ class ChomskyGrammarSymbol(LockableType):
             raise RuntimeError( "Invalid symbol creation! Symbol with no length: `%s` (%s)" % self.str, sequence )
 
     def __lt__(self, other):
+        """
+            Operator less than `<` used when comparing production's objects.
+
+            A symbol is compared explicitly by its string representation.
+        """
 
         if isinstance( other, LockableType ):
             return str( self ) < str( other )

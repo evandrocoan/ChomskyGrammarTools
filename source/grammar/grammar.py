@@ -28,7 +28,9 @@ log( 1, "Importing " + __name__ )
 
 class ChomskyGrammar():
     """
-        Regular grammar object. Example grammar:
+        Chomsky Regular grammar.
+
+        Example grammar:
         S -> aA | bB | a | b | &
         A -> aA | a
         B -> bB | b
@@ -129,11 +131,22 @@ class ChomskyGrammar():
         return biggest_label_length
 
     def __init__(self, initial_symbol="", productions=None):
-        # {'1': {( 'a', '' ), ( 'a', 'A' )}}
+        """
+            Create a new grammar. Optionally, you can pass a `initial_symbol` string and dictionary
+            with the grammar productions on the format {'1': {( 'a', '' ), ( 'a', 'A' )}}.
+        """
+
+        ## A dictionary with productions this grammar can generates
         self.productions = productions if productions else {}
+
+        ## This grammar initial symbol as a simple string or NonTerminal
         self.initial_symbol = initial_symbol
 
     def __len__(self):
+        """
+            Returns the length of this grammar as being the counting of productions start symbols it
+            has.
+        """
         return len( self.productions )
 
     @classmethod
@@ -191,6 +204,11 @@ class ChomskyGrammar():
         return grammar
 
     def add(self, start_symbol, production):
+        """
+            Add a new `production` to this grammar given a `start_symbol`.
+
+            The production object is a composition of several Terminal's and NonTerminal's symbols.
+        """
 
         if type( start_symbol ) is not Production:
             raise RuntimeError( "Your start_symbol is not an instance of Production! %s, %s" % ( start_symbol, production ) )

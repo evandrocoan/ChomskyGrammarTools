@@ -31,9 +31,13 @@ class LockableType(object):
         """
         super().__setattr__('locked', False)
 
-        """
-            An unique identifier for any LockableType object
-        """
+        ## Controls whether the attributes changes of this object are allow or not
+        self.locked = False
+
+        ## Caches the string representation of this object, after locking its attributes changes with `lock()`
+        self.str = ""
+
+        ## An unique identifier for any LockableType object
         self.unique_hash = get_unique_hash()
 
     def __setattr__(self, name, value):
@@ -49,6 +53,9 @@ class LockableType(object):
             super().__setattr__( name, value )
 
     def __eq__(self, other):
+        """
+            Determines whether this object is equal to another one based on their hashes.
+        """
 
         if isinstance( self, LockableType ) is isinstance( other, LockableType ):
             return hash( self ) == hash( other )
@@ -57,9 +64,15 @@ class LockableType(object):
                 self.__class__.__name__, other.__class__.__name__ ) )
 
     def __hash__(self):
+        """
+            Return the hash of this object based on its string representation.
+        """
         return self._hash
 
     def __repr__(self):
+        """
+            Prints a representation of this object within all its attributes.
+        """
 
         if self._USE_STRING:
             string = self.__str__()

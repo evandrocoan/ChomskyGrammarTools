@@ -296,7 +296,10 @@ class DynamicIterationSet(object):
 
             `initial` is any list related object used to initialize the set if new values.
         """
+        ## The set with the items which were already iterated while iterating over this set
         self.iterated_items = set()
+
+        ## The set with the items which are going to be iterated while iterating over this set
         self.non_iterated_items = set( initial )
 
     def __repr__(self):

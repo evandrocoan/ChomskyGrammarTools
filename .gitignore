@@ -3,6 +3,7 @@
 *.sublime-workspace
 
 html
+latex
 
 **__pycache__
 
