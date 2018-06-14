@@ -264,9 +264,19 @@ class ChomskyGrammar():
                 if non_terminal not in start_non_terminals:
                     raise RuntimeError( "Invalid Non Terminal `%s` added to the grammar: \n%s" % ( non_terminal, self ) )
 
+    def first_non_terminal(self):
+        """
+            Calculates the start production symbols non terminal's FIRST set.
+        """
+        first = {}
+        return first
+
     def first(self):
         """
-            Calculate this grammar FIRST's set for each non terminal.
+            Calculate this grammar terminal's FIRST's set for each non terminal.
+
+            First and Follow Sets
+            https://www.jambe.co.nz/UNI/FirstAndFollowSets.html
 
             @return a dictionary with the first for each non terminal start symbol
         """

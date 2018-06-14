@@ -48,7 +48,7 @@ class TestChomskyGrammar(TestingUtilities):
             cow
         """, dictionary[non_terminal_A] )
 
-    def test_grammarChapter5FirstExample1(self):
+    def test_grammarFirstCalculationOfChapter5FirstExample1(self):
         firstGrammar = ChomskyGrammar.load_from_text_lines( wrap_text(
         """
             S -> Ab | A Bc
@@ -56,7 +56,6 @@ class TestChomskyGrammar(TestingUtilities):
             B -> bB | Ad | &
         """ ) )
         first = firstGrammar.first()
-        follow = firstGrammar.follow( first )
 
         self.assertTextEqual(
         """
@@ -65,6 +64,15 @@ class TestChomskyGrammar(TestingUtilities):
             + B: & a b d
         """, dictionary_to_string( first ) )
 
+    def test_grammarFollowCalculationOfChapter5FirstExample1(self):
+        firstGrammar = ChomskyGrammar.load_from_text_lines( wrap_text(
+        """
+            S -> Ab | A Bc
+            A -> aA | &
+            B -> bB | Ad | &
+        """ ) )
+        follow = firstGrammar.follow()
+
         self.assertTextEqual(
         """
             + S: $
@@ -72,7 +80,21 @@ class TestChomskyGrammar(TestingUtilities):
             + B: c
         """, dictionary_to_string( follow ) )
 
-    def test_grammarChapter5FollowExample1IsTheSameAsFirstExample2(self):
+    def test_grammarNonTerminalFirstCalculationOfChapter5FirstExample1(self):
+        firstGrammar = ChomskyGrammar.load_from_text_lines( wrap_text(
+        """
+            S -> Ab | A Bc
+            A -> aA | &
+            B -> bB | Ad | &
+        """ ) )
+        first_non_terminal = firstGrammar.first_non_terminal()
+
+        self.assertTextEqual(
+        """
+            not implemented yet
+        """, dictionary_to_string( first_non_terminal ) )
+
+    def test_grammarFirstCalculationOfChapter5FollowExample1(self):
         firstGrammar = ChomskyGrammar.load_from_text_lines( wrap_text(
         """
             S -> A B C
@@ -81,7 +103,6 @@ class TestChomskyGrammar(TestingUtilities):
             C -> cC | &
         """ ) )
         first = firstGrammar.first()
-        follow = firstGrammar.follow( first )
 
         self.assertTextEqual(
         """
@@ -91,6 +112,16 @@ class TestChomskyGrammar(TestingUtilities):
             + C: & c
         """, dictionary_to_string( first ) )
 
+    def test_grammarFollowCalculationOfChapter5FollowExample1(self):
+        firstGrammar = ChomskyGrammar.load_from_text_lines( wrap_text(
+        """
+            S -> A B C
+            A -> aA | &
+            B -> bB | A Cd
+            C -> cC | &
+        """ ) )
+        follow = firstGrammar.follow()
+
         self.assertTextEqual(
         """
             + S: $
@@ -99,7 +130,7 @@ class TestChomskyGrammar(TestingUtilities):
             + C: $ d
         """, dictionary_to_string( follow ) )
 
-    def test_grammarChapter5FollowExample2(self):
+    def test_grammarFirstCalculationOfChapter5FollowExample2(self):
         firstGrammar = ChomskyGrammar.load_from_text_lines( wrap_text(
         """
             E  -> T E'
@@ -109,7 +140,6 @@ class TestChomskyGrammar(TestingUtilities):
             F  -> ( E ) | id
         """ ) )
         first = firstGrammar.first()
-        follow = firstGrammar.follow( first )
 
         self.assertTextEqual(
         """
@@ -120,6 +150,17 @@ class TestChomskyGrammar(TestingUtilities):
             +  F: ( id
         """, dictionary_to_string( first ) )
 
+    def test_grammarFollowCalculationOfChapter5FollowExample2(self):
+        firstGrammar = ChomskyGrammar.load_from_text_lines( wrap_text(
+        """
+            E  -> T E'
+            E' -> + T E' | &
+            T  -> F T'
+            T' -> * F T' | &
+            F  -> ( E ) | id
+        """ ) )
+        follow = firstGrammar.follow()
+
         self.assertTextEqual(
         """
             +  E: $ )
@@ -129,7 +170,7 @@ class TestChomskyGrammar(TestingUtilities):
             +  F: $ ) * +
         """, dictionary_to_string( follow ) )
 
-    def test_grammarChapter5FollowExample3(self):
+    def test_grammarFirstCalculationOfChapter5FollowExample3(self):
         firstGrammar = ChomskyGrammar.load_from_text_lines( wrap_text(
         """
             S -> Ab C D | E F
@@ -140,7 +181,6 @@ class TestChomskyGrammar(TestingUtilities):
             F -> F S | fF | g
         """ ) )
         first = firstGrammar.first()
-        follow = firstGrammar.follow( first )
 
         self.assertTextEqual(
         """
@@ -152,6 +192,18 @@ class TestChomskyGrammar(TestingUtilities):
             + F: f g
         """, dictionary_to_string( first ) )
 
+    def test_grammarFollowCalculationOfChapter5FollowExample3(self):
+        firstGrammar = ChomskyGrammar.load_from_text_lines( wrap_text(
+        """
+            S -> Ab C D | E F
+            A -> aA | &
+            C -> E C F | c
+            D -> C D | dD d | &
+            E -> eE | &
+            F -> F S | fF | g
+        """ ) )
+        follow = firstGrammar.follow()
+
         self.assertTextEqual(
         """
             + S: $ a b c d e f g
@@ -162,7 +214,7 @@ class TestChomskyGrammar(TestingUtilities):
             + F: $ a b c d e f g
         """, dictionary_to_string( follow ) )
 
-    def test_grammarChapter5FollowExample4(self):
+    def test_grammarFirstCalculationOfChapter5FollowExample4(self):
         firstGrammar = ChomskyGrammar.load_from_text_lines( wrap_text(
         """
             S -> A C | C e B | B a
@@ -172,7 +224,6 @@ class TestChomskyGrammar(TestingUtilities):
         """ ) )
         # sys.setrecursionlimit( 2000 )
         first = firstGrammar.first()
-        follow = firstGrammar.follow( first )
 
         self.assertTextEqual(
         """
@@ -181,6 +232,17 @@ class TestChomskyGrammar(TestingUtilities):
             + B: & a b c
             + C: & c
         """, dictionary_to_string( first ) )
+
+    def test_grammarFollowCalculationOfChapter5FollowExample4(self):
+        firstGrammar = ChomskyGrammar.load_from_text_lines( wrap_text(
+        """
+            S -> A C | C e B | B a
+            A -> a A | B C
+            B -> b B | A B | &
+            C -> c C | &
+        """ ) )
+        # sys.setrecursionlimit( 2000 )
+        follow = firstGrammar.follow()
 
         self.assertTextEqual(
         """
