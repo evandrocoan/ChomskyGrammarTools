@@ -78,14 +78,6 @@ class Production(LockableType):
         raise TypeError( "'<' not supported between instances of '%s' and '%s'" % (
                 self.__class__.__name__, other.__class__.__name__ ) )
 
-    def _len(self):
-        lengths = []
-
-        for symbol in self.symbols:
-            lengths.append( len( symbol ) )
-
-        return sum( lengths )
-
     def __getitem__(self, key):
         """
             Called by Python automatically when indexing a production as in object[index].
@@ -139,28 +131,6 @@ class Production(LockableType):
 
         return following_symbols
 
-    def lock(self):
-        """
-            Block further changes to this object attributes and save its length for faster access.
-        """
-
-        if self.locked:
-            return
-
-        self.len = len( self )
-        self._len = lambda : self.len
-
-        self.check_consistency()
-        super().lock()
-
-    def check_consistency(self):
-        """
-            Assures the symbol has meaning, i.e., is not empty.
-        """
-
-        if not self.symbols:
-            raise RuntimeError( "Invalid production creation! Production with no length: `%s` (%s)" % self.symbols, sequence )
-
     def add(self, symbol):
         """
             Add a new symbol to the production. If the last added symbol and the current are
@@ -200,15 +170,35 @@ class Production(LockableType):
 
         return False
 
-    def _get_symbols(self, symbolType):
-        symbols = []
+    def lock(self):
+        """
+            Block further changes to this object attributes and save its length for faster access.
+        """
+
+        if self.locked:
+            return
+
+        self.len = len( self )
+        self._len = lambda : self.len
+
+        self.check_consistency()
+        super().lock()
+
+    def _len(self):
+        lengths = []
 
         for symbol in self.symbols:
+            lengths.append( len( symbol ) )
 
-            if type( symbol ) is symbolType:
-                symbols.append( symbol )
+        return sum( lengths )
 
-        return symbols
+    def check_consistency(self):
+        """
+            Assures the symbol has meaning, i.e., is not empty.
+        """
+
+        if not self.symbols:
+            raise RuntimeError( "Invalid production creation! Production with no length: `%s` (%s)" % self.symbols, sequence )
 
     def get_terminals(self):
         """
@@ -231,6 +221,16 @@ class Production(LockableType):
             size.
         """
         return symbol.sequence >= self.symbols[-1].sequence
+
+    def _get_symbols(self, symbolType):
+        symbols = []
+
+        for symbol in self.symbols:
+
+            if type( symbol ) is symbolType:
+                symbols.append( symbol )
+
+        return symbols
 
     @staticmethod
     def copy_productions_except_epsilon(source, destine):
