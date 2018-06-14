@@ -21,14 +21,14 @@ involving the following checks / operations:
 ## II - Observations:
 1. Represent the GLC in a textual way, following the pattern of the examples below:
 
-   ### a)
+   **a)**
    ```
    E -> E + T | E-T | T
    T -> T * F | T / F | F
    F -> (E) | id
    ```
 
-   ### b)
+   **b)**
    ```
     E -> T E1
    E1 -> + T E1 | &
