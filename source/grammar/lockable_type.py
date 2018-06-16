@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*-
 
 import os
+import copy
 
 from .utilities import get_unique_hash
 from .utilities import get_representation
@@ -75,14 +76,9 @@ class LockableType(object):
         """
 
         if self._USE_STRING:
-            string = self.__str__()
+            return self.__str__()
 
-            if self._EMQUOTE_STRING:
-                return emquote_string( string )
-
-            return string
-
-        return get_representation( self, ignore={'unique_hash'} )
+        return get_representation( self, ignore={'unique_hash'}, emquote=self._EMQUOTE_STRING )
 
     def __str__(self):
         """
@@ -123,4 +119,17 @@ class LockableType(object):
         self._hash = hash( self._str() )
         self.locked = True
 
+    def new(self, unlocked=False):
+        """
+            Creates and return a new copy of the current a object.
+        """
+        new_copy = copy.deepcopy( self )
+
+        if unlocked:
+            new_copy.unlock()
+
+        else:
+            new_copy.lock()
+
+        return new_copy
 

@@ -191,7 +191,7 @@ class ChomskyGrammar():
                                 grammar.initial_symbol = current_level
 
                     if level_name == 'non_terminals':
-                        grammar.add( current_level, node )
+                        grammar.add_production( current_level, node )
 
         new_tree = ChomskyGrammarTreeTransformer().transform( AST )
         parse_tree( new_tree, 0, len( new_tree.children ) )
@@ -333,11 +333,14 @@ class ChomskyGrammar():
 
             if self.non_terminal_has_transitions_with( non_terminal, epsilon_production ):
                 self._remove_production_from_non_terminal( non_terminal, epsilon_production )
-                non_terminal_productions = self.productions[non_terminal]
+                non_terminal_productions = set( self.productions[non_terminal] )
 
                 for production in non_terminal_productions:
+                    production_non_terminals = production.get_non_terminals()
+                    not_go_to_epsilon = self.not_go_to_epsilon( production_non_terminals )
+                    add_epsilon = len( not_go_to_epsilon ) or len( production.get_terminals() )
 
-                    for combination in production.combinations():
+                    for combination in production.combinations( not_go_to_epsilon, add_epsilon ):
                         self.add_production( non_terminal, combination )
 
             if non_terminal == self.initial_symbol:
@@ -348,6 +351,19 @@ class ChomskyGrammar():
 
                     self.add_production( new_initial_symbol, epsilon_production )
                     self._copy_productions_for_one_non_terminal( new_initial_symbol, non_terminal )
+
+    def not_go_to_epsilon(self, non_terminals_to_check):
+        """
+            Get a list of on terminal's which does not go epsilon.
+        """
+        not_go_to_epsilon = []
+
+        for non_terminal in non_terminals_to_check:
+
+            if not self.has_production( non_terminal, epsilon_production ):
+                not_go_to_epsilon.append( non_terminal )
+
+        return not_go_to_epsilon
 
     def _remove_production_from_non_terminal(self, non_terminal, production):
         self.productions[non_terminal].discard( production )

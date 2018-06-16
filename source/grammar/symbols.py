@@ -52,7 +52,7 @@ class ChomskyGrammarSymbol(LockableType):
         """
 
         if not self.str:
-            raise RuntimeError( "Invalid symbol creation! Symbol with no length: `%s` (%s)" % self.str, sequence )
+            raise RuntimeError( "Invalid symbol creation! Symbol with no length: `%s`" % self.str )
 
     def __lt__(self, other):
         """
@@ -96,11 +96,17 @@ class ChomskyGrammarSymbol(LockableType):
         self.check_consistency()
         super().lock()
 
-    def trim_epsilons(self):
+    def trim_epsilons(self, new_copy=False):
         """
             Merges the epsilon symbol with other symbols, because the epsilon symbol has not
             meaning, unless it is alone.
+
+            If `new_copy` is True, then instead of modifying the current object, return a new copy
+            with epsilon's trimmed.
         """
+
+        if new_copy:
+            self = self.new( True )
 
         if len( self ):
             new_symbols = []
@@ -129,4 +135,13 @@ class NonTerminal(ChomskyGrammarSymbol):
     """
     def _len(self):
         return 1
+
+    def check_consistency(self):
+        """
+            Assures the symbol has meaning, i.e., is not empty.
+        """
+        super().check_consistency()
+
+        if not len( self ):
+            raise RuntimeError( "Invalid symbol creation! Symbol with no length: `%s`" % self.str )
 

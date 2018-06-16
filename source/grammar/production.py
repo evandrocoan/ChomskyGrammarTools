@@ -65,10 +65,13 @@ class Production(LockableType):
         """
 
         if self.locked:
-            raise AttributeError( "Attributes cannot be changed after `locked` is set to True! %s" % self.__repr__() )
+            raise AttributeError( "Attributes cannot be changed after `locked` is set to True! %s" % self )
 
         else:
             super().__setattr__( name, value )
+
+    def __repr__(self):
+        return super().__repr__() + '\n'
 
     def __str__(self):
         """
@@ -104,23 +107,26 @@ class Production(LockableType):
         """
             Called by Python automatically when iterating over this set and python wants to start
             the iteration process.
+
+            `self._index` internally controls the which one is the current item in an iteration over
+            an production
         """
-        self.__dict__['index'] = -1
+        self.__dict__['_index'] = -1
         return self
 
     def __next__(self):
         """
             Return the next item immediate for the current iteration.
         """
-        index = self.index + 1
+        index = self._index + 1
 
         if index < len( self.symbols ):
-            self.__dict__['index'] = index
+            self.__dict__['_index'] = index
             return self.symbols[index]
 
         raise StopIteration
 
-    def combinations(self, non_terminals_to_ignore=[]):
+    def combinations(self, non_terminals_to_ignore=[], add_epsilon=True):
         """
             Return a new set within all its non terminal's removal combinations.
 
@@ -128,27 +134,28 @@ class Production(LockableType):
             http://thomas-cokelaer.info/blog/2012/11/how-do-use-itertools-in-python-to-build-permutation-or-combination/
         """
         # log( 1, "self: %s", self )
-        combinations = set([epsilon_terminal])
+        combinations = set()
 
         non_terminals = self.get_non_terminals()
         non_terminals_count = len( non_terminals )
 
-        for permutation_size in range( 1, non_terminals_count ):
-            n_items_permutation = list( itertools.permutations( non_terminals, permutation_size ) )
+        for permutation_size in range( 1, non_terminals_count + 1 ):
             # log( 1, "permutation_size: %s", permutation_size )
+            n_items_permutation = list( itertools.permutations( non_terminals, permutation_size ) )
 
             for permutation in n_items_permutation:
                 new_production = self.new( True )
                 new_production.filter_non_terminals( permutation, non_terminals_to_ignore )
 
-                combinations.add( new_production )
                 # log( 1, "new_production: %s", new_production )
+                combinations.add( new_production )
 
         return combinations
 
     def filter_non_terminals(self, non_terminals_to_keep, non_terminals_to_ignore):
         """
-            Removes all non terminal's not present on the  given list `non_terminals_to_keep`.
+            Removes all non terminal's not present on the given list `non_terminals_to_keep`, but
+            keeps all non terminal's in the list `non_terminals_to_ignore`.
         """
 
         for symbol in self.symbols:
@@ -157,6 +164,9 @@ class Production(LockableType):
 
                 if symbol not in non_terminals_to_keep and symbol not in non_terminals_to_ignore:
                     self.symbols[symbol.sequence - 1] = epsilon_terminal
+
+        if not len( self ):
+            self.add( epsilon_terminal.new( True ) )
 
         self.trim_epsilons()
 
@@ -199,20 +209,6 @@ class Production(LockableType):
         self.lock()
         return self
 
-    def new(self, unlocked=False):
-        """
-            Creates and return a new copy of the current a object.
-        """
-        new_copy = copy.deepcopy( self )
-
-        if unlocked:
-            new_copy.unlock()
-
-        else:
-            new_copy.lock()
-
-        return new_copy
-
     def _copy_construc(self, other):
         """
             Is there a decent way of creating a copy constructor in python?
@@ -225,7 +221,7 @@ class Production(LockableType):
             Inside a item iteration, allow to the next nth element given by `lookahead`. If the
             search goes past end or it is the last item, return None.
         """
-        index = self.index + lookahead
+        index = self._index + lookahead
 
         if index < len( self.symbols ):
             return self.symbols[index]
@@ -237,7 +233,7 @@ class Production(LockableType):
             Similar to `peek_next()` but get all the following symbols until the end of the
             production. Return an empty list when there are not remaining symbols.
         """
-        index = self.index + 1
+        index = self._index + 1
         remaining_count = len( self.symbols )
         following_symbols = []
 
@@ -254,7 +250,10 @@ class Production(LockableType):
         """
 
         if type( symbol ) not in ( Terminal, NonTerminal ):
-            raise RuntimeError( "You can only add Terminal's and NonTerminal's in a Production object! %s" % symbol )
+            raise RuntimeError( "You can only add Terminal's and NonTerminal's! %s (%s)" % ( symbol, type( symbol ) ) )
+
+        if symbol.locked:
+            raise RuntimeError( "You can only add `unlocked` symbols in a production! %s" % symbol )
 
         # Epsilon symbols have length 0
         if len( symbol ) == 0:

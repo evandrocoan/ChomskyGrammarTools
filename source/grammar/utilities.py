@@ -56,6 +56,7 @@ def emquote_string(string):
     """
         Return a string escape into single or double quotes accordingly to its contents.
     """
+    string = str( string )
     is_single = "'" in string
     is_double = '"' in string
 
@@ -88,7 +89,7 @@ def sort_alphabetically_and_by_length(iterable):
         how to sort by length of string followed by alphabetical order?
         https://stackoverflow.com/questions/4659524/how-to-sort-by-length-of-string-followed-by-alphabetical-order
     """
-    return sorted( natsorted( iterable, key=lambda item: str( item ) ), key=len )
+    return sorted( natsorted( iterable, key=str ), key=len )
 
 
 def sort_correctly(iterable):
@@ -306,7 +307,7 @@ def get_representation(self, ignore=[], emquote=False):
         if not attribute.startswith( '_' ) and attribute not in ignore:
             clean_attributes.append( "{}: {}".format( attribute, pack_attribute( self.__dict__[attribute] ) ) )
 
-    return "%s %s;\n" % ( self.__class__.__name__, ", ".join( clean_attributes ) )
+    return "%s %s;" % ( self.__class__.__name__, ", ".join( clean_attributes ) )
 
 
 class DynamicIterationSet(object):
