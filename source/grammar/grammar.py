@@ -338,9 +338,8 @@ class ChomskyGrammar():
                 for production in non_terminal_productions:
                     production_non_terminals = production.get_non_terminals()
                     not_go_to_epsilon = self.not_go_to_epsilon( production_non_terminals )
-                    add_epsilon = len( not_go_to_epsilon ) or len( production.get_terminals() )
 
-                    for combination in production.combinations( not_go_to_epsilon, add_epsilon ):
+                    for combination in production.combinations( not_go_to_epsilon ):
                         self.add_production( non_terminal, combination )
 
             if non_terminal == self.initial_symbol:

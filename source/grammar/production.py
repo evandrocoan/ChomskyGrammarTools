@@ -126,9 +126,10 @@ class Production(LockableType):
 
         raise StopIteration
 
-    def combinations(self, non_terminals_to_ignore=[], add_epsilon=True):
+    def combinations(self, non_terminals_to_ignore=[]):
         """
-            Return a new set within all its non terminal's removal combinations.
+            Return a new set within all its non terminal's removal combinations, except for the non
+            terminal's set on `non_terminals_to_ignore`.
 
             How do use itertools in Python to build permutation or combination
             http://thomas-cokelaer.info/blog/2012/11/how-do-use-itertools-in-python-to-build-permutation-or-combination/
@@ -139,17 +140,29 @@ class Production(LockableType):
         non_terminals = self.get_non_terminals()
         non_terminals_count = len( non_terminals )
 
-        for permutation_size in range( 1, non_terminals_count + 1 ):
+        for permutation_size in range( 0, non_terminals_count ):
             # log( 1, "permutation_size: %s", permutation_size )
             n_items_permutation = list( itertools.permutations( non_terminals, permutation_size ) )
 
             for permutation in n_items_permutation:
                 new_production = self.new( True )
-                new_production.filter_non_terminals( permutation, non_terminals_to_ignore )
+
+                try:
+                    new_production.filter_non_terminals( permutation, non_terminals_to_ignore )
+
+                except RuntimeError as error:
+                    error = str( error )
+
+                    if error.startswith( "Invalid production creation! Production with no length:" ):
+                        new_production = epsilon_production.new( True )
+
+                    else:
+                        raise RuntimeError( error )
 
                 # log( 1, "new_production: %s", new_production )
                 combinations.add( new_production )
 
+        # log( 1, "combinations: %s", combinations )
         return combinations
 
     def filter_non_terminals(self, non_terminals_to_keep, non_terminals_to_ignore):
@@ -192,12 +205,13 @@ class Production(LockableType):
             If `new_copy` is True, then instead of modifying the current object, return a new copy
             with epsilon's trimmed.
         """
-        old_symbols = self.symbols
-        self.symbols = []
-        self.sequence = 0
 
         if new_copy:
             self = self.new( True )
+
+        old_symbols = self.symbols
+        self.symbols = []
+        self.sequence = 0
 
         for old_symbol in old_symbols:
 
@@ -325,7 +339,7 @@ class Production(LockableType):
         """
 
         if not self.symbols:
-            raise RuntimeError( "Invalid production creation! Production with no length: `%s` (%s)" % self.symbols, sequence )
+            raise RuntimeError( "Invalid production creation! Production with no length: `%s`" % self.symbols )
 
     def get_terminals(self):
         """

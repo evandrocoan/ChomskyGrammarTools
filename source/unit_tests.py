@@ -37,19 +37,27 @@ class TestProduction(TestingUtilities):
             Creates basic non terminal's for usage.
         """
         super().setUp()
+        LockableType._USE_STRING = True
+
         self.ntA = NonTerminal( "A" )
         self.ntB = NonTerminal( "B" )
         self.ntC = NonTerminal( "C" )
         self.ntD = NonTerminal( "D" )
-        LockableType._USE_STRING = True
 
-    def test_productionNonTerminalRemoval1SymbolABCD(self):
+        self.ta = Terminal( "a" )
+        self.tb = Terminal( "b" )
+        self.tc = Terminal( "c" )
+        self.td = Terminal( "d" )
+
+    def test_productionNonTerminalRemovalSymbolFromABCD(self):
         LockableType._USE_STRING = False
         production = Production( symbols=[self.ntA, self.ntB, self.ntC, self.ntD], lock=True )
 
         self.assertTextEqual(
         """
-            + [Production locked: True, str: A, symbols: [NonTerminal locked: True, str: A, sequence: 1,
+            + [Production locked: False, str: &, symbols: [Terminal locked: True, str: &, sequence: 1,
+            + has_epsilon: True, len: 0;], sequence: 1, has_epsilon: True, len: 0;
+            + , Production locked: True, str: A, symbols: [NonTerminal locked: True, str: A, sequence: 1,
             + has_epsilon: False, len: 1;], sequence: 1, has_epsilon: False, len: 1;
             + , Production locked: True, str: B, symbols: [NonTerminal locked: True, str: B, sequence: 1,
             + has_epsilon: False, len: 1;], sequence: 1, has_epsilon: False, len: 1;
@@ -91,47 +99,61 @@ class TestProduction(TestingUtilities):
             + has_epsilon: False, len: 1;, NonTerminal locked: True, str: C, sequence: 2, has_epsilon: False, len:
             + 1;, NonTerminal locked: True, str: D, sequence: 3, has_epsilon: False, len: 1;], sequence: 3,
             + has_epsilon: False, len: 3;
-            + , Production locked: True, str: A B C D, symbols: [NonTerminal locked: True, str: A, sequence: 1,
-            + has_epsilon: False, len: 1;, NonTerminal locked: True, str: B, sequence: 2, has_epsilon: False, len:
-            + 1;, NonTerminal locked: True, str: C, sequence: 3, has_epsilon: False, len: 1;, NonTerminal locked:
-            + True, str: D, sequence: 4, has_epsilon: False, len: 1;], sequence: 4, has_epsilon: False, len: 4;
             + ]
         """, wrap_text( sort_alphabetically_and_by_length( production.combinations() ), wrap=100 ) )
 
-    def test_productionNonTerminalRemoval1SymbolABC(self):
+    def test_productionNonTerminalRemovalSymbolFromABC(self):
         production = Production( symbols=[self.ntA, self.ntB, self.ntC], lock=True )
 
         self.assertTextEqual(
         """
-            + [A
+            + [&
+            + , A
             + , B
             + , C
             + , A B
             + , A C
             + , B C
-            + , A B C
             + ]
         """, sort_alphabetically_and_by_length( production.combinations() ) )
 
-    def test_productionNonTerminalRemoval1SymbolAB(self):
+    def test_productionNonTerminalRemovalSymbolFromAB(self):
         production = Production( symbols=[self.ntA, self.ntB], lock=True )
 
         self.assertTextEqual(
         """
-            + [A
+            + [&
+            + , A
             + , B
-            + , A B
             + ]
         """, sort_alphabetically_and_by_length( production.combinations() ) )
 
-    def test_productionNonTerminalRemoval1SymbolFromA(self):
+    def test_productionNonTerminalRemovalSymbolFromA(self):
         production = Production( symbols=[self.ntA], lock=True )
 
         self.assertTextEqual(
         """
-            + [A
+            + [&
             + ]
         """, sort_alphabetically_and_by_length( production.combinations() ) )
+
+    # def test_productionNonTerminalRemovalSymbolFromAa(self):
+    #     production = Production( symbols=[self.ntA, self.ta], lock=True )
+
+    #     self.assertTextEqual(
+    #     """
+    #     """, sort_alphabetically_and_by_length( production.combinations() ) )
+
+    def test_productionFilterNonTerminalsFromAa(self):
+        LockableType._USE_STRING = False
+
+        production = Production( symbols=[self.ntA, self.ta] )
+        production.filter_non_terminals([], [])
+
+        self.assertTextEqual(
+        """
+            + [Terminal locked: True, str: a, sequence: 1, has_epsilon: False, len: 1;]
+        """, sort_alphabetically_and_by_length( production ) )
 
     def test_productionABCD(self):
         production = Production( symbols=[self.ntA, self.ntB, self.ntC, self.ntD], lock=True )
