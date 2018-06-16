@@ -264,6 +264,63 @@ class ChomskyGrammar():
                 if non_terminal not in start_non_terminals:
                     raise RuntimeError( "Invalid Non Terminal `%s` added to the grammar: \n%s" % ( non_terminal, self ) )
 
+    def is_epsilon_free(self):
+        """
+            Return `True` if the start symbol is recursive and has epsilon transitions or if other
+            non initial symbol start non terminal have epsilon.
+        """
+
+        for non_terminal in self.productions.keys():
+
+            if self.non_terminal_has_transitions_with( non_terminal, epsilon_production ):
+
+                if non_terminal == self.initial_symbol:
+
+                    if self.has_recursion_on_the_non_terminal( non_terminal ):
+                        return False
+
+                else:
+                    return False
+
+        return True
+
+    def non_terminal_has_transitions_with(self, non_terminal_to_check, production_to_check):
+        productions = self.productions[non_terminal_to_check]
+
+        for production in productions:
+
+            if production == production_to_check:
+                return True
+
+        return False
+
+    def has_recursion_on_the_non_terminal(self, non_terminal_to_check):
+        """
+            Return `True` if the given ``non_terminal_to_check` is recursive with himself.
+        """
+        recursive_terminals = DynamicIterationSet([non_terminal_to_check])
+
+        for non_terminal in recursive_terminals:
+            productions = self.productions[non_terminal]
+
+            for production in productions:
+                # log( 1, "production: %s", production )
+
+                for symbol in production:
+                    # log( 1, "symbol: %s", symbol )
+
+                    if type( symbol ) is NonTerminal:
+
+                        if symbol == non_terminal_to_check:
+                            # log( 1, "recursive_terminals: %s", recursive_terminals )
+                            return True
+
+                        if symbol not in recursive_terminals:
+                            recursive_terminals.add( symbol )
+
+        # log( 1, "recursive_terminals: %s", recursive_terminals )
+        return False
+
     def convert_to_epsilon_free(self):
         pass
 

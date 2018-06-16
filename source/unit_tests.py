@@ -17,6 +17,8 @@ from grammar.symbols import Terminal
 from grammar.symbols import NonTerminal
 
 from grammar.production import Production
+from grammar.production import epsilon_production
+from grammar.production import epsilon_terminal
 from grammar.lockable_type import LockableType
 from grammar.tree_transformer import ChomskyGrammarTreeTransformer
 
@@ -31,7 +33,57 @@ class TestChomskyGrammar(TestingUtilities):
     def tearDown(self):
         LockableType._USE_STRING = True
 
-    def test_grammarHasLeftRecursionCalculationOfChapter5FirstExample1(self):
+    def test_grammarEpsilonProductionEvalutesTrueOnIf(self):
+
+        if epsilon_production:
+            self.fail( "Epsilon production did evaluate to `True`" )
+
+        if epsilon_terminal:
+            self.fail( "Epsilon terminal did evaluate to `True`" )
+
+        if Production( symbols=[Terminal( "&" )], lock=True ):
+            self.fail( "Recent created Epsilon Production did not evaluate to `True`" )
+
+        if not Terminal( "a", lock=True ):
+            self.fail( "Terminal did not evaluate to `True`" )
+
+        if not NonTerminal( "A", lock=True ):
+            self.fail( "NonTerminal did not evaluate to `True`" )
+
+        if not Production( symbols=[Terminal( "b" )], lock=True ):
+            self.fail( "Production did not evaluate to `True`" )
+
+    def test_grammarNonTerminalHasTransitionsWithChapter5FirstExample1(self):
+        firstGrammar = ChomskyGrammar.load_from_text_lines( wrap_text(
+        """
+            S -> Ab | A Bc
+            A -> aA | &
+            B -> bB | Ad | &
+        """ ) )
+        terminal_b = Terminal( "b" )
+        non_terminal_S = NonTerminal( "S" )
+        non_terminal_A = NonTerminal( "A" )
+
+        production_S = Production( symbols=[non_terminal_S], lock=True )
+        production_A = Production( symbols=[non_terminal_A, terminal_b], lock=True )
+
+        self.assertFalse( firstGrammar.non_terminal_has_transitions_with( non_terminal_S, production_S ) )
+        self.assertTrue( firstGrammar.non_terminal_has_transitions_with( non_terminal_S, production_A ) )
+
+    def test_grammarHasOnNonTerminalChapter5FirstExample1(self):
+        firstGrammar = ChomskyGrammar.load_from_text_lines( wrap_text(
+        """
+            S -> Ab | A Bc
+            A -> aA | &
+            B -> bB | Ad | &
+        """ ) )
+        non_terminal_S = NonTerminal( "S", lock=True )
+        non_terminal_A = NonTerminal( "A", lock=True )
+
+        self.assertFalse( firstGrammar.has_recursion_on_the_non_terminal( non_terminal_S ) )
+        self.assertTrue( firstGrammar.has_recursion_on_the_non_terminal( non_terminal_A ) )
+
+    def test_grammarIsNotEpsilonFreeChapter5FirstExample1(self):
         firstGrammar = ChomskyGrammar.load_from_text_lines( wrap_text(
         """
             S -> Ab | A Bc
@@ -39,12 +91,32 @@ class TestChomskyGrammar(TestingUtilities):
             B -> bB | Ad | &
         """ ) )
 
-        self.assertTextEqual(
-        """
-            not implemented yet
-        """, dictionary_to_string( firstGrammar.left_recursion() ) )
+        self.assertFalse( firstGrammar.is_epsilon_free() )
 
-        self.assertFalse( firstGrammar.has_left_recursion() )
+    def test_grammarIsEpsilonFreeChapter5FirstExample1EpsilonFreed(self):
+        firstGrammar = ChomskyGrammar.load_from_text_lines( wrap_text(
+        """
+            S -> Ab | A Bc | &
+            A -> aA | a
+            B -> bB | Ad
+        """ ) )
+
+        self.assertTrue( firstGrammar.is_epsilon_free() )
+
+    # def test_grammarHasLeftRecursionCalculationOfChapter5FirstExample1(self):
+    #     firstGrammar = ChomskyGrammar.load_from_text_lines( wrap_text(
+    #     """
+    #         S -> Ab | A Bc
+    #         A -> aA | &
+    #         B -> bB | Ad | &
+    #     """ ) )
+
+    #     self.assertTextEqual(
+    #     """
+    #         not implemented yet
+    #     """, dictionary_to_string( firstGrammar.left_recursion() ) )
+
+    #     self.assertFalse( firstGrammar.has_left_recursion() )
 
     # def test_grammarHasLeftRecursionCalculationOfChapter5FirstExample1(self):
     #     firstGrammar = ChomskyGrammar.load_from_text_lines( wrap_text(
