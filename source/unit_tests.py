@@ -50,46 +50,46 @@ class TestProduction(TestingUtilities):
         self.assertTextEqual(
         """
             + [Production locked: True, str: A, symbols: [NonTerminal locked: True, str: A, sequence: 1,
-            + has_epsilon: False, len: 1;], sequence: 4, has_epsilon: False, len: 1;
-            + , Production locked: True, str: B, symbols: [NonTerminal locked: True, str: B, sequence: 2,
-            + has_epsilon: False, len: 1;], sequence: 4, has_epsilon: False, len: 1;
-            + , Production locked: True, str: C, symbols: [NonTerminal locked: True, str: C, sequence: 3,
-            + has_epsilon: False, len: 1;], sequence: 4, has_epsilon: False, len: 1;
-            + , Production locked: True, str: D, symbols: [NonTerminal locked: True, str: D, sequence: 4,
-            + has_epsilon: False, len: 1;], sequence: 4, has_epsilon: False, len: 1;
+            + has_epsilon: False, len: 1;], sequence: 1, has_epsilon: False, len: 1;
+            + , Production locked: True, str: B, symbols: [NonTerminal locked: True, str: B, sequence: 1,
+            + has_epsilon: False, len: 1;], sequence: 1, has_epsilon: False, len: 1;
+            + , Production locked: True, str: C, symbols: [NonTerminal locked: True, str: C, sequence: 1,
+            + has_epsilon: False, len: 1;], sequence: 1, has_epsilon: False, len: 1;
+            + , Production locked: True, str: D, symbols: [NonTerminal locked: True, str: D, sequence: 1,
+            + has_epsilon: False, len: 1;], sequence: 1, has_epsilon: False, len: 1;
             + , Production locked: True, str: A B, symbols: [NonTerminal locked: True, str: A, sequence: 1,
             + has_epsilon: False, len: 1;, NonTerminal locked: True, str: B, sequence: 2, has_epsilon: False, len:
-            + 1;], sequence: 4, has_epsilon: False, len: 2;
+            + 1;], sequence: 2, has_epsilon: False, len: 2;
             + , Production locked: True, str: A C, symbols: [NonTerminal locked: True, str: A, sequence: 1,
-            + has_epsilon: False, len: 1;, NonTerminal locked: True, str: C, sequence: 3, has_epsilon: False, len:
-            + 1;], sequence: 4, has_epsilon: False, len: 2;
+            + has_epsilon: False, len: 1;, NonTerminal locked: True, str: C, sequence: 2, has_epsilon: False, len:
+            + 1;], sequence: 2, has_epsilon: False, len: 2;
             + , Production locked: True, str: A D, symbols: [NonTerminal locked: True, str: A, sequence: 1,
-            + has_epsilon: False, len: 1;, NonTerminal locked: True, str: D, sequence: 4, has_epsilon: False, len:
-            + 1;], sequence: 4, has_epsilon: False, len: 2;
-            + , Production locked: True, str: B C, symbols: [NonTerminal locked: True, str: B, sequence: 2,
-            + has_epsilon: False, len: 1;, NonTerminal locked: True, str: C, sequence: 3, has_epsilon: False, len:
-            + 1;], sequence: 4, has_epsilon: False, len: 2;
-            + , Production locked: True, str: B D, symbols: [NonTerminal locked: True, str: B, sequence: 2,
-            + has_epsilon: False, len: 1;, NonTerminal locked: True, str: D, sequence: 4, has_epsilon: False, len:
-            + 1;], sequence: 4, has_epsilon: False, len: 2;
-            + , Production locked: True, str: C D, symbols: [NonTerminal locked: True, str: C, sequence: 3,
-            + has_epsilon: False, len: 1;, NonTerminal locked: True, str: D, sequence: 4, has_epsilon: False, len:
-            + 1;], sequence: 4, has_epsilon: False, len: 2;
+            + has_epsilon: False, len: 1;, NonTerminal locked: True, str: D, sequence: 2, has_epsilon: False, len:
+            + 1;], sequence: 2, has_epsilon: False, len: 2;
+            + , Production locked: True, str: B C, symbols: [NonTerminal locked: True, str: B, sequence: 1,
+            + has_epsilon: False, len: 1;, NonTerminal locked: True, str: C, sequence: 2, has_epsilon: False, len:
+            + 1;], sequence: 2, has_epsilon: False, len: 2;
+            + , Production locked: True, str: B D, symbols: [NonTerminal locked: True, str: B, sequence: 1,
+            + has_epsilon: False, len: 1;, NonTerminal locked: True, str: D, sequence: 2, has_epsilon: False, len:
+            + 1;], sequence: 2, has_epsilon: False, len: 2;
+            + , Production locked: True, str: C D, symbols: [NonTerminal locked: True, str: C, sequence: 1,
+            + has_epsilon: False, len: 1;, NonTerminal locked: True, str: D, sequence: 2, has_epsilon: False, len:
+            + 1;], sequence: 2, has_epsilon: False, len: 2;
             + , Production locked: True, str: A B C, symbols: [NonTerminal locked: True, str: A, sequence: 1,
             + has_epsilon: False, len: 1;, NonTerminal locked: True, str: B, sequence: 2, has_epsilon: False, len:
-            + 1;, NonTerminal locked: True, str: C, sequence: 3, has_epsilon: False, len: 1;], sequence: 4,
+            + 1;, NonTerminal locked: True, str: C, sequence: 3, has_epsilon: False, len: 1;], sequence: 3,
             + has_epsilon: False, len: 3;
             + , Production locked: True, str: A B D, symbols: [NonTerminal locked: True, str: A, sequence: 1,
             + has_epsilon: False, len: 1;, NonTerminal locked: True, str: B, sequence: 2, has_epsilon: False, len:
-            + 1;, NonTerminal locked: True, str: D, sequence: 4, has_epsilon: False, len: 1;], sequence: 4,
+            + 1;, NonTerminal locked: True, str: D, sequence: 3, has_epsilon: False, len: 1;], sequence: 3,
             + has_epsilon: False, len: 3;
             + , Production locked: True, str: A C D, symbols: [NonTerminal locked: True, str: A, sequence: 1,
-            + has_epsilon: False, len: 1;, NonTerminal locked: True, str: C, sequence: 3, has_epsilon: False, len:
-            + 1;, NonTerminal locked: True, str: D, sequence: 4, has_epsilon: False, len: 1;], sequence: 4,
+            + has_epsilon: False, len: 1;, NonTerminal locked: True, str: C, sequence: 2, has_epsilon: False, len:
+            + 1;, NonTerminal locked: True, str: D, sequence: 3, has_epsilon: False, len: 1;], sequence: 3,
             + has_epsilon: False, len: 3;
-            + , Production locked: True, str: B C D, symbols: [NonTerminal locked: True, str: B, sequence: 2,
-            + has_epsilon: False, len: 1;, NonTerminal locked: True, str: C, sequence: 3, has_epsilon: False, len:
-            + 1;, NonTerminal locked: True, str: D, sequence: 4, has_epsilon: False, len: 1;], sequence: 4,
+            + , Production locked: True, str: B C D, symbols: [NonTerminal locked: True, str: B, sequence: 1,
+            + has_epsilon: False, len: 1;, NonTerminal locked: True, str: C, sequence: 2, has_epsilon: False, len:
+            + 1;, NonTerminal locked: True, str: D, sequence: 3, has_epsilon: False, len: 1;], sequence: 3,
             + has_epsilon: False, len: 3;
             + , Production locked: True, str: A B C D, symbols: [NonTerminal locked: True, str: A, sequence: 1,
             + has_epsilon: False, len: 1;, NonTerminal locked: True, str: B, sequence: 2, has_epsilon: False, len:

@@ -31,6 +31,7 @@ class LockableType(object):
             https://stackoverflow.com/questions/3870982/how-to-handle-call-to-setattr-from-init
         """
         super().__setattr__('locked', False)
+        self._original_len = self._len
 
         ## Controls whether the attributes changes of this object are allow or not
         self.locked = False
@@ -103,6 +104,13 @@ class LockableType(object):
 
     def _len(self):
         raise TypeError( "object of type '%s' has no len()" % self.__class__.__name__ )
+
+    def unlock(self):
+        """
+            Unblock the object changes allowing its attributes to be freely set.
+        """
+        self.__dict__['locked'] = False
+        self._len = self._original_len
 
     def lock(self):
         """

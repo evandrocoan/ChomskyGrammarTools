@@ -192,20 +192,21 @@ class Production(LockableType):
             If `new_copy` is True, then instead of modifying the current object, return a new copy
             with epsilon's trimmed.
         """
-        new_symbols = []
+        old_symbols = self.symbols
+        self.symbols = []
+        self.sequence = 0
 
         if new_copy:
             self = self.new( True )
 
-        for symbol in self.symbols:
+        for old_symbol in old_symbols:
 
-            if len( symbol ):
-                new_symbols.append( symbol )
+            if len( old_symbol ):
+                self.add( old_symbol.new( True ) )
 
-        if not len( new_symbols ):
-            new_symbols.append( epsilon_terminal )
+        if not len( self ):
+            self.add( epsilon_terminal.new( True ) )
 
-        self.symbols = new_symbols
         self.lock()
         return self
 
@@ -272,6 +273,10 @@ class Production(LockableType):
         self.symbols.append( symbol )
 
     def _merge_terminals(self, new_symbol):
+        """
+            Return `True` when it is not required to increment the `sequence` counting, as the
+            symbol was squashed with the last one.
+        """
 
         if type( new_symbol ) is Terminal:
 
@@ -286,7 +291,10 @@ class Production(LockableType):
         return False
 
     def unlock(self):
-        self.__dict__['locked'] = False
+        """
+            Unblock the object changes allowing its attributes to be freely set.
+        """
+        super().unlock()
         self._len = self._original_len
 
     def lock(self):
