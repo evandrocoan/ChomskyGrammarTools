@@ -79,7 +79,7 @@ class Production(LockableType):
         for symbol in self.symbols:
             symbols_str.append( str( symbol ) )
 
-        return "\n".join( symbols_str )
+        return " ".join( symbols_str )
 
     def __lt__(self, other):
         """

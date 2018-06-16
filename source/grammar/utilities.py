@@ -88,8 +88,19 @@ def sort_alphabetically_and_by_length(iterable):
         how to sort by length of string followed by alphabetical order?
         https://stackoverflow.com/questions/4659524/how-to-sort-by-length-of-string-followed-by-alphabetical-order
     """
-    natsorted( iterable )
-    return sorted( iterable, key=len )
+    return sorted( natsorted( iterable, key=lambda item: str( item ) ), key=len )
+
+
+def sort_correctly(iterable):
+    """
+        Sort the given iterable in the way that humans expect.
+
+        How to sort alpha numeric set in python
+        https://stackoverflow.com/questions/2669059/how-to-sort-alpha-numeric-set-in-python
+    """
+    convert = lambda text: int( text ) if text.isdigit() else text
+    alphanum_key = lambda key: [convert( characters ) for characters in re.split( '([0-9]+)', key )]
+    return sorted( iterable, key=alphanum_key )
 
 
 def get_largest_item_size(iterable):
@@ -295,7 +306,7 @@ def get_representation(self, ignore=[], emquote=False):
         if not attribute.startswith( '_' ) and attribute not in ignore:
             clean_attributes.append( "{}: {}".format( attribute, pack_attribute( self.__dict__[attribute] ) ) )
 
-    return "%s %s;" % ( self.__class__.__name__, ", ".join( clean_attributes ) )
+    return "%s %s;\n" % ( self.__class__.__name__, ", ".join( clean_attributes ) )
 
 
 class DynamicIterationSet(object):

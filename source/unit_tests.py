@@ -41,14 +41,13 @@ class TestProduction(TestingUtilities):
         self.ntB = NonTerminal( "B" )
         self.ntC = NonTerminal( "C" )
         self.ntD = NonTerminal( "D" )
-        LockableType._USE_STRING = False
 
     def test_productionNonTerminalRemoval1SymbolABCD(self):
         production = Production( symbols=[self.ntA, self.ntB, self.ntC, self.ntD], lock=True )
 
         self.assertTextEqual(
         """
-            + [&, C, B, D, A, A D, A C, B C, B D, A B, C D, B C D, A B C, A B D, A C D]
+            + [&, A, B, C, D, A B, A C, A D, B C, B D, C D, A B C, A B D, A C D, B C D]
         """, sort_alphabetically_and_by_length( production.combinations() ) )
 
     def test_productionNonTerminalRemoval1SymbolABC(self):
@@ -56,25 +55,16 @@ class TestProduction(TestingUtilities):
 
         self.assertTextEqual(
         """
-            + [&, C, B, A, A C, B C, A B]
+            + [&, A, B, C, A B, A C, B C]
         """, sort_alphabetically_and_by_length( production.combinations() ) )
 
     def test_productionNonTerminalRemoval1SymbolAB(self):
-        production1 = Production( symbols=[self.ntA, self.ntB], lock=True )
-        production2 = Production( symbols=[self.ntC, self.ntD], lock=True )
+        production = Production( symbols=[self.ntA, self.ntB], lock=True )
 
-        throuble = set([self.ntA, production1])
-
-        for shit in throuble:
-            print( "type:", type( shit ) )
-            print( 'nth shit:', shit.__repr__() )
-
-        natsorted( throuble )
-
-        # self.assertTextEqual(
-        # """
-        #     + [&, A, B]
-        # """, sort_alphabetically_and_by_length( production1.combinations() ) )
+        self.assertTextEqual(
+        """
+            + [&, A, B]
+        """, sort_alphabetically_and_by_length( production.combinations() ) )
 
     def test_productionNonTerminalRemoval1SymbolFromA(self):
         production = Production( symbols=[self.ntA], lock=True )
