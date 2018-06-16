@@ -203,7 +203,7 @@ class ChomskyGrammar():
         grammar.assure_existing_symbols()
         return grammar
 
-    def add(self, start_symbol, production):
+    def add_production(self, start_symbol, production):
         """
             Add a new `production` to this grammar given a `start_symbol`.
 
@@ -215,6 +215,9 @@ class ChomskyGrammar():
 
         if type( production ) is not Production:
             raise RuntimeError( "Your production is not an instance of Production! %s, %s" % ( start_symbol, production ) )
+
+        if not len( start_symbol ):
+            raise RuntimeError( "Grammar start non terminal cannot be Epsilon! %s -> %s", start_symbol, production )
 
         production.lock()
         start_symbol.lock()
@@ -322,7 +325,43 @@ class ChomskyGrammar():
         return False
 
     def convert_to_epsilon_free(self):
-        pass
+        """
+            Convert the current grammar to a epsilon free grammar.
+        """
+
+        for non_terminal in set( self.productions.keys() ):
+
+            if self.non_terminal_has_transitions_with( non_terminal, epsilon_production ):
+                self._remove_production_from_non_terminal( non_terminal, epsilon_production )
+                non_terminal_productions = self.productions[non_terminal]
+
+                for production in non_terminal_productions:
+
+                    for combination in production.combinations():
+                        self.add_production( non_terminal, combination )
+
+            if non_terminal == self.initial_symbol:
+
+                if self.has_recursion_on_the_non_terminal( non_terminal ):
+                    new_initial_symbol = self._get_new_initial_symbol()
+                    self.initial_symbol = new_initial_symbol
+
+                    self.add_production( new_initial_symbol, epsilon_production )
+                    self._copy_productions_for_one_non_terminal( new_initial_symbol, non_terminal )
+
+    def _remove_production_from_non_terminal(self, non_terminal, production):
+        self.productions[non_terminal].discard( production )
+
+    def _copy_productions_for_one_non_terminal(self, non_terminal_destine, non_terminal_source, secondGrammar=None):
+
+        if secondGrammar:
+            secondGrammarProductions = secondGrammar.productions[non_terminal_source]
+
+        else:
+            secondGrammarProductions = self.productions[non_terminal_source]
+
+        for production in secondGrammarProductions:
+            self.add_production( non_terminal_destine, production )
 
     def left_recursion(self):
         """

@@ -2,6 +2,10 @@
 # -*- coding: utf-8 -*-
 
 import os
+
+import copy
+import itertools
+
 from debug_tools import getLogger
 
 from .symbols import Terminal
@@ -19,30 +23,32 @@ class Production(LockableType):
         A full featured Chomsky Grammar production.
     """
 
-    def __init__(self, symbols=[], lock=False, sequence=0):
+    def __init__(self, symbols=[], lock=False):
         """
             Creates a new fresh production.
 
-            `sequence` the index of the first symbol of the symbol's sequence
             `symbols` a list of initial symbols to add to the production
             `lock` if True, the object will be immediately locked upon creation
         """
         super().__init__()
 
-        ## A list of Terminal's and NonTerminal's this production is composed
-        self.symbols = []
+        if isinstance( symbols, Production ):
+            self._copy_construc( symbols )
+            return
 
-        if not isinstance( sequence, int ):
-            raise RuntimeError( "The sequence parameter must to be an integer! %s" % sequence )
+        else:
+            ## A list of Terminal's and NonTerminal's this production is composed
+            self.symbols = []
 
         ## The last symbols' sequence starting from 1
-        self.sequence = sequence
+        self.sequence = 0
 
         ## Whether this production has some Epsilon symbol or not
         self.has_epsilon = False
 
         ## Caches the length of this symbol, useful after its changes have been locked by `lock()`
         self.len = 0
+        self._original_len = self._len
 
         if symbols:
 
@@ -73,7 +79,7 @@ class Production(LockableType):
         for symbol in self.symbols:
             symbols_str.append( str( symbol ) )
 
-        return " ".join( symbols_str )
+        return "\n".join( symbols_str )
 
     def __lt__(self, other):
         """
@@ -113,6 +119,106 @@ class Production(LockableType):
             return self.symbols[index]
 
         raise StopIteration
+
+    def combinations(self, non_terminals_to_ignore=[]):
+        """
+            Return a new set within all its non terminal's removal combinations.
+
+            How do use itertools in Python to build permutation or combination
+            http://thomas-cokelaer.info/blog/2012/11/how-do-use-itertools-in-python-to-build-permutation-or-combination/
+        """
+        # log( 1, "self: %s", self )
+        combinations = set([epsilon_terminal])
+
+        non_terminals = self.get_non_terminals()
+        non_terminals_count = len( non_terminals )
+
+        for permutation_size in range( 1, non_terminals_count ):
+            n_items_permutation = list( itertools.permutations( non_terminals, permutation_size ) )
+            # log( 1, "permutation_size: %s", permutation_size )
+
+            for permutation in n_items_permutation:
+                new_production = self.new( True )
+                new_production.filter_non_terminals( permutation, non_terminals_to_ignore )
+
+                combinations.add( new_production )
+                # log( 1, "new_production: %s", new_production )
+
+        return combinations
+
+    def filter_non_terminals(self, non_terminals_to_keep, non_terminals_to_ignore):
+        """
+            Removes all non terminal's not present on the  given list `non_terminals_to_keep`.
+        """
+
+        for symbol in self.symbols:
+
+            if type( symbol ) is NonTerminal:
+
+                if symbol not in non_terminals_to_keep and symbol not in non_terminals_to_ignore:
+                    self.symbols[symbol.sequence - 1] = epsilon_terminal
+
+        self.trim_epsilons()
+
+    def remove_non_terminal(self, index):
+        """
+            Given an index starting from 0, removes the nth non terminal's.
+        """
+        terminal_index = -1
+
+        for symbol in self.symbols:
+
+            if type( symbol ) is NonTerminal:
+                terminal_index += 1
+
+                if terminal_index == index:
+                    self.symbols[symbol.sequence - 1] = epsilon_terminal
+                    break
+
+    def trim_epsilons(self, new_copy=False):
+        """
+            Removes all meaningless epsilon's, i.e., with no meaning, useless.
+
+            If `new_copy` is True, then instead of modifying the current object, return a new copy
+            with epsilon's trimmed.
+        """
+        new_symbols = []
+
+        if new_copy:
+            self = self.new( True )
+
+        for symbol in self.symbols:
+
+            if len( symbol ):
+                new_symbols.append( symbol )
+
+        if not len( new_symbols ):
+            new_symbols.append( epsilon_terminal )
+
+        self.symbols = new_symbols
+        self.lock()
+        return self
+
+    def new(self, unlocked=False):
+        """
+            Creates and return a new copy of the current a object.
+        """
+        new_copy = copy.deepcopy( self )
+
+        if unlocked:
+            new_copy.unlock()
+
+        else:
+            new_copy.lock()
+
+        return new_copy
+
+    def _copy_construc(self, other):
+        """
+            Is there a decent way of creating a copy constructor in python?
+            https://stackoverflow.com/questions/10640642/is-there-a-decent-way-of-creating-a-copy-constructor-in-python
+        """
+        self.__dict__ = other.__dict__.deepcopy()
 
     def peek_next(self, lookahead=1):
         """
@@ -179,6 +285,10 @@ class Production(LockableType):
                     return True
 
         return False
+
+    def unlock(self):
+        self.__dict__['locked'] = False
+        self._len = self._original_len
 
     def lock(self):
         """

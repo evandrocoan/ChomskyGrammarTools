@@ -5,6 +5,7 @@ import sys
 import lark
 
 import unittest
+from natsort import natsorted
 from collections import OrderedDict
 
 from grammar.grammar import ChomskyGrammar
@@ -12,6 +13,7 @@ from grammar.grammar import ChomskyGrammar
 from grammar.utilities import wrap_text
 from grammar.utilities import getCleanSpaces
 from grammar.utilities import dictionary_to_string
+from grammar.utilities import sort_alphabetically_and_by_length
 
 from grammar.symbols import Terminal
 from grammar.symbols import NonTerminal
@@ -23,6 +25,72 @@ from grammar.lockable_type import LockableType
 from grammar.tree_transformer import ChomskyGrammarTreeTransformer
 
 from grammar.testing_utilities import TestingUtilities
+
+
+class TestProduction(TestingUtilities):
+    """
+        Tests the Production class.
+    """
+
+    def setUp(self):
+        """
+            Creates basic non terminal's for usage.
+        """
+        super().__init__()
+        self.ntA = NonTerminal( "A" )
+        self.ntB = NonTerminal( "B" )
+        self.ntC = NonTerminal( "C" )
+        self.ntD = NonTerminal( "D" )
+        LockableType._USE_STRING = False
+
+    def test_productionNonTerminalRemoval1SymbolABCD(self):
+        production = Production( symbols=[self.ntA, self.ntB, self.ntC, self.ntD], lock=True )
+
+        self.assertTextEqual(
+        """
+            + [&, C, B, D, A, A D, A C, B C, B D, A B, C D, B C D, A B C, A B D, A C D]
+        """, sort_alphabetically_and_by_length( production.combinations() ) )
+
+    def test_productionNonTerminalRemoval1SymbolABC(self):
+        production = Production( symbols=[self.ntA, self.ntB, self.ntC], lock=True )
+
+        self.assertTextEqual(
+        """
+            + [&, C, B, A, A C, B C, A B]
+        """, sort_alphabetically_and_by_length( production.combinations() ) )
+
+    def test_productionNonTerminalRemoval1SymbolAB(self):
+        production1 = Production( symbols=[self.ntA, self.ntB], lock=True )
+        production2 = Production( symbols=[self.ntC, self.ntD], lock=True )
+
+        throuble = set([self.ntA, production1])
+
+        for shit in throuble:
+            print( "type:", type( shit ) )
+            print( 'nth shit:', shit.__repr__() )
+
+        natsorted( throuble )
+
+        # self.assertTextEqual(
+        # """
+        #     + [&, A, B]
+        # """, sort_alphabetically_and_by_length( production1.combinations() ) )
+
+    def test_productionNonTerminalRemoval1SymbolFromA(self):
+        production = Production( symbols=[self.ntA], lock=True )
+
+        self.assertTextEqual(
+        """
+            + [&]
+        """, sort_alphabetically_and_by_length( production.combinations() ) )
+
+    def test_productionABCD(self):
+        production = Production( symbols=[self.ntA, self.ntB, self.ntC, self.ntD], lock=True )
+
+        self.assertTextEqual(
+        """
+            + A B C D
+        """, production )
 
 
 class TestChomskyGrammar(TestingUtilities):
@@ -82,6 +150,21 @@ class TestChomskyGrammar(TestingUtilities):
 
         self.assertFalse( firstGrammar.has_recursion_on_the_non_terminal( non_terminal_S ) )
         self.assertTrue( firstGrammar.has_recursion_on_the_non_terminal( non_terminal_A ) )
+
+    def test_grammarConvertToEpsilonFreeChapter5FirstExample1(self):
+        firstGrammar = ChomskyGrammar.load_from_text_lines( wrap_text(
+        """
+            S -> Ab | A Bc
+            A -> aA | &
+            B -> bB | Ad | &
+        """ ) )
+        firstGrammar.convert_to_epsilon_free()
+
+        self.assertTextEqual(
+        """
+        """, firstGrammar )
+
+        self.assertTrue( firstGrammar.is_epsilon_free() )
 
     def test_grammarIsNotEpsilonFreeChapter5FirstExample1(self):
         firstGrammar = ChomskyGrammar.load_from_text_lines( wrap_text(
@@ -356,7 +439,7 @@ class TestChomskyGrammar(TestingUtilities):
         LockableType._USE_STRING = False
 
         non_terminal_A = NonTerminal( 'A' )
-        production_A = Production( [non_terminal_A], True, 0 )
+        production_A = Production( [non_terminal_A], True )
 
         # print( "production_A:", hash( production_A ) )
         # print( "non_terminal_A:", hash( non_terminal_A ) )

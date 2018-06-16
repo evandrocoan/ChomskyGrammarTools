@@ -9,6 +9,7 @@ import random
 import PyQt5
 import textwrap
 
+from natsort import natsorted
 from debug_tools import getLogger
 
 # level 4 - Abstract Syntax Tree Parsing
@@ -76,6 +77,19 @@ def sort_dictionary_lists(dictionary):
         dictionary[key] = sorted( value )
 
     return dictionary
+
+
+def sort_alphabetically_and_by_length(iterable):
+    """
+        Give a iterable, call `sorted` accordingly:
+        1. sorts normally by alphabetical order
+        2. sorts by descending length
+
+        how to sort by length of string followed by alphabetical order?
+        https://stackoverflow.com/questions/4659524/how-to-sort-by-length-of-string-followed-by-alphabetical-order
+    """
+    natsorted( iterable )
+    return sorted( iterable, key=len )
 
 
 def get_largest_item_size(iterable):

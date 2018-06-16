@@ -53,7 +53,7 @@ class ChomskyGrammarTreeTransformer(lark.Transformer):
             Grammar.
         """
         log( 4, 'non_terminal: %s', non_terminal )
-        new_production = Production( sequence=-1 )
+        new_production = Production()
         new_production.add( non_terminal[0] )
         return new_production
 

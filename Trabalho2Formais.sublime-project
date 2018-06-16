@@ -28,7 +28,8 @@
         {
             "cmd":
             [
-                "python", "unit_tests.py",
+                // "python", "unit_tests.py",
+                "python", "unit_tests.py", "TestProduction",
                 // "python", "unit_tests.py", "TestChomskyGrammar.test_grammarChapter5FollowExample1IsTheSameAsFirstExample2",
             ],
             "file_regex": "^[ ]*File \"(...*?)\", line ([0-9]*)",
