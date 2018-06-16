@@ -43,7 +43,7 @@
         {
             "cmd":
             [
-                "python", "unit_tests.py", "{test_class}.{test_func}",
+                "pylint", "--disable=I,E,R,W,C,F", "--enable=E0102", "--reports=no", "unit_tests.py", "&&", "python", "unit_tests.py", "-v", "{test_class}.{test_func}",
             ],
             "file_regex": "^[ ]*File \"(...*?)\", line ([0-9]*)",
             "name": "Run Single Test",
