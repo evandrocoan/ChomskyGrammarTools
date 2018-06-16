@@ -356,7 +356,7 @@ class TestChomskyGrammar(TestingUtilities):
         LockableType._USE_STRING = False
 
         non_terminal_A = NonTerminal( 'A' )
-        production_A = Production( 0, [non_terminal_A], True )
+        production_A = Production( [non_terminal_A], True, 0 )
 
         # print( "production_A:", hash( production_A ) )
         # print( "non_terminal_A:", hash( non_terminal_A ) )

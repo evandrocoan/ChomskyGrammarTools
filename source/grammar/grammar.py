@@ -387,11 +387,11 @@ class ChomskyGrammar():
 
                 for production in start_productions:
 
-                    # If there is a Production X → Y1Y2..Yk then add first(Y1Y2..Yk) to first(X)
+                    # If there is a production X → Y1Y2..Yk then add first(Y1Y2..Yk) to first(X)
                     for symbol in production:
 
                         # If X is a terminal then First(X) is just X!
-                        # If there is a Production X → ε then add ε to first(X)
+                        # If there is a production X → ε then add ε to first(X)
                         if type( symbol ) is Terminal:
 
                             if symbol not in first[start_symbol]:
