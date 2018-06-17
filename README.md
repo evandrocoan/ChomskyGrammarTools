@@ -1,14 +1,14 @@
-# Chomsky Grammar Tools
+# Chomsky Grammar Tools for Context Free Grammars (CFG)
 
 
 ## I - Definition:
 
 An application,
-with graphical interface to manipulate GLC,
+with graphical interface to manipulate CFG,
 involving the following checks / operations:
-1. Edit GLC's verbatim;
+1. Edit CFG's verbatim;
 2. Check whether L (G) is empty, finite or infinite;
-3. Transform a GLC into Own GLC,
+3. Transform a CFG into Own CFG,
    providing: Intermediate grammars, NF, Vi, Ne and NA;
 4. Calculate First (A),
    Follow (A) and First-NT (A) (defined as the set of symbols of Vn that can start sequences derived from A) for all A ∈ Vn;
@@ -19,7 +19,7 @@ involving the following checks / operations:
 
 
 ## II - Observations:
-1. Represent the GLC in a textual way, following the pattern of the examples below:
+1. Represent the CFG in a textual way, following the pattern of the examples below:
 
    **a)**
    ```
