@@ -43,9 +43,6 @@ class Production(LockableType):
         ## The last symbols' sequence starting from 1
         self.sequence = 0
 
-        ## Whether this production has some Epsilon symbol or not
-        self.has_epsilon = False
-
         ## Caches the length of this symbol, useful after its changes have been locked by `lock()`
         self.len = 0
 
@@ -270,15 +267,6 @@ class Production(LockableType):
 
         if symbol.locked:
             raise RuntimeError( "You can only add `unlocked` symbols in a production! %s" % symbol )
-
-        if len( symbol ) == 0:
-            # log( 1, "Epsilon symbols have length 0" )
-
-            if self.has_epsilon:
-                return
-
-            else:
-                self.has_epsilon = True
 
         if not self._merge_terminals( symbol ):
             self.sequence += 1

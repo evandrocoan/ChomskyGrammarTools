@@ -37,9 +37,6 @@ class ChomskyGrammarSymbol(LockableType):
         ## The position of this symbol from the start of the production beginning at 1
         self.sequence = sequence
 
-        ## Whether this symbol has an epsilon terminal
-        self.has_epsilon = False
-
         ## Caches the length of this symbol, useful after its changes have been locked by `lock()`
         self.len = 0
 
@@ -74,7 +71,6 @@ class ChomskyGrammarSymbol(LockableType):
 
             if symbol == '&':
                 length -= 1
-                self.has_epsilon = True
 
         return length
 

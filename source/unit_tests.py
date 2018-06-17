@@ -54,51 +54,41 @@ class TestProduction(TestingUtilities):
         production = Production( symbols=[self.ntA, self.ntB, self.ntC, self.ntD], lock=True )
 
         self.assertTextEqual(
-        """
-            + [Production locked: False, str: &, symbols: [Terminal locked: True, str: &, sequence: 1,
-            + has_epsilon: True, len: 0;], sequence: 1, has_epsilon: True, len: 0;
-            + , Production locked: True, str: A, symbols: [NonTerminal locked: True, str: A, sequence: 1,
-            + has_epsilon: False, len: 1;], sequence: 1, has_epsilon: False, len: 1;
-            + , Production locked: True, str: B, symbols: [NonTerminal locked: True, str: B, sequence: 1,
-            + has_epsilon: False, len: 1;], sequence: 1, has_epsilon: False, len: 1;
-            + , Production locked: True, str: C, symbols: [NonTerminal locked: True, str: C, sequence: 1,
-            + has_epsilon: False, len: 1;], sequence: 1, has_epsilon: False, len: 1;
-            + , Production locked: True, str: D, symbols: [NonTerminal locked: True, str: D, sequence: 1,
-            + has_epsilon: False, len: 1;], sequence: 1, has_epsilon: False, len: 1;
-            + , Production locked: True, str: A B, symbols: [NonTerminal locked: True, str: A, sequence: 1,
-            + has_epsilon: False, len: 1;, NonTerminal locked: True, str: B, sequence: 2, has_epsilon: False, len:
-            + 1;], sequence: 2, has_epsilon: False, len: 2;
-            + , Production locked: True, str: A C, symbols: [NonTerminal locked: True, str: A, sequence: 1,
-            + has_epsilon: False, len: 1;, NonTerminal locked: True, str: C, sequence: 2, has_epsilon: False, len:
-            + 1;], sequence: 2, has_epsilon: False, len: 2;
-            + , Production locked: True, str: A D, symbols: [NonTerminal locked: True, str: A, sequence: 1,
-            + has_epsilon: False, len: 1;, NonTerminal locked: True, str: D, sequence: 2, has_epsilon: False, len:
-            + 1;], sequence: 2, has_epsilon: False, len: 2;
-            + , Production locked: True, str: B C, symbols: [NonTerminal locked: True, str: B, sequence: 1,
-            + has_epsilon: False, len: 1;, NonTerminal locked: True, str: C, sequence: 2, has_epsilon: False, len:
-            + 1;], sequence: 2, has_epsilon: False, len: 2;
-            + , Production locked: True, str: B D, symbols: [NonTerminal locked: True, str: B, sequence: 1,
-            + has_epsilon: False, len: 1;, NonTerminal locked: True, str: D, sequence: 2, has_epsilon: False, len:
-            + 1;], sequence: 2, has_epsilon: False, len: 2;
-            + , Production locked: True, str: C D, symbols: [NonTerminal locked: True, str: C, sequence: 1,
-            + has_epsilon: False, len: 1;, NonTerminal locked: True, str: D, sequence: 2, has_epsilon: False, len:
-            + 1;], sequence: 2, has_epsilon: False, len: 2;
-            + , Production locked: True, str: A B C, symbols: [NonTerminal locked: True, str: A, sequence: 1,
-            + has_epsilon: False, len: 1;, NonTerminal locked: True, str: B, sequence: 2, has_epsilon: False, len:
-            + 1;, NonTerminal locked: True, str: C, sequence: 3, has_epsilon: False, len: 1;], sequence: 3,
-            + has_epsilon: False, len: 3;
-            + , Production locked: True, str: A B D, symbols: [NonTerminal locked: True, str: A, sequence: 1,
-            + has_epsilon: False, len: 1;, NonTerminal locked: True, str: B, sequence: 2, has_epsilon: False, len:
-            + 1;, NonTerminal locked: True, str: D, sequence: 3, has_epsilon: False, len: 1;], sequence: 3,
-            + has_epsilon: False, len: 3;
-            + , Production locked: True, str: A C D, symbols: [NonTerminal locked: True, str: A, sequence: 1,
-            + has_epsilon: False, len: 1;, NonTerminal locked: True, str: C, sequence: 2, has_epsilon: False, len:
-            + 1;, NonTerminal locked: True, str: D, sequence: 3, has_epsilon: False, len: 1;], sequence: 3,
-            + has_epsilon: False, len: 3;
-            + , Production locked: True, str: B C D, symbols: [NonTerminal locked: True, str: B, sequence: 1,
-            + has_epsilon: False, len: 1;, NonTerminal locked: True, str: C, sequence: 2, has_epsilon: False, len:
-            + 1;, NonTerminal locked: True, str: D, sequence: 3, has_epsilon: False, len: 1;], sequence: 3,
-            + has_epsilon: False, len: 3;
+        r"""
+            + [Production locked: True, str: &, symbols: [Terminal locked: True, str: &, sequence: 1, len: 0;],
+            + sequence: 1, len: 0;
+            + , Production locked: True, str: A, symbols: [NonTerminal locked: True, str: A, sequence: 1, len:
+            + 1;], sequence: 1, len: 1;
+            + , Production locked: True, str: B, symbols: [NonTerminal locked: True, str: B, sequence: 1, len:
+            + 1;], sequence: 1, len: 1;
+            + , Production locked: True, str: C, symbols: [NonTerminal locked: True, str: C, sequence: 1, len:
+            + 1;], sequence: 1, len: 1;
+            + , Production locked: True, str: D, symbols: [NonTerminal locked: True, str: D, sequence: 1, len:
+            + 1;], sequence: 1, len: 1;
+            + , Production locked: True, str: A B, symbols: [NonTerminal locked: True, str: A, sequence: 1, len:
+            + 1;, NonTerminal locked: True, str: B, sequence: 2, len: 1;], sequence: 2, len: 2;
+            + , Production locked: True, str: A C, symbols: [NonTerminal locked: True, str: A, sequence: 1, len:
+            + 1;, NonTerminal locked: True, str: C, sequence: 2, len: 1;], sequence: 2, len: 2;
+            + , Production locked: True, str: A D, symbols: [NonTerminal locked: True, str: A, sequence: 1, len:
+            + 1;, NonTerminal locked: True, str: D, sequence: 2, len: 1;], sequence: 2, len: 2;
+            + , Production locked: True, str: B C, symbols: [NonTerminal locked: True, str: B, sequence: 1, len:
+            + 1;, NonTerminal locked: True, str: C, sequence: 2, len: 1;], sequence: 2, len: 2;
+            + , Production locked: True, str: B D, symbols: [NonTerminal locked: True, str: B, sequence: 1, len:
+            + 1;, NonTerminal locked: True, str: D, sequence: 2, len: 1;], sequence: 2, len: 2;
+            + , Production locked: True, str: C D, symbols: [NonTerminal locked: True, str: C, sequence: 1, len:
+            + 1;, NonTerminal locked: True, str: D, sequence: 2, len: 1;], sequence: 2, len: 2;
+            + , Production locked: True, str: A B C, symbols: [NonTerminal locked: True, str: A, sequence: 1, len:
+            + 1;, NonTerminal locked: True, str: B, sequence: 2, len: 1;, NonTerminal locked: True, str: C,
+            + sequence: 3, len: 1;], sequence: 3, len: 3;
+            + , Production locked: True, str: A B D, symbols: [NonTerminal locked: True, str: A, sequence: 1, len:
+            + 1;, NonTerminal locked: True, str: B, sequence: 2, len: 1;, NonTerminal locked: True, str: D,
+            + sequence: 3, len: 1;], sequence: 3, len: 3;
+            + , Production locked: True, str: A C D, symbols: [NonTerminal locked: True, str: A, sequence: 1, len:
+            + 1;, NonTerminal locked: True, str: C, sequence: 2, len: 1;, NonTerminal locked: True, str: D,
+            + sequence: 3, len: 1;], sequence: 3, len: 3;
+            + , Production locked: True, str: B C D, symbols: [NonTerminal locked: True, str: B, sequence: 1, len:
+            + 1;, NonTerminal locked: True, str: C, sequence: 2, len: 1;, NonTerminal locked: True, str: D,
+            + sequence: 3, len: 1;], sequence: 3, len: 3;
             + ]
         """, wrap_text( sort_alphabetically_and_by_length( production.combinations() ), wrap=100 ) )
 
@@ -163,8 +153,8 @@ class TestProduction(TestingUtilities):
 
         self.assertTextEqual(
         r"""
-            + [Production locked: True, str: aa, symbols: [Terminal locked: True, str: aa, sequence: 1,
-            + has_epsilon: False, len: 2;], sequence: 1, has_epsilon: False, len: 2;
+            + [Production locked: True, str: aa, symbols: [Terminal locked: True, str: aa, sequence: 1, len: 2;],
+            + sequence: 1, len: 2;
             + ]
         """, wrap_text( sort_alphabetically_and_by_length( production.combinations() ), wrap=100 ) )
 
@@ -176,7 +166,7 @@ class TestProduction(TestingUtilities):
 
         self.assertTextEqual(
         r"""
-            + [Terminal locked: True, str: aa, sequence: 1, has_epsilon: False, len: 2;]
+            + [Terminal locked: True, str: aa, sequence: 1, len: 2;]
         """, sort_alphabetically_and_by_length( production ) )
 
     def test_productionFilterNonTerminalsFromAa(self):
@@ -187,7 +177,7 @@ class TestProduction(TestingUtilities):
 
         self.assertTextEqual(
         r"""
-            + [Terminal locked: True, str: a, sequence: 1, has_epsilon: False, len: 1;]
+            + [Terminal locked: True, str: a, sequence: 1, len: 1;]
         """, sort_alphabetically_and_by_length( production ) )
 
     def test_productionABCD(self):
@@ -609,41 +599,34 @@ class TestChomskyGrammar(TestingUtilities):
         self.assertTextEqual(
         r"""
             + Tree(productions, [Production locked: False, str: , symbols: [NonTerminal locked: True, str: E,
-            + sequence: 1, has_epsilon: False, len: 1;], sequence: 1, has_epsilon: False, len: 0;
+            + sequence: 1, len: 1;], sequence: 1, len: 0;
             + , Tree(space, []), Tree(space, []), Tree(non_terminals, [Production locked: False, str: , symbols:
-            + [NonTerminal locked: True, str: T, sequence: 1, has_epsilon: False, len: 1;, NonTerminal locked:
-            + True, str: E', sequence: 2, has_epsilon: False, len: 1;], sequence: 2, has_epsilon: False, len: 0;
+            + [NonTerminal locked: True, str: T, sequence: 1, len: 1;, NonTerminal locked: True, str: E',
+            + sequence: 2, len: 1;], sequence: 2, len: 0;
             + ]), Tree(end_symbol, [Tree(new_line, [Token(NEWLINE, '\n')])]), Production locked: False, str: ,
-            + symbols: [NonTerminal locked: True, str: E', sequence: 1, has_epsilon: False, len: 1;], sequence: 1,
-            + has_epsilon: False, len: 0;
+            + symbols: [NonTerminal locked: True, str: E', sequence: 1, len: 1;], sequence: 1, len: 0;
             + , Tree(space, []), Tree(non_terminals, [Production locked: False, str: , symbols: [Terminal locked:
-            + True, str: +, sequence: 1, has_epsilon: False, len: 1;, NonTerminal locked: True, str: T, sequence:
-            + 2, has_epsilon: False, len: 1;, NonTerminal locked: True, str: E', sequence: 3, has_epsilon: False,
-            + len: 1;], sequence: 3, has_epsilon: False, len: 0;
-            + , Production locked: False, str: , symbols: [Terminal locked: True, str: &, sequence: 1,
-            + has_epsilon: True, len: 0;], sequence: 1, has_epsilon: True, len: 0;
+            + True, str: +, sequence: 1, len: 1;, NonTerminal locked: True, str: T, sequence: 2, len: 1;,
+            + NonTerminal locked: True, str: E', sequence: 3, len: 1;], sequence: 3, len: 0;
+            + , Production locked: False, str: , symbols: [Terminal locked: True, str: &, sequence: 1, len: 0;],
+            + sequence: 1, len: 0;
             + ]), Tree(end_symbol, [Tree(new_line, [Token(NEWLINE, '\n')])]), Production locked: False, str: ,
-            + symbols: [NonTerminal locked: True, str: T, sequence: 1, has_epsilon: False, len: 1;], sequence: 1,
-            + has_epsilon: False, len: 0;
+            + symbols: [NonTerminal locked: True, str: T, sequence: 1, len: 1;], sequence: 1, len: 0;
             + , Tree(space, []), Tree(space, []), Tree(non_terminals, [Production locked: False, str: , symbols:
-            + [NonTerminal locked: True, str: F, sequence: 1, has_epsilon: False, len: 1;, NonTerminal locked:
-            + True, str: T', sequence: 2, has_epsilon: False, len: 1;], sequence: 2, has_epsilon: False, len: 0;
+            + [NonTerminal locked: True, str: F, sequence: 1, len: 1;, NonTerminal locked: True, str: T',
+            + sequence: 2, len: 1;], sequence: 2, len: 0;
             + ]), Tree(end_symbol, [Tree(new_line, [Token(NEWLINE, '\n')])]), Production locked: False, str: ,
-            + symbols: [NonTerminal locked: True, str: T', sequence: 1, has_epsilon: False, len: 1;], sequence: 1,
-            + has_epsilon: False, len: 0;
+            + symbols: [NonTerminal locked: True, str: T', sequence: 1, len: 1;], sequence: 1, len: 0;
             + , Tree(space, []), Tree(non_terminals, [Production locked: False, str: , symbols: [Terminal locked:
-            + True, str: *, sequence: 1, has_epsilon: False, len: 1;, NonTerminal locked: True, str: F, sequence:
-            + 2, has_epsilon: False, len: 1;, NonTerminal locked: True, str: T', sequence: 3, has_epsilon: False,
-            + len: 1;], sequence: 3, has_epsilon: False, len: 0;
+            + True, str: *, sequence: 1, len: 1;, NonTerminal locked: True, str: F, sequence: 2, len: 1;,
+            + NonTerminal locked: True, str: T', sequence: 3, len: 1;], sequence: 3, len: 0;
             + ]), Tree(end_symbol, [Tree(new_line, [Token(NEWLINE, '\n')])]), Production locked: False, str: ,
-            + symbols: [NonTerminal locked: True, str: F, sequence: 1, has_epsilon: False, len: 1;], sequence: 1,
-            + has_epsilon: False, len: 0;
+            + symbols: [NonTerminal locked: True, str: F, sequence: 1, len: 1;], sequence: 1, len: 0;
             + , Tree(space, []), Tree(space, []), Tree(non_terminals, [Production locked: False, str: , symbols:
-            + [Terminal locked: True, str: (, sequence: 1, has_epsilon: False, len: 1;, NonTerminal locked: True,
-            + str: E, sequence: 2, has_epsilon: False, len: 1;, Terminal locked: True, str: ), sequence: 3,
-            + has_epsilon: False, len: 1;], sequence: 3, has_epsilon: False, len: 0;
-            + , Production locked: False, str: , symbols: [Terminal locked: True, str: id, sequence: 1,
-            + has_epsilon: False, len: 2;], sequence: 1, has_epsilon: False, len: 0;
+            + [Terminal locked: True, str: (, sequence: 1, len: 1;, NonTerminal locked: True, str: E, sequence: 2,
+            + len: 1;, Terminal locked: True, str: ), sequence: 3, len: 1;], sequence: 3, len: 0;
+            + , Production locked: False, str: , symbols: [Terminal locked: True, str: id, sequence: 1, len: 2;],
+            + sequence: 1, len: 0;
             + ])])
         """, wrap_text( firstGrammar, wrap=100 ) )
 
@@ -670,20 +653,18 @@ class TestChomskyGrammar(TestingUtilities):
         self.assertTextEqual( wrap_text(
         r"""
             + Tree(productions, [Production locked: False, str: , symbols: [NonTerminal locked: True, str: S,
-            + sequence: 1, has_epsilon: False, len: 1;], sequence: 1, has_epsilon: False, len: 0;
+            + sequence: 1, len: 1;], sequence: 1, len: 0;
             + , Tree(space, []), Tree(non_terminals, [Production locked: False, str: , symbols: [Terminal locked:
-            + True, str: a, sequence: 1, has_epsilon: False, len: 1;, NonTerminal locked: True, str: AB, sequence:
-            + 2, has_epsilon: False, len: 1;, Terminal locked: True, str: bb, sequence: 3, has_epsilon: False,
-            + len: 2;, NonTerminal locked: True, str: CC, sequence: 4, has_epsilon: False, len: 1;, Terminal
-            + locked: True, str: 1a, sequence: 5, has_epsilon: False, len: 2;, NonTerminal locked: True, str: A,
-            + sequence: 6, has_epsilon: False, len: 1;, Terminal locked: True, str: b, sequence: 7, has_epsilon:
-            + False, len: 1;, NonTerminal locked: True, str: A, sequence: 8, has_epsilon: False, len: 1;,
-            + NonTerminal locked: True, str: BC, sequence: 9, has_epsilon: False, len: 1;], sequence: 9,
-            + has_epsilon: False, len: 0;
-            + , Production locked: False, str: , symbols: [Terminal locked: True, str: ba, sequence: 1,
-            + has_epsilon: False, len: 2;], sequence: 1, has_epsilon: False, len: 0;
-            + , Production locked: False, str: , symbols: [Terminal locked: True, str: c, sequence: 1,
-            + has_epsilon: False, len: 1;], sequence: 1, has_epsilon: False, len: 0;
+            + True, str: a, sequence: 1, len: 1;, NonTerminal locked: True, str: AB, sequence: 2, len: 1;,
+            + Terminal locked: True, str: bb, sequence: 3, len: 2;, NonTerminal locked: True, str: CC, sequence:
+            + 4, len: 1;, Terminal locked: True, str: 1a, sequence: 5, len: 2;, NonTerminal locked: True, str: A,
+            + sequence: 6, len: 1;, Terminal locked: True, str: b, sequence: 7, len: 1;, NonTerminal locked: True,
+            + str: A, sequence: 8, len: 1;, NonTerminal locked: True, str: BC, sequence: 9, len: 1;], sequence: 9,
+            + len: 0;
+            + , Production locked: False, str: , symbols: [Terminal locked: True, str: ba, sequence: 1, len: 2;],
+            + sequence: 1, len: 0;
+            + , Production locked: False, str: , symbols: [Terminal locked: True, str: c, sequence: 1, len: 1;],
+            + sequence: 1, len: 0;
             + ])])
         """ ), wrap_text( str( firstGrammar ), wrap=100 ) )
 
