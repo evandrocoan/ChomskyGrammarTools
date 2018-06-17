@@ -27,187 +27,6 @@ from grammar.tree_transformer import ChomskyGrammarTreeTransformer
 from grammar.testing_utilities import TestingUtilities
 
 
-class TestProduction(TestingUtilities):
-    """
-        Tests the Production class.
-    """
-
-    def setUp(self):
-        """
-            Creates basic non terminal's for usage.
-        """
-        super().setUp()
-        LockableType._USE_STRING = False
-
-        self.ntA = NonTerminal( "A" )
-        self.ntB = NonTerminal( "B" )
-        self.ntC = NonTerminal( "C" )
-        self.ntD = NonTerminal( "D" )
-
-        self.ta = Terminal( "a" )
-        self.tb = Terminal( "b" )
-        self.tc = Terminal( "c" )
-        self.td = Terminal( "d" )
-
-    def test_combinationNonTerminalRemovalSymbolFromABCD(self):
-        symbols = [self.ntA, self.ntB, self.ntC, self.ntD]
-        production = Production( symbols, lock=True )
-
-        self.assertTextEqual(
-        r"""
-            + [Production locked: True, str: &, symbols: [Terminal locked: True, str: &, sequence: 1, len: 0;],
-            + sequence: 1, len: 0;
-            + , Production locked: True, str: A, symbols: [NonTerminal locked: True, str: A, sequence: 1, len:
-            + 1;], sequence: 1, len: 1;
-            + , Production locked: True, str: B, symbols: [NonTerminal locked: True, str: B, sequence: 1, len:
-            + 1;], sequence: 1, len: 1;
-            + , Production locked: True, str: C, symbols: [NonTerminal locked: True, str: C, sequence: 1, len:
-            + 1;], sequence: 1, len: 1;
-            + , Production locked: True, str: D, symbols: [NonTerminal locked: True, str: D, sequence: 1, len:
-            + 1;], sequence: 1, len: 1;
-            + , Production locked: True, str: A B, symbols: [NonTerminal locked: True, str: A, sequence: 1, len:
-            + 1;, NonTerminal locked: True, str: B, sequence: 2, len: 1;], sequence: 2, len: 2;
-            + , Production locked: True, str: A C, symbols: [NonTerminal locked: True, str: A, sequence: 1, len:
-            + 1;, NonTerminal locked: True, str: C, sequence: 2, len: 1;], sequence: 2, len: 2;
-            + , Production locked: True, str: A D, symbols: [NonTerminal locked: True, str: A, sequence: 1, len:
-            + 1;, NonTerminal locked: True, str: D, sequence: 2, len: 1;], sequence: 2, len: 2;
-            + , Production locked: True, str: B C, symbols: [NonTerminal locked: True, str: B, sequence: 1, len:
-            + 1;, NonTerminal locked: True, str: C, sequence: 2, len: 1;], sequence: 2, len: 2;
-            + , Production locked: True, str: B D, symbols: [NonTerminal locked: True, str: B, sequence: 1, len:
-            + 1;, NonTerminal locked: True, str: D, sequence: 2, len: 1;], sequence: 2, len: 2;
-            + , Production locked: True, str: C D, symbols: [NonTerminal locked: True, str: C, sequence: 1, len:
-            + 1;, NonTerminal locked: True, str: D, sequence: 2, len: 1;], sequence: 2, len: 2;
-            + , Production locked: True, str: A B C, symbols: [NonTerminal locked: True, str: A, sequence: 1, len:
-            + 1;, NonTerminal locked: True, str: B, sequence: 2, len: 1;, NonTerminal locked: True, str: C,
-            + sequence: 3, len: 1;], sequence: 3, len: 3;
-            + , Production locked: True, str: A B D, symbols: [NonTerminal locked: True, str: A, sequence: 1, len:
-            + 1;, NonTerminal locked: True, str: B, sequence: 2, len: 1;, NonTerminal locked: True, str: D,
-            + sequence: 3, len: 1;], sequence: 3, len: 3;
-            + , Production locked: True, str: A C D, symbols: [NonTerminal locked: True, str: A, sequence: 1, len:
-            + 1;, NonTerminal locked: True, str: C, sequence: 2, len: 1;, NonTerminal locked: True, str: D,
-            + sequence: 3, len: 1;], sequence: 3, len: 3;
-            + , Production locked: True, str: B C D, symbols: [NonTerminal locked: True, str: B, sequence: 1, len:
-            + 1;, NonTerminal locked: True, str: C, sequence: 2, len: 1;, NonTerminal locked: True, str: D,
-            + sequence: 3, len: 1;], sequence: 3, len: 3;
-            + ]
-        """, wrap_text( sort_alphabetically_and_by_length( production.combinations( symbols ) ), wrap=100 ) )
-
-    def test_combinationNonTerminalRemovalSymbolFromABC(self):
-        symbols = [self.ntA, self.ntB, self.ntC]
-        production = Production( symbols, lock=True )
-
-        self.assertTextEqual(
-        """
-            + [Production locked: True, str: &, symbols: [Terminal locked: True, str: &, sequence: 1, len: 0;],
-            + sequence: 1, len: 0;
-            + , Production locked: True, str: A, symbols: [NonTerminal locked: True, str: A, sequence: 1, len:
-            + 1;], sequence: 1, len: 1;
-            + , Production locked: True, str: B, symbols: [NonTerminal locked: True, str: B, sequence: 1, len:
-            + 1;], sequence: 1, len: 1;
-            + , Production locked: True, str: C, symbols: [NonTerminal locked: True, str: C, sequence: 1, len:
-            + 1;], sequence: 1, len: 1;
-            + , Production locked: True, str: A B, symbols: [NonTerminal locked: True, str: A, sequence: 1, len:
-            + 1;, NonTerminal locked: True, str: B, sequence: 2, len: 1;], sequence: 2, len: 2;
-            + , Production locked: True, str: A C, symbols: [NonTerminal locked: True, str: A, sequence: 1, len:
-            + 1;, NonTerminal locked: True, str: C, sequence: 2, len: 1;], sequence: 2, len: 2;
-            + , Production locked: True, str: B C, symbols: [NonTerminal locked: True, str: B, sequence: 1, len:
-            + 1;, NonTerminal locked: True, str: C, sequence: 2, len: 1;], sequence: 2, len: 2;
-            + ]
-        """, wrap_text( sort_alphabetically_and_by_length( production.combinations( symbols ) ), wrap=100 ) )
-
-    def test_combinationNonTerminalRemovalSymbolFromAB(self):
-        symbols = [self.ntA, self.ntB]
-        production = Production( symbols, lock=True )
-
-        self.assertTextEqual(
-        """
-            + [Production locked: True, str: &, symbols: [Terminal locked: True, str: &, sequence: 1, len: 0;],
-            + sequence: 1, len: 0;
-            + , Production locked: True, str: A, symbols: [NonTerminal locked: True, str: A, sequence: 1, len:
-            + 1;], sequence: 1, len: 1;
-            + , Production locked: True, str: B, symbols: [NonTerminal locked: True, str: B, sequence: 1, len:
-            + 1;], sequence: 1, len: 1;
-            + ]
-        """, wrap_text( sort_alphabetically_and_by_length( production.combinations( symbols ) ), wrap=100 ) )
-
-    def test_combinationNonTerminalRemovalSymbolFromA(self):
-        symbols = [self.ntA]
-        production = Production( symbols, lock=True )
-
-        self.assertTextEqual(
-        """
-            + [Production locked: True, str: &, symbols: [Terminal locked: True, str: &, sequence: 1, len: 0;],
-            + sequence: 1, len: 0;
-            + ]
-        """, wrap_text( sort_alphabetically_and_by_length( production.combinations( symbols ) ), wrap=100 ) )
-
-    def test_combinationNonTerminalRemovalSymbolFromAa(self):
-        symbols = [self.ntA, self.ta]
-        production = Production( symbols, lock=True )
-
-        self.assertTextEqual(
-        """
-            + [Production locked: True, str: a, symbols: [Terminal locked: True, str: a, sequence: 1, len: 1;],
-            + sequence: 1, len: 1;
-            + ]
-        """, wrap_text( sort_alphabetically_and_by_length( production.combinations( symbols ) ), wrap=100 ) )
-
-    def test_combinationNonTerminalRemovalSymbolFromBAa(self):
-        symbols = [self.ntB, self.ntA, self.ta.new()]
-        production = Production( symbols, lock=True )
-
-        self.assertTextEqual(
-        """
-            + [Production locked: True, str: a, symbols: [Terminal locked: True, str: a, sequence: 1, len: 1;],
-            + sequence: 1, len: 1;
-            + , Production locked: True, str: A a, symbols: [NonTerminal locked: True, str: A, sequence: 1, len:
-            + 1;, Terminal locked: True, str: a, sequence: 2, len: 1;], sequence: 2, len: 2;
-            + , Production locked: True, str: B a, symbols: [NonTerminal locked: True, str: B, sequence: 1, len:
-            + 1;, Terminal locked: True, str: a, sequence: 2, len: 1;], sequence: 2, len: 2;
-            + ]
-        """, wrap_text( sort_alphabetically_and_by_length( production.combinations( symbols ) ), wrap=100 ) )
-
-    def test_combinationNonTerminalRemovalSymbolFromaAa(self):
-        symbols = [self.ta, self.ntA, self.ta.new()]
-        production = Production( symbols, lock=True )
-
-        self.assertTextEqual(
-        r"""
-            + [Production locked: True, str: aa, symbols: [Terminal locked: True, str: aa, sequence: 1, len: 2;],
-            + sequence: 1, len: 2;
-            + ]
-        """, wrap_text( sort_alphabetically_and_by_length( production.combinations( symbols ) ), wrap=100 ) )
-
-    def test_combinationFilterNonTerminalsFromaAa(self):
-        symbols = [self.ta, self.ntA, self.ta.new()]
-        production = Production( symbols )
-        production.filter_non_terminals( [], symbols )
-
-        self.assertTextEqual(
-        r"""
-            + [Terminal locked: True, str: aa, sequence: 1, len: 2;]
-        """, sort_alphabetically_and_by_length( production ) )
-
-    def test_combinationFilterNonTerminalsFromAa(self):
-        symbols = [self.ntA, self.ta]
-        production = Production( symbols )
-        production.filter_non_terminals([], symbols)
-
-        self.assertTextEqual(
-        r"""
-            + [Terminal locked: True, str: a, sequence: 1, len: 1;]
-        """, sort_alphabetically_and_by_length( production ) )
-
-    def test_combinationABCD(self):
-        symbols = [self.ntA, self.ntB, self.ntC, self.ntD]
-        production = Production( symbols, lock=True )
-
-        self.assertTextEqual(
-        """
-            + A B C D
-        """, production )
-
-
 class TestChomskyGrammar(TestingUtilities):
     """
         Tests the Grammar class.
@@ -1020,6 +839,187 @@ class TestChomskyGrammar(TestingUtilities):
     #     """
     #         + ['a', 'aa', 'aaa', 'aaaa', 'aaaaa']
     #     """, str( generate_sentences ) )
+
+
+class TestProduction(TestingUtilities):
+    """
+        Tests the Production class.
+    """
+
+    def setUp(self):
+        """
+            Creates basic non terminal's for usage.
+        """
+        super().setUp()
+        LockableType._USE_STRING = False
+
+        self.ntA = NonTerminal( "A" )
+        self.ntB = NonTerminal( "B" )
+        self.ntC = NonTerminal( "C" )
+        self.ntD = NonTerminal( "D" )
+
+        self.ta = Terminal( "a" )
+        self.tb = Terminal( "b" )
+        self.tc = Terminal( "c" )
+        self.td = Terminal( "d" )
+
+    def test_combinationABCD(self):
+        symbols = [self.ntA, self.ntB, self.ntC, self.ntD]
+        production = Production( symbols, lock=True )
+
+        self.assertTextEqual(
+        """
+            + A B C D
+        """, production )
+
+    def test_combinationNonTerminalRemovalSymbolFromABCD(self):
+        symbols = [self.ntA, self.ntB, self.ntC, self.ntD]
+        production = Production( symbols, lock=True )
+
+        self.assertTextEqual(
+        r"""
+            + [Production locked: True, str: &, symbols: [Terminal locked: True, str: &, sequence: 1, len: 0;],
+            + sequence: 1, len: 0;
+            + , Production locked: True, str: A, symbols: [NonTerminal locked: True, str: A, sequence: 1, len:
+            + 1;], sequence: 1, len: 1;
+            + , Production locked: True, str: B, symbols: [NonTerminal locked: True, str: B, sequence: 1, len:
+            + 1;], sequence: 1, len: 1;
+            + , Production locked: True, str: C, symbols: [NonTerminal locked: True, str: C, sequence: 1, len:
+            + 1;], sequence: 1, len: 1;
+            + , Production locked: True, str: D, symbols: [NonTerminal locked: True, str: D, sequence: 1, len:
+            + 1;], sequence: 1, len: 1;
+            + , Production locked: True, str: A B, symbols: [NonTerminal locked: True, str: A, sequence: 1, len:
+            + 1;, NonTerminal locked: True, str: B, sequence: 2, len: 1;], sequence: 2, len: 2;
+            + , Production locked: True, str: A C, symbols: [NonTerminal locked: True, str: A, sequence: 1, len:
+            + 1;, NonTerminal locked: True, str: C, sequence: 2, len: 1;], sequence: 2, len: 2;
+            + , Production locked: True, str: A D, symbols: [NonTerminal locked: True, str: A, sequence: 1, len:
+            + 1;, NonTerminal locked: True, str: D, sequence: 2, len: 1;], sequence: 2, len: 2;
+            + , Production locked: True, str: B C, symbols: [NonTerminal locked: True, str: B, sequence: 1, len:
+            + 1;, NonTerminal locked: True, str: C, sequence: 2, len: 1;], sequence: 2, len: 2;
+            + , Production locked: True, str: B D, symbols: [NonTerminal locked: True, str: B, sequence: 1, len:
+            + 1;, NonTerminal locked: True, str: D, sequence: 2, len: 1;], sequence: 2, len: 2;
+            + , Production locked: True, str: C D, symbols: [NonTerminal locked: True, str: C, sequence: 1, len:
+            + 1;, NonTerminal locked: True, str: D, sequence: 2, len: 1;], sequence: 2, len: 2;
+            + , Production locked: True, str: A B C, symbols: [NonTerminal locked: True, str: A, sequence: 1, len:
+            + 1;, NonTerminal locked: True, str: B, sequence: 2, len: 1;, NonTerminal locked: True, str: C,
+            + sequence: 3, len: 1;], sequence: 3, len: 3;
+            + , Production locked: True, str: A B D, symbols: [NonTerminal locked: True, str: A, sequence: 1, len:
+            + 1;, NonTerminal locked: True, str: B, sequence: 2, len: 1;, NonTerminal locked: True, str: D,
+            + sequence: 3, len: 1;], sequence: 3, len: 3;
+            + , Production locked: True, str: A C D, symbols: [NonTerminal locked: True, str: A, sequence: 1, len:
+            + 1;, NonTerminal locked: True, str: C, sequence: 2, len: 1;, NonTerminal locked: True, str: D,
+            + sequence: 3, len: 1;], sequence: 3, len: 3;
+            + , Production locked: True, str: B C D, symbols: [NonTerminal locked: True, str: B, sequence: 1, len:
+            + 1;, NonTerminal locked: True, str: C, sequence: 2, len: 1;, NonTerminal locked: True, str: D,
+            + sequence: 3, len: 1;], sequence: 3, len: 3;
+            + ]
+        """, wrap_text( sort_alphabetically_and_by_length( production.combinations( symbols ) ), wrap=100 ) )
+
+    def test_combinationNonTerminalRemovalSymbolFromABC(self):
+        symbols = [self.ntA, self.ntB, self.ntC]
+        production = Production( symbols, lock=True )
+
+        self.assertTextEqual(
+        """
+            + [Production locked: True, str: &, symbols: [Terminal locked: True, str: &, sequence: 1, len: 0;],
+            + sequence: 1, len: 0;
+            + , Production locked: True, str: A, symbols: [NonTerminal locked: True, str: A, sequence: 1, len:
+            + 1;], sequence: 1, len: 1;
+            + , Production locked: True, str: B, symbols: [NonTerminal locked: True, str: B, sequence: 1, len:
+            + 1;], sequence: 1, len: 1;
+            + , Production locked: True, str: C, symbols: [NonTerminal locked: True, str: C, sequence: 1, len:
+            + 1;], sequence: 1, len: 1;
+            + , Production locked: True, str: A B, symbols: [NonTerminal locked: True, str: A, sequence: 1, len:
+            + 1;, NonTerminal locked: True, str: B, sequence: 2, len: 1;], sequence: 2, len: 2;
+            + , Production locked: True, str: A C, symbols: [NonTerminal locked: True, str: A, sequence: 1, len:
+            + 1;, NonTerminal locked: True, str: C, sequence: 2, len: 1;], sequence: 2, len: 2;
+            + , Production locked: True, str: B C, symbols: [NonTerminal locked: True, str: B, sequence: 1, len:
+            + 1;, NonTerminal locked: True, str: C, sequence: 2, len: 1;], sequence: 2, len: 2;
+            + ]
+        """, wrap_text( sort_alphabetically_and_by_length( production.combinations( symbols ) ), wrap=100 ) )
+
+    def test_combinationNonTerminalRemovalSymbolFromAB(self):
+        symbols = [self.ntA, self.ntB]
+        production = Production( symbols, lock=True )
+
+        self.assertTextEqual(
+        """
+            + [Production locked: True, str: &, symbols: [Terminal locked: True, str: &, sequence: 1, len: 0;],
+            + sequence: 1, len: 0;
+            + , Production locked: True, str: A, symbols: [NonTerminal locked: True, str: A, sequence: 1, len:
+            + 1;], sequence: 1, len: 1;
+            + , Production locked: True, str: B, symbols: [NonTerminal locked: True, str: B, sequence: 1, len:
+            + 1;], sequence: 1, len: 1;
+            + ]
+        """, wrap_text( sort_alphabetically_and_by_length( production.combinations( symbols ) ), wrap=100 ) )
+
+    def test_combinationNonTerminalRemovalSymbolFromA(self):
+        symbols = [self.ntA]
+        production = Production( symbols, lock=True )
+
+        self.assertTextEqual(
+        """
+            + [Production locked: True, str: &, symbols: [Terminal locked: True, str: &, sequence: 1, len: 0;],
+            + sequence: 1, len: 0;
+            + ]
+        """, wrap_text( sort_alphabetically_and_by_length( production.combinations( symbols ) ), wrap=100 ) )
+
+    def test_combinationNonTerminalRemovalSymbolFromAa(self):
+        symbols = [self.ntA, self.ta]
+        production = Production( symbols, lock=True )
+
+        self.assertTextEqual(
+        """
+            + [Production locked: True, str: a, symbols: [Terminal locked: True, str: a, sequence: 1, len: 1;],
+            + sequence: 1, len: 1;
+            + ]
+        """, wrap_text( sort_alphabetically_and_by_length( production.combinations( symbols ) ), wrap=100 ) )
+
+    def test_combinationNonTerminalRemovalSymbolFromBAa(self):
+        symbols = [self.ntB, self.ntA, self.ta.new()]
+        production = Production( symbols, lock=True )
+
+        self.assertTextEqual(
+        """
+            + [Production locked: True, str: a, symbols: [Terminal locked: True, str: a, sequence: 1, len: 1;],
+            + sequence: 1, len: 1;
+            + , Production locked: True, str: A a, symbols: [NonTerminal locked: True, str: A, sequence: 1, len:
+            + 1;, Terminal locked: True, str: a, sequence: 2, len: 1;], sequence: 2, len: 2;
+            + , Production locked: True, str: B a, symbols: [NonTerminal locked: True, str: B, sequence: 1, len:
+            + 1;, Terminal locked: True, str: a, sequence: 2, len: 1;], sequence: 2, len: 2;
+            + ]
+        """, wrap_text( sort_alphabetically_and_by_length( production.combinations( symbols ) ), wrap=100 ) )
+
+    def test_combinationNonTerminalRemovalSymbolFromaAa(self):
+        symbols = [self.ta, self.ntA, self.ta.new()]
+        production = Production( symbols, lock=True )
+
+        self.assertTextEqual(
+        r"""
+            + [Production locked: True, str: aa, symbols: [Terminal locked: True, str: aa, sequence: 1, len: 2;],
+            + sequence: 1, len: 2;
+            + ]
+        """, wrap_text( sort_alphabetically_and_by_length( production.combinations( symbols ) ), wrap=100 ) )
+
+    def test_combinationFilterNonTerminalsFromaAa(self):
+        symbols = [self.ta, self.ntA, self.ta.new()]
+        production = Production( symbols )
+        production.filter_non_terminals( [], symbols )
+
+        self.assertTextEqual(
+        r"""
+            + [Terminal locked: True, str: aa, sequence: 1, len: 2;]
+        """, sort_alphabetically_and_by_length( production ) )
+
+    def test_combinationFilterNonTerminalsFromAa(self):
+        symbols = [self.ntA, self.ta]
+        production = Production( symbols )
+        production.filter_non_terminals([], symbols)
+
+        self.assertTextEqual(
+        r"""
+            + [Terminal locked: True, str: a, sequence: 1, len: 1;]
+        """, sort_alphabetically_and_by_length( production ) )
 
 
 if __name__ == "__main__":
