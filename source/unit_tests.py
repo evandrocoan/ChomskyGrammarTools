@@ -37,7 +37,7 @@ class TestProduction(TestingUtilities):
             Creates basic non terminal's for usage.
         """
         super().setUp()
-        LockableType._USE_STRING = True
+        LockableType._USE_STRING = False
 
         self.ntA = NonTerminal( "A" )
         self.ntB = NonTerminal( "B" )
@@ -50,7 +50,6 @@ class TestProduction(TestingUtilities):
         self.td = Terminal( "d" )
 
     def test_productionNonTerminalRemovalSymbolFromABCD(self):
-        LockableType._USE_STRING = False
         production = Production( symbols=[self.ntA, self.ntB, self.ntC, self.ntD], lock=True )
 
         self.assertTextEqual(
@@ -97,58 +96,72 @@ class TestProduction(TestingUtilities):
 
         self.assertTextEqual(
         """
-            + [&
-            + , A
-            + , B
-            + , C
-            + , A B
-            + , A C
-            + , B C
+            + [Production locked: True, str: &, symbols: [Terminal locked: True, str: &, sequence: 1, len: 0;],
+            + sequence: 1, len: 0;
+            + , Production locked: True, str: A, symbols: [NonTerminal locked: True, str: A, sequence: 1, len:
+            + 1;], sequence: 1, len: 1;
+            + , Production locked: True, str: B, symbols: [NonTerminal locked: True, str: B, sequence: 1, len:
+            + 1;], sequence: 1, len: 1;
+            + , Production locked: True, str: C, symbols: [NonTerminal locked: True, str: C, sequence: 1, len:
+            + 1;], sequence: 1, len: 1;
+            + , Production locked: True, str: A B, symbols: [NonTerminal locked: True, str: A, sequence: 1, len:
+            + 1;, NonTerminal locked: True, str: B, sequence: 2, len: 1;], sequence: 2, len: 2;
+            + , Production locked: True, str: A C, symbols: [NonTerminal locked: True, str: A, sequence: 1, len:
+            + 1;, NonTerminal locked: True, str: C, sequence: 2, len: 1;], sequence: 2, len: 2;
+            + , Production locked: True, str: B C, symbols: [NonTerminal locked: True, str: B, sequence: 1, len:
+            + 1;, NonTerminal locked: True, str: C, sequence: 2, len: 1;], sequence: 2, len: 2;
             + ]
-        """, sort_alphabetically_and_by_length( production.combinations() ) )
+        """, wrap_text( sort_alphabetically_and_by_length( production.combinations() ), wrap=100 ) )
 
     def test_productionNonTerminalRemovalSymbolFromAB(self):
         production = Production( symbols=[self.ntA, self.ntB], lock=True )
 
         self.assertTextEqual(
         """
-            + [&
-            + , A
-            + , B
+            + [Production locked: True, str: &, symbols: [Terminal locked: True, str: &, sequence: 1, len: 0;],
+            + sequence: 1, len: 0;
+            + , Production locked: True, str: A, symbols: [NonTerminal locked: True, str: A, sequence: 1, len:
+            + 1;], sequence: 1, len: 1;
+            + , Production locked: True, str: B, symbols: [NonTerminal locked: True, str: B, sequence: 1, len:
+            + 1;], sequence: 1, len: 1;
             + ]
-        """, sort_alphabetically_and_by_length( production.combinations() ) )
+        """, wrap_text( sort_alphabetically_and_by_length( production.combinations() ), wrap=100 ) )
 
     def test_productionNonTerminalRemovalSymbolFromA(self):
         production = Production( symbols=[self.ntA], lock=True )
 
         self.assertTextEqual(
         """
-            + [&
+            + [Production locked: True, str: &, symbols: [Terminal locked: True, str: &, sequence: 1, len: 0;],
+            + sequence: 1, len: 0;
             + ]
-        """, sort_alphabetically_and_by_length( production.combinations() ) )
+        """, wrap_text( sort_alphabetically_and_by_length( production.combinations() ), wrap=100 ) )
 
     def test_productionNonTerminalRemovalSymbolFromAa(self):
         production = Production( symbols=[self.ntA, self.ta], lock=True )
 
         self.assertTextEqual(
         """
-            + [a
+            + [Production locked: True, str: a, symbols: [Terminal locked: True, str: a, sequence: 1, len: 1;],
+            + sequence: 1, len: 1;
             + ]
-        """, sort_alphabetically_and_by_length( production.combinations() ) )
+        """, wrap_text( sort_alphabetically_and_by_length( production.combinations() ), wrap=100 ) )
 
     def test_productionNonTerminalRemovalSymbolFromBAa(self):
         production = Production( symbols=[self.ntB, self.ntA, self.ta.new()], lock=True )
 
         self.assertTextEqual(
         """
-            + [a
-            + , A a
-            + , B a
+            + [Production locked: True, str: a, symbols: [Terminal locked: True, str: a, sequence: 1, len: 1;],
+            + sequence: 1, len: 1;
+            + , Production locked: True, str: A a, symbols: [NonTerminal locked: True, str: A, sequence: 1, len:
+            + 1;, Terminal locked: True, str: a, sequence: 2, len: 1;], sequence: 2, len: 2;
+            + , Production locked: True, str: B a, symbols: [NonTerminal locked: True, str: B, sequence: 1, len:
+            + 1;, Terminal locked: True, str: a, sequence: 2, len: 1;], sequence: 2, len: 2;
             + ]
-        """, sort_alphabetically_and_by_length( production.combinations() ) )
+        """, wrap_text( sort_alphabetically_and_by_length( production.combinations() ), wrap=100 ) )
 
     def test_productionNonTerminalRemovalSymbolFromaAa(self):
-        LockableType._USE_STRING = False
         production = Production( symbols=[self.ta, self.ntA, self.ta.new()], lock=True )
 
         self.assertTextEqual(
@@ -159,8 +172,6 @@ class TestProduction(TestingUtilities):
         """, wrap_text( sort_alphabetically_and_by_length( production.combinations() ), wrap=100 ) )
 
     def test_productionFilterNonTerminalsFromaAa(self):
-        LockableType._USE_STRING = False
-
         production = Production( symbols=[self.ta, self.ntA, self.ta.new()] )
         production.filter_non_terminals([], [])
 
@@ -170,8 +181,6 @@ class TestProduction(TestingUtilities):
         """, sort_alphabetically_and_by_length( production ) )
 
     def test_productionFilterNonTerminalsFromAa(self):
-        LockableType._USE_STRING = False
-
         production = Production( symbols=[self.ntA, self.ta] )
         production.filter_non_terminals([], [])
 
