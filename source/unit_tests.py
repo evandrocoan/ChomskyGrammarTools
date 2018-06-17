@@ -232,21 +232,6 @@ class TestChomskyGrammar(TestingUtilities):
 
     #     self.assertFalse( firstGrammar.has_left_recursion() )
 
-    # def test_grammarHasLeftRecursionCalculationOfChapter5Example1First(self):
-    #     firstGrammar = ChomskyGrammar.load_from_text_lines( wrap_text(
-    #     """
-    #         S -> Ab | A Bc
-    #         A -> aA | &
-    #         B -> bB | Ad | &
-    #     """ ) )
-
-    #     self.assertTextEqual(
-    #     """
-    #         not implemented yet
-    #     """, dictionary_to_string( firstGrammar.left_recursion() ) )
-
-    #     self.assertFalse( firstGrammar.has_left_recursion() )
-
     # def test_grammarIsFactoredCalculationOfChapter5Example1First(self):
     #     firstGrammar = ChomskyGrammar.load_from_text_lines( wrap_text(
     #     """
@@ -364,6 +349,43 @@ class TestChomskyGrammar(TestingUtilities):
             + C: $ d
         """, dictionary_to_string( follow ) )
 
+    def test_grammarFertileNonTerminalsChapter5Example1Follow(self):
+        firstGrammar = ChomskyGrammar.load_from_text_lines( wrap_text(
+        """
+            S -> A B C
+            A -> aA | &
+            B -> bB | A Cd
+            C -> cC | &
+        """ ) )
+        fertile = firstGrammar.fertile()
+
+        self.assertTextEqual(
+        """
+            + [A
+            + , B
+            + , C
+            + , S
+            + ]
+        """, sort_alphabetically_and_by_length( fertile ) )
+
+    def test_grammarFertileNonTerminalsChapter5Example1FollowSadPath(self):
+        firstGrammar = ChomskyGrammar.load_from_text_lines( wrap_text(
+        """
+            S -> A B C | B C
+            A -> aA
+            B -> bB | Cd
+            C -> cC | c
+        """ ) )
+        fertile = firstGrammar.fertile()
+
+        self.assertTextEqual(
+        """
+            + [B
+            + , C
+            + , S
+            + ]
+        """, sort_alphabetically_and_by_length( fertile ) )
+
     def test_grammarFirstCalculationOfChapter5FollowExample2(self):
         firstGrammar = ChomskyGrammar.load_from_text_lines( wrap_text(
         """
@@ -383,6 +405,45 @@ class TestChomskyGrammar(TestingUtilities):
             + T': & *
             +  F: ( id
         """, dictionary_to_string( first ) )
+
+    def test_grammarFertileNonTerminalsChapter5FollowExample2(self):
+        firstGrammar = ChomskyGrammar.load_from_text_lines( wrap_text(
+        """
+            E  -> T E'
+            E' -> + T E' | &
+            T  -> F T'
+            T' -> * F T' | &
+            F  -> ( E ) | id
+        """ ) )
+        fertile = firstGrammar.fertile()
+
+        self.assertTextEqual(
+        """
+            + [E
+            + , E'
+            + , F
+            + , T
+            + , T'
+            + ]
+        """, sort_alphabetically_and_by_length( fertile ) )
+
+    def test_grammarFertileNonTerminalsChapter5FollowExample2SadPath(self):
+        firstGrammar = ChomskyGrammar.load_from_text_lines( wrap_text(
+        """
+            E  -> T E'
+            E' -> + T E' | &
+            T  -> F T'
+            T' -> * F T' | &
+            F  -> ( E )
+        """ ) )
+        fertile = firstGrammar.fertile()
+
+        self.assertTextEqual(
+        """
+            + [E'
+            + , T'
+            + ]
+        """, sort_alphabetically_and_by_length( fertile ) )
 
     def test_grammarFirstNonTerminalCalculationOfChapter5FollowExample2(self):
         firstGrammar = ChomskyGrammar.load_from_text_lines( wrap_text(

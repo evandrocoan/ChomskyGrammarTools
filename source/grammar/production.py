@@ -149,7 +149,7 @@ class Production(LockableType):
                 except RuntimeError as error:
                     error = str( error )
 
-                    if error.startswith( "Invalid production creation! Production with no length:" ):
+                    if error.startswith( "Invalid production creation! Production with no length: [&]" ):
                         new_production = epsilon_production.new()
 
                     else:

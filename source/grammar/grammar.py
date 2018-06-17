@@ -236,31 +236,61 @@ class ChomskyGrammar():
         """
         return production in self.productions[start_symbol]
 
-    def get_non_terminals(self, symbol):
+    def terminals_productions(self, non_terminal_start):
         """
-            Given a start symbol as S, return all its non_terminal's reachable from it.
+            Given the non terminal `non_terminal_start`, return all reachable productions only composed
+            with terminal's.
         """
-        return self.get_non_terminals_composition( self.productions[symbol] )
+        productions = self.productions[non_terminal_start]
+        reachable_terminals = set()
+
+        for production in productions:
+            only_terminals = True
+
+            for symbol in production:
+
+                if type( symbol ) is NonTerminal:
+                    only_terminals = False
+                    break
+
+            if only_terminals:
+                reachable_terminals.add( production )
+
+        return reachable_terminals
+
+    def get_non_terminals(self, start_symbol):
+        """
+            Given a `start_symbol` as S, return all its non terminal's reachable from it, with or
+            without terminal's together.
+        """
+        return self.get_symbols_composition( self.productions[start_symbol], NonTerminal )
+
+    def get_terminals(self, symbol):
+        """
+            Given a `start_symbol` as S, return all its terminal's reachable from it, with or
+            without non terminal's together.
+        """
+        return self.get_symbols_composition( self.productions[symbol], Terminal )
 
     @staticmethod
-    def get_non_terminals_composition(productions):
+    def get_symbols_composition(productions, symbolType):
         """
-            For each production in `productions`, get all NonTerminal's they are composed.
+            For each production in `productions`, get all symbol of type `symbolType` they are composed.
         """
-        symbol_non_terminals = set()
+        symbols_composition = set()
 
         for symbol in productions:
-            non_terminals = symbol.get_non_terminals()
-            symbol_non_terminals.update( non_terminals )
+            symbols = symbol._get_symbols( symbolType )
+            symbols_composition.update( symbols )
 
-        return symbol_non_terminals
+        return symbols_composition
 
     def assure_existing_symbols(self):
         """
             Checks whether the grammar uses non existent non terminal symbols as `S -> Aa | a`.
         """
         production_keys = self.productions.keys()
-        start_non_terminals = self.get_non_terminals_composition( production_keys )
+        start_non_terminals = self.get_symbols_composition( production_keys, NonTerminal )
 
         for non_terminal_start in production_keys:
             non_terminals = self.get_non_terminals( non_terminal_start )
@@ -463,6 +493,54 @@ class ChomskyGrammar():
         """
         return bool( not self.factors() )
 
+    def fertile(self):
+        """
+            Return a set with the fertile non terminal's start symbols.
+        """
+        # log( 1, "self: \n%s", self )
+        fertile = set()
+        production_keys = self.productions.keys()
+
+        old_counter = -1
+        current_counter = 0
+
+        # Create the initial fertile Non Terminal's sets
+        for non_terminal_start in production_keys:
+            current_terminals = self.terminals_productions( non_terminal_start )
+            # log( 1, "non_terminal_start: %s, current_terminals: %s", non_terminal_start, current_terminals )
+
+            if current_terminals:
+                fertile.add( non_terminal_start )
+
+        while old_counter != current_counter:
+            old_counter = current_counter
+
+            for start_symbol in production_keys:
+                start_productions = self.productions[start_symbol]
+
+                for production in start_productions:
+                    all_fertile = True
+
+                    for symbol in production:
+
+                        if type( symbol ) is Terminal:
+                            continue
+
+                        if type( symbol ) is NonTerminal:
+
+                            if symbol in fertile:
+                                continue
+
+                            else:
+                                all_fertile = False
+                                break
+
+                    if all_fertile and start_symbol not in fertile:
+                        current_counter += 1
+                        fertile.add( start_symbol )
+
+        return fertile
+
     def first_non_terminal(self):
         """
             Calculates the start production symbols non terminal's FIRST set.
@@ -470,15 +548,15 @@ class ChomskyGrammar():
         first = {}
         production_keys = self.productions.keys()
 
+        old_counter = -1
         current_counter = 0
-        processed_symbols = -1
 
         # Create the initial FIRST Non Terminal's sets
         for symbol in production_keys:
             first[symbol] = set()
 
-        while processed_symbols != current_counter:
-            processed_symbols = current_counter
+        while old_counter != current_counter:
+            old_counter = current_counter
 
             for start_symbol in production_keys:
                 start_productions = self.productions[start_symbol]
@@ -521,15 +599,15 @@ class ChomskyGrammar():
         first = {}
         production_keys = self.productions.keys()
 
+        old_counter = -1
         current_counter = 0
-        processed_symbols = -1
 
         # Create the initial FIRST's sets
         for symbol in production_keys:
             first[symbol] = set()
 
-        while processed_symbols != current_counter:
-            processed_symbols = current_counter
+        while old_counter != current_counter:
+            old_counter = current_counter
 
             for start_symbol in production_keys:
                 start_productions = self.productions[start_symbol]
@@ -598,8 +676,8 @@ class ChomskyGrammar():
         follow = {}
         production_keys = self.productions.keys()
 
+        old_counter = -1
         current_counter = 0
-        processed_symbols = -1
 
         if not first:
             first = self.first()
@@ -611,8 +689,8 @@ class ChomskyGrammar():
         # First put $ (the end of input marker) in Follow(S) (S is the start symbol)
         follow[self.initial_symbol].add( end_of_string_terminal )
 
-        while processed_symbols != current_counter:
-            processed_symbols = current_counter
+        while old_counter != current_counter:
+            old_counter = current_counter
 
             for start_symbol in production_keys:
                 start_productions = self.productions[start_symbol]
