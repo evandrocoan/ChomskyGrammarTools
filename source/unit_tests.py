@@ -55,7 +55,7 @@ class TestChomskyGrammar(TestingUtilities):
         if not Production( symbols=[Terminal( "b" )], lock=True ):
             self.fail( "Production did not evaluate to `True`" )
 
-    def test_grammarNonTerminalHasTransitionsWithChapter5FirstExample1(self):
+    def test_grammarNonTerminalHasTransitionsWithChapter5Example1First(self):
         firstGrammar = ChomskyGrammar.load_from_text_lines( wrap_text(
         """
             S -> Ab | A Bc
@@ -72,7 +72,7 @@ class TestChomskyGrammar(TestingUtilities):
         self.assertFalse( firstGrammar.has_production( non_terminal_S, production_S ) )
         self.assertTrue( firstGrammar.has_production( non_terminal_S, production_A ) )
 
-    def test_grammarHasOnNonTerminalChapter5FirstExample1(self):
+    def test_grammarHasOnNonTerminalChapter5Example1First(self):
         firstGrammar = ChomskyGrammar.load_from_text_lines( wrap_text(
         """
             S -> Ab | A Bc
@@ -85,7 +85,7 @@ class TestChomskyGrammar(TestingUtilities):
         self.assertFalse( firstGrammar.has_recursion_on_the_non_terminal( non_terminal_S ) )
         self.assertTrue( firstGrammar.has_recursion_on_the_non_terminal( non_terminal_A ) )
 
-    def test_grammarConvertToEpsilonFreeChapter5FirstExample1(self):
+    def test_grammarConvertToEpsilonFreeChapter5Example1First(self):
         firstGrammar = ChomskyGrammar.load_from_text_lines( wrap_text(
         """
             S -> Ab | A Bc
@@ -103,7 +103,7 @@ class TestChomskyGrammar(TestingUtilities):
 
         self.assertTrue( firstGrammar.is_epsilon_free() )
 
-    def test_grammarConvertToEpsilonFreeWithNewInitialSymbolChapter5FirstExample1MutatedWithEpsilonS(self):
+    def test_grammarConvertToEpsilonFreeWithNewInitialSymbolChapter5Example1FirstMutatedWithEpsilonS(self):
         firstGrammar = ChomskyGrammar.load_from_text_lines( wrap_text(
         """
             S -> Ab | A Bc | A B S | &
@@ -122,7 +122,7 @@ class TestChomskyGrammar(TestingUtilities):
 
         self.assertTrue( firstGrammar.is_epsilon_free() )
 
-    def test_grammarConvertToEpsilonFreeWithNewInitialSymbolChapter5FirstExample1MutatedS(self):
+    def test_grammarConvertToEpsilonFreeWithNewInitialSymbolChapter5Example1FirstMutatedS(self):
         firstGrammar = ChomskyGrammar.load_from_text_lines( wrap_text(
         """
             S -> Ab | A Bc | A B S
@@ -141,7 +141,7 @@ class TestChomskyGrammar(TestingUtilities):
 
         self.assertTrue( firstGrammar.is_epsilon_free() )
 
-    def test_grammarConvertToEpsilonFreeWithNewInitialSymbolChapter5FirstExample1MutatedNoS(self):
+    def test_grammarConvertToEpsilonFreeWithNewInitialSymbolChapter5Example1FirstMutatedNoS(self):
         firstGrammar = ChomskyGrammar.load_from_text_lines( wrap_text(
         """
             S -> Ab | A Bc | A B
@@ -159,7 +159,7 @@ class TestChomskyGrammar(TestingUtilities):
 
         self.assertTrue( firstGrammar.is_epsilon_free() )
 
-    def test_grammarGetNonTerminalEpsilonSimpleCaseChapter5FirstExample1(self):
+    def test_grammarGetNonTerminalEpsilonSimpleCaseChapter5Example1First(self):
         LockableType._USE_STRING = False
         firstGrammar = ChomskyGrammar.load_from_text_lines( wrap_text(
         """
@@ -177,7 +177,7 @@ class TestChomskyGrammar(TestingUtilities):
             + ]
         """, wrap_text( sort_alphabetically_and_by_length( firstGrammar.get_non_terminal_epsilon() ), wrap=100 ) )
 
-    def test_grammarGetNonTerminalEpsilonChapter5FirstExample1Mutated(self):
+    def test_grammarGetNonTerminalEpsilonChapter5Example1FirstMutated(self):
         LockableType._USE_STRING = False
         firstGrammar = ChomskyGrammar.load_from_text_lines( wrap_text(
         """
@@ -197,7 +197,7 @@ class TestChomskyGrammar(TestingUtilities):
             + ]
         """, wrap_text( sort_alphabetically_and_by_length( firstGrammar.get_non_terminal_epsilon() ), wrap=100 ) )
 
-    def test_grammarIsNotEpsilonFreeChapter5FirstExample1(self):
+    def test_grammarIsNotEpsilonFreeChapter5Example1First(self):
         firstGrammar = ChomskyGrammar.load_from_text_lines( wrap_text(
         """
             S -> Ab | A Bc
@@ -207,7 +207,7 @@ class TestChomskyGrammar(TestingUtilities):
 
         self.assertFalse( firstGrammar.is_epsilon_free() )
 
-    def test_grammarIsEpsilonFreeChapter5FirstExample1EpsilonFreed(self):
+    def test_grammarIsEpsilonFreeChapter5Example1FirstEpsilonFreed(self):
         firstGrammar = ChomskyGrammar.load_from_text_lines( wrap_text(
         """
             S -> Ab | A Bc | &
@@ -217,7 +217,7 @@ class TestChomskyGrammar(TestingUtilities):
 
         self.assertTrue( firstGrammar.is_epsilon_free() )
 
-    # def test_grammarHasLeftRecursionCalculationOfChapter5FirstExample1(self):
+    # def test_grammarHasLeftRecursionCalculationOfChapter5Example1First(self):
     #     firstGrammar = ChomskyGrammar.load_from_text_lines( wrap_text(
     #     """
     #         S -> Ab | A Bc
@@ -232,7 +232,7 @@ class TestChomskyGrammar(TestingUtilities):
 
     #     self.assertFalse( firstGrammar.has_left_recursion() )
 
-    # def test_grammarHasLeftRecursionCalculationOfChapter5FirstExample1(self):
+    # def test_grammarHasLeftRecursionCalculationOfChapter5Example1First(self):
     #     firstGrammar = ChomskyGrammar.load_from_text_lines( wrap_text(
     #     """
     #         S -> Ab | A Bc
@@ -247,7 +247,7 @@ class TestChomskyGrammar(TestingUtilities):
 
     #     self.assertFalse( firstGrammar.has_left_recursion() )
 
-    # def test_grammarIsFactoredCalculationOfChapter5FirstExample1(self):
+    # def test_grammarIsFactoredCalculationOfChapter5Example1First(self):
     #     firstGrammar = ChomskyGrammar.load_from_text_lines( wrap_text(
     #     """
     #         S -> Ab | A Bc
@@ -262,21 +262,23 @@ class TestChomskyGrammar(TestingUtilities):
 
     #     self.assertFalse( firstGrammar.is_factored() )
 
-    # def test_grammarNonTerminalFirstCalculationOfChapter5FirstExample1(self):
-    #     firstGrammar = ChomskyGrammar.load_from_text_lines( wrap_text(
-    #     """
-    #         S -> Ab | A Bc
-    #         A -> aA | &
-    #         B -> bB | Ad | &
-    #     """ ) )
-    #     first_non_terminal = firstGrammar.first_non_terminal()
+    def test_grammarNonTerminalFirstCalculationOfChapter5Example1First(self):
+        firstGrammar = ChomskyGrammar.load_from_text_lines( wrap_text(
+        """
+            S -> Ab | A Bc
+            A -> aA | &
+            B -> bB | Ad | &
+        """ ) )
+        first_non_terminal = firstGrammar.first_non_terminal()
 
-    #     self.assertTextEqual(
-    #     """
-    #         not implemented yet
-    #     """, dictionary_to_string( first_non_terminal ) )
+        self.assertTextEqual(
+        """
+            + S: A B
+            + A:
+            + B: A
+        """, dictionary_to_string( first_non_terminal ) )
 
-    def test_grammarFirstCalculationOfChapter5FirstExample1(self):
+    def test_grammarFirstCalculationOfChapter5Example1First(self):
         firstGrammar = ChomskyGrammar.load_from_text_lines( wrap_text(
         """
             S -> Ab | A Bc
@@ -292,7 +294,7 @@ class TestChomskyGrammar(TestingUtilities):
             + B: & a b d
         """, dictionary_to_string( first ) )
 
-    def test_grammarFollowCalculationOfChapter5FirstExample1(self):
+    def test_grammarFollowCalculationOfChapter5Example1First(self):
         firstGrammar = ChomskyGrammar.load_from_text_lines( wrap_text(
         """
             S -> Ab | A Bc
@@ -308,7 +310,7 @@ class TestChomskyGrammar(TestingUtilities):
             + B: c
         """, dictionary_to_string( follow ) )
 
-    def test_grammarFirstCalculationOfChapter5FollowExample1(self):
+    def test_grammarFirstCalculationOfChapter5Example1Follow(self):
         firstGrammar = ChomskyGrammar.load_from_text_lines( wrap_text(
         """
             S -> A B C
@@ -326,7 +328,7 @@ class TestChomskyGrammar(TestingUtilities):
             + C: & c
         """, dictionary_to_string( first ) )
 
-    def test_grammarFollowCalculationOfChapter5FollowExample1(self):
+    def test_grammarFollowCalculationOfChapter5Example1Follow(self):
         firstGrammar = ChomskyGrammar.load_from_text_lines( wrap_text(
         """
             S -> A B C

@@ -468,6 +468,45 @@ class ChomskyGrammar():
             Calculates the start production symbols non terminal's FIRST set.
         """
         first = {}
+        production_keys = self.productions.keys()
+
+        current_counter = 0
+        processed_symbols = -1
+
+        # Create the initial FIRST Non Terminal's sets
+        for symbol in production_keys:
+            first[symbol] = set()
+
+        while processed_symbols != current_counter:
+            processed_symbols = current_counter
+
+            for start_symbol in production_keys:
+                start_productions = self.productions[start_symbol]
+
+                for production in start_productions:
+
+                    # If there is a production X → Y1Y2..Yk then add first(Y1Y2..Yk) to first(X)
+                    for symbol in production:
+
+                        if type( symbol ) is NonTerminal:
+
+                            if symbol not in first[start_symbol]:
+                                first[start_symbol].add( symbol )
+                                current_counter += 1
+
+                            if Production.copy_productions_except_epsilon( first[symbol], first[start_symbol] ):
+                                current_counter += 1
+
+                            # log( 1, "symbol: %s, production: %-6s, first: %s", symbol, production, first[symbol] )
+                            if self.has_production( symbol, epsilon_production ):
+                                continue
+
+                            else:
+                                break
+
+                        else:
+                            break
+
         return first
 
     def first(self):
