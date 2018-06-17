@@ -157,12 +157,16 @@ class TestProduction(TestingUtilities):
             + ]
         """, sort_alphabetically_and_by_length( production.combinations() ) )
 
-    # def test_productionNonTerminalRemovalSymbolFromaAa(self):
-    #     production = Production( symbols=[self.ta, self.ntA, self.ta.new( True )], lock=True )
+    def test_productionNonTerminalRemovalSymbolFromaAa(self):
+        LockableType._USE_STRING = False
+        production = Production( symbols=[self.ta, self.ntA, self.ta.new( True )], lock=True )
 
-    #     self.assertTextEqual(
-    #     """
-    #     """, sort_alphabetically_and_by_length( production.combinations() ) )
+        self.assertTextEqual(
+        r"""
+            + [Production locked: True, str: aa, symbols: [Terminal locked: True, str: aa, sequence: 1,
+            + has_epsilon: False, len: 2;], sequence: 1, has_epsilon: False, len: 2;
+            + ]
+        """, wrap_text( sort_alphabetically_and_by_length( production.combinations() ), wrap=100 ) )
 
     def test_productionFilterNonTerminalsFromaAa(self):
         LockableType._USE_STRING = False
@@ -171,7 +175,7 @@ class TestProduction(TestingUtilities):
         production.filter_non_terminals([], [])
 
         self.assertTextEqual(
-        """
+        r"""
             + [Terminal locked: True, str: aa, sequence: 1, has_epsilon: False, len: 2;]
         """, sort_alphabetically_and_by_length( production ) )
 
@@ -182,7 +186,7 @@ class TestProduction(TestingUtilities):
         production.filter_non_terminals([], [])
 
         self.assertTextEqual(
-        """
+        r"""
             + [Terminal locked: True, str: a, sequence: 1, has_epsilon: False, len: 1;]
         """, sort_alphabetically_and_by_length( production ) )
 

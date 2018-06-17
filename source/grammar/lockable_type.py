@@ -94,7 +94,7 @@ class LockableType(object):
         if self._USE_STRING:
             return super().__str__()
 
-        return get_representation( self, ignore={'unique_hash'} )
+        return get_representation( self, ignore={'unique_hash'}, emquote=self._EMQUOTE_STRING )
 
     def __len__(self):
         """
@@ -110,6 +110,10 @@ class LockableType(object):
         """
             Unblock the object changes allowing its attributes to be freely set.
         """
+
+        if not self.locked:
+            return
+
         self.__dict__['locked'] = False
         self._len = self._original_len
         self._str = self._original_str
@@ -125,6 +129,9 @@ class LockableType(object):
 
         self.str = str( self )
         self._str = lambda : self.str
+
+        self.len = len( self )
+        self._len = lambda : self.len
 
         self._hash = hash( self._str() )
         self.locked = True

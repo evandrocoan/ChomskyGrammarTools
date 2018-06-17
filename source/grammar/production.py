@@ -48,8 +48,6 @@ class Production(LockableType):
 
         ## Caches the length of this symbol, useful after its changes have been locked by `lock()`
         self.len = 0
-        self._original_len = self._len
-        self._original_str = self._str
 
         if symbols:
 
@@ -308,14 +306,6 @@ class Production(LockableType):
                     return True
 
         return False
-
-    def unlock(self):
-        """
-            Unblock the object changes allowing its attributes to be freely set.
-        """
-        super().unlock()
-        self._len = self._original_len
-        self._str = self._original_str
 
     def lock(self):
         """

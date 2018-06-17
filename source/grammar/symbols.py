@@ -89,9 +89,6 @@ class ChomskyGrammarSymbol(LockableType):
         if self.locked:
             return
 
-        self.len = len( self )
-        self._len = lambda : self.len
-
         self.trim_epsilons()
         self.check_consistency()
         super().lock()
