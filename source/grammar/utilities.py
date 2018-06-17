@@ -13,7 +13,7 @@ from natsort import natsorted
 from debug_tools import getLogger
 
 # level 4 - Abstract Syntax Tree Parsing
-log = getLogger( 127-4, os.path.basename( os.path.dirname( os.path.abspath ( __file__ ) ) ) )
+log = getLogger( 127-4, __name__ )
 
 # An unique identifier for any created object
 initial_hash = random.getrandbits( 32 )
@@ -89,7 +89,7 @@ def sort_alphabetically_and_by_length(iterable):
         how to sort by length of string followed by alphabetical order?
         https://stackoverflow.com/questions/4659524/how-to-sort-by-length-of-string-followed-by-alphabetical-order
     """
-    return sorted( natsorted( iterable, key=str ), key=len )
+    return sorted( sorted( natsorted( iterable, key=lambda item: str( item ).lower() ), key=lambda item: str( item ).istitle() ), key=len )
 
 
 def sort_correctly(iterable):
@@ -316,7 +316,7 @@ class DynamicIterationSet(object):
         its elements as if a `for element in dynamic_set`
     """
 
-    def __init__(self, initial):
+    def __init__(self, initial=[]):
         """
             Fully initializes and create a new set.
 

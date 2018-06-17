@@ -15,7 +15,7 @@ from .utilities import get_unique_hash
 from .lockable_type import LockableType
 
 # level 4 - Abstract Syntax Tree Parsing
-log = getLogger( 127-4, os.path.basename( os.path.dirname( os.path.abspath ( __file__ ) ) ) )
+log = getLogger( 127-4, __name__ )
 
 
 class Production(LockableType):
@@ -122,10 +122,10 @@ class Production(LockableType):
 
         raise StopIteration
 
-    def combinations(self, non_terminals_to_ignore=[]):
+    def combinations(self, non_terminal_epsilon=[]):
         """
-            Return a new set within all its non terminal's removal combinations, except for the non
-            terminal's set on `non_terminals_to_ignore`.
+            Return a new set within all its non terminal's removal combinations, accordingly with
+            the non terminal's set on `non_terminal_epsilon`.
 
             How do use itertools in Python to build permutation or combination
             http://thomas-cokelaer.info/blog/2012/11/how-do-use-itertools-in-python-to-build-permutation-or-combination/
@@ -144,7 +144,7 @@ class Production(LockableType):
                 new_production = self.new()
 
                 try:
-                    new_production.filter_non_terminals( permutation, non_terminals_to_ignore )
+                    new_production.filter_non_terminals( permutation, non_terminal_epsilon )
 
                 except RuntimeError as error:
                     error = str( error )
@@ -158,20 +158,21 @@ class Production(LockableType):
                 # log( 1, "new_production: %s", new_production )
                 combinations.add( new_production )
 
-        # log( 1, "combinations: %s", combinations )
+        # log( 1, "combinations: \n%s", combinations )
         return combinations
 
-    def filter_non_terminals(self, non_terminals_to_keep, non_terminals_to_ignore):
+    def filter_non_terminals(self, non_terminals_to_keep, non_terminal_epsilon):
         """
             Removes all non terminal's not present on the given list `non_terminals_to_keep`, but
-            keeps all non terminal's in the list `non_terminals_to_ignore`.
+            removes all non terminal's in the list `non_terminal_epsilon`.
         """
+        # log( 1, "non_terminals_to_keep: %s, non_terminal_epsilon: %s", non_terminals_to_keep, non_terminal_epsilon )
 
         for symbol in self.symbols:
 
             if type( symbol ) is NonTerminal:
 
-                if symbol not in non_terminals_to_keep and symbol not in non_terminals_to_ignore:
+                if symbol not in non_terminals_to_keep and symbol in non_terminal_epsilon:
                     self.symbols[symbol.sequence - 1] = epsilon_terminal
 
         if not len( self ):

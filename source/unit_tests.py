@@ -49,8 +49,9 @@ class TestProduction(TestingUtilities):
         self.tc = Terminal( "c" )
         self.td = Terminal( "d" )
 
-    def test_productionNonTerminalRemovalSymbolFromABCD(self):
-        production = Production( symbols=[self.ntA, self.ntB, self.ntC, self.ntD], lock=True )
+    def test_combinationNonTerminalRemovalSymbolFromABCD(self):
+        symbols = [self.ntA, self.ntB, self.ntC, self.ntD]
+        production = Production( symbols, lock=True )
 
         self.assertTextEqual(
         r"""
@@ -89,10 +90,11 @@ class TestProduction(TestingUtilities):
             + 1;, NonTerminal locked: True, str: C, sequence: 2, len: 1;, NonTerminal locked: True, str: D,
             + sequence: 3, len: 1;], sequence: 3, len: 3;
             + ]
-        """, wrap_text( sort_alphabetically_and_by_length( production.combinations() ), wrap=100 ) )
+        """, wrap_text( sort_alphabetically_and_by_length( production.combinations( symbols ) ), wrap=100 ) )
 
-    def test_productionNonTerminalRemovalSymbolFromABC(self):
-        production = Production( symbols=[self.ntA, self.ntB, self.ntC], lock=True )
+    def test_combinationNonTerminalRemovalSymbolFromABC(self):
+        symbols = [self.ntA, self.ntB, self.ntC]
+        production = Production( symbols, lock=True )
 
         self.assertTextEqual(
         """
@@ -111,10 +113,11 @@ class TestProduction(TestingUtilities):
             + , Production locked: True, str: B C, symbols: [NonTerminal locked: True, str: B, sequence: 1, len:
             + 1;, NonTerminal locked: True, str: C, sequence: 2, len: 1;], sequence: 2, len: 2;
             + ]
-        """, wrap_text( sort_alphabetically_and_by_length( production.combinations() ), wrap=100 ) )
+        """, wrap_text( sort_alphabetically_and_by_length( production.combinations( symbols ) ), wrap=100 ) )
 
-    def test_productionNonTerminalRemovalSymbolFromAB(self):
-        production = Production( symbols=[self.ntA, self.ntB], lock=True )
+    def test_combinationNonTerminalRemovalSymbolFromAB(self):
+        symbols = [self.ntA, self.ntB]
+        production = Production( symbols, lock=True )
 
         self.assertTextEqual(
         """
@@ -125,30 +128,33 @@ class TestProduction(TestingUtilities):
             + , Production locked: True, str: B, symbols: [NonTerminal locked: True, str: B, sequence: 1, len:
             + 1;], sequence: 1, len: 1;
             + ]
-        """, wrap_text( sort_alphabetically_and_by_length( production.combinations() ), wrap=100 ) )
+        """, wrap_text( sort_alphabetically_and_by_length( production.combinations( symbols ) ), wrap=100 ) )
 
-    def test_productionNonTerminalRemovalSymbolFromA(self):
-        production = Production( symbols=[self.ntA], lock=True )
+    def test_combinationNonTerminalRemovalSymbolFromA(self):
+        symbols = [self.ntA]
+        production = Production( symbols, lock=True )
 
         self.assertTextEqual(
         """
             + [Production locked: True, str: &, symbols: [Terminal locked: True, str: &, sequence: 1, len: 0;],
             + sequence: 1, len: 0;
             + ]
-        """, wrap_text( sort_alphabetically_and_by_length( production.combinations() ), wrap=100 ) )
+        """, wrap_text( sort_alphabetically_and_by_length( production.combinations( symbols ) ), wrap=100 ) )
 
-    def test_productionNonTerminalRemovalSymbolFromAa(self):
-        production = Production( symbols=[self.ntA, self.ta], lock=True )
+    def test_combinationNonTerminalRemovalSymbolFromAa(self):
+        symbols = [self.ntA, self.ta]
+        production = Production( symbols, lock=True )
 
         self.assertTextEqual(
         """
             + [Production locked: True, str: a, symbols: [Terminal locked: True, str: a, sequence: 1, len: 1;],
             + sequence: 1, len: 1;
             + ]
-        """, wrap_text( sort_alphabetically_and_by_length( production.combinations() ), wrap=100 ) )
+        """, wrap_text( sort_alphabetically_and_by_length( production.combinations( symbols ) ), wrap=100 ) )
 
-    def test_productionNonTerminalRemovalSymbolFromBAa(self):
-        production = Production( symbols=[self.ntB, self.ntA, self.ta.new()], lock=True )
+    def test_combinationNonTerminalRemovalSymbolFromBAa(self):
+        symbols = [self.ntB, self.ntA, self.ta.new()]
+        production = Production( symbols, lock=True )
 
         self.assertTextEqual(
         """
@@ -159,38 +165,42 @@ class TestProduction(TestingUtilities):
             + , Production locked: True, str: B a, symbols: [NonTerminal locked: True, str: B, sequence: 1, len:
             + 1;, Terminal locked: True, str: a, sequence: 2, len: 1;], sequence: 2, len: 2;
             + ]
-        """, wrap_text( sort_alphabetically_and_by_length( production.combinations() ), wrap=100 ) )
+        """, wrap_text( sort_alphabetically_and_by_length( production.combinations( symbols ) ), wrap=100 ) )
 
-    def test_productionNonTerminalRemovalSymbolFromaAa(self):
-        production = Production( symbols=[self.ta, self.ntA, self.ta.new()], lock=True )
+    def test_combinationNonTerminalRemovalSymbolFromaAa(self):
+        symbols = [self.ta, self.ntA, self.ta.new()]
+        production = Production( symbols, lock=True )
 
         self.assertTextEqual(
         r"""
             + [Production locked: True, str: aa, symbols: [Terminal locked: True, str: aa, sequence: 1, len: 2;],
             + sequence: 1, len: 2;
             + ]
-        """, wrap_text( sort_alphabetically_and_by_length( production.combinations() ), wrap=100 ) )
+        """, wrap_text( sort_alphabetically_and_by_length( production.combinations( symbols ) ), wrap=100 ) )
 
-    def test_productionFilterNonTerminalsFromaAa(self):
-        production = Production( symbols=[self.ta, self.ntA, self.ta.new()] )
-        production.filter_non_terminals([], [])
+    def test_combinationFilterNonTerminalsFromaAa(self):
+        symbols = [self.ta, self.ntA, self.ta.new()]
+        production = Production( symbols )
+        production.filter_non_terminals( [], symbols )
 
         self.assertTextEqual(
         r"""
             + [Terminal locked: True, str: aa, sequence: 1, len: 2;]
         """, sort_alphabetically_and_by_length( production ) )
 
-    def test_productionFilterNonTerminalsFromAa(self):
-        production = Production( symbols=[self.ntA, self.ta] )
-        production.filter_non_terminals([], [])
+    def test_combinationFilterNonTerminalsFromAa(self):
+        symbols = [self.ntA, self.ta]
+        production = Production( symbols )
+        production.filter_non_terminals([], symbols)
 
         self.assertTextEqual(
         r"""
             + [Terminal locked: True, str: a, sequence: 1, len: 1;]
         """, sort_alphabetically_and_by_length( production ) )
 
-    def test_productionABCD(self):
-        production = Production( symbols=[self.ntA, self.ntB, self.ntC, self.ntD], lock=True )
+    def test_combinationABCD(self):
+        symbols = [self.ntA, self.ntB, self.ntC, self.ntD]
+        production = Production( symbols, lock=True )
 
         self.assertTextEqual(
         """
@@ -240,8 +250,8 @@ class TestChomskyGrammar(TestingUtilities):
         production_S = Production( symbols=[non_terminal_S], lock=True )
         production_A = Production( symbols=[non_terminal_A, terminal_b], lock=True )
 
-        self.assertFalse( firstGrammar.non_terminal_has_transitions_with( non_terminal_S, production_S ) )
-        self.assertTrue( firstGrammar.non_terminal_has_transitions_with( non_terminal_S, production_A ) )
+        self.assertFalse( firstGrammar.has_production( non_terminal_S, production_S ) )
+        self.assertTrue( firstGrammar.has_production( non_terminal_S, production_A ) )
 
     def test_grammarHasOnNonTerminalChapter5FirstExample1(self):
         firstGrammar = ChomskyGrammar.load_from_text_lines( wrap_text(
@@ -267,9 +277,106 @@ class TestChomskyGrammar(TestingUtilities):
 
         self.assertTextEqual(
         """
+            + S -> b | c | A b | A c | B c | A B c
+            + A -> a | a A
+            + B -> b | d | A d | b B
         """, firstGrammar )
 
         self.assertTrue( firstGrammar.is_epsilon_free() )
+
+    def test_grammarConvertToEpsilonFreeWithNewInitialSymbolChapter5FirstExample1MutatedWithEpsilonS(self):
+        firstGrammar = ChomskyGrammar.load_from_text_lines( wrap_text(
+        """
+            S -> Ab | A Bc | A B S | &
+            A -> aA | &
+            B -> bB | Ad | &
+        """ ) )
+        firstGrammar.convert_to_epsilon_free()
+
+        self.assertTextEqual(
+        """
+            + S' -> & | b | c | A | B | S | A b | A c | B c | A B | A S | B S | A B c | A B S
+            +  A -> a | a A
+            +  B -> b | d | A d | b B
+            +  S -> b | c | A | B | S | A b | A c | B c | A B | A S | B S | A B c | A B S
+        """, firstGrammar )
+
+        self.assertTrue( firstGrammar.is_epsilon_free() )
+
+    def test_grammarConvertToEpsilonFreeWithNewInitialSymbolChapter5FirstExample1MutatedS(self):
+        firstGrammar = ChomskyGrammar.load_from_text_lines( wrap_text(
+        """
+            S -> Ab | A Bc | A B S
+            A -> aA | &
+            B -> bB | Ad | &
+        """ ) )
+        firstGrammar.convert_to_epsilon_free()
+
+        self.assertTextEqual(
+        """
+            + S' -> b | c | S | A b | A c | B c | A S | B S | A B c | A B S
+            +  A -> a | a A
+            +  B -> b | d | A d | b B
+            +  S -> b | c | S | A b | A c | B c | A S | B S | A B c | A B S
+        """, firstGrammar )
+
+        self.assertTrue( firstGrammar.is_epsilon_free() )
+
+    def test_grammarConvertToEpsilonFreeWithNewInitialSymbolChapter5FirstExample1MutatedNoS(self):
+        firstGrammar = ChomskyGrammar.load_from_text_lines( wrap_text(
+        """
+            S -> Ab | A Bc | A B
+            A -> aA | &
+            B -> bB | Ad | &
+        """ ) )
+        firstGrammar.convert_to_epsilon_free()
+
+        self.assertTextEqual(
+        """
+            + S -> b | c | A | B | A b | A c | B c | A B | A B c
+            + A -> a | a A
+            + B -> b | d | A d | b B
+        """, firstGrammar )
+
+        self.assertTrue( firstGrammar.is_epsilon_free() )
+
+    def test_grammarGetNonTerminalEpsilonSimpleCaseChapter5FirstExample1(self):
+        LockableType._USE_STRING = False
+        firstGrammar = ChomskyGrammar.load_from_text_lines( wrap_text(
+        """
+            S -> Ab | A Bc
+            A -> aA | &
+            B -> bB | Ad | &
+        """ ) )
+
+        self.assertTextEqual(
+        """
+            + [Production locked: True, str: A, symbols: [NonTerminal locked: True, str: A, sequence: 1, len: 1;],
+            + sequence: 1, len: 1;
+            + , Production locked: True, str: B, symbols: [NonTerminal locked: True, str: B, sequence: 1, len:
+            + 1;], sequence: 1, len: 1;
+            + ]
+        """, wrap_text( sort_alphabetically_and_by_length( firstGrammar.get_non_terminal_epsilon() ), wrap=100 ) )
+
+    def test_grammarGetNonTerminalEpsilonChapter5FirstExample1Mutated(self):
+        LockableType._USE_STRING = False
+        firstGrammar = ChomskyGrammar.load_from_text_lines( wrap_text(
+        """
+            S -> Ab | A Bc | A B
+            A -> aA | &
+            B -> bB | Ad | &
+        """ ) )
+
+        self.assertTextEqual(
+        """
+            + [Production locked: True, str: A, symbols: [NonTerminal locked: True, str: A, sequence: 1, len: 1;],
+            + sequence: 1, len: 1;
+            + , Production locked: True, str: B, symbols: [NonTerminal locked: True, str: B, sequence: 1, len:
+            + 1;], sequence: 1, len: 1;
+            + , Production locked: True, str: S, symbols: [NonTerminal locked: True, str: S, sequence: 1, len:
+            + 1;], sequence: 1, len: 1;
+            + ]
+        """, wrap_text( sort_alphabetically_and_by_length( firstGrammar.get_non_terminal_epsilon() ), wrap=100 ) )
 
     def test_grammarIsNotEpsilonFreeChapter5FirstExample1(self):
         firstGrammar = ChomskyGrammar.load_from_text_lines( wrap_text(

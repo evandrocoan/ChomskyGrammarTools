@@ -23,7 +23,7 @@ from .utilities import sort_alphabetically_and_by_length
 from .tree_transformer import ChomskyGrammarTreeTransformer
 
 # level 4 - Abstract Syntax Tree Parsing
-log = getLogger( 127-4, os.path.basename( os.path.dirname( os.path.abspath ( __file__ ) ) ) )
+log = getLogger( 127-4, __name__ )
 log( 1, "Importing " + __name__ )
 
 
@@ -116,7 +116,7 @@ class ChomskyGrammar():
         else:
             raise RuntimeError( "Your grammar has an invalid initial_symbol! %s, %s" % ( self.initial_symbol, self.productions ) )
 
-        for non_terminal in sort_alphabetically_and_by_length( set( self.productions.keys() ) - {self.initial_symbol} ):
+        for non_terminal in sorted( set( self.productions.keys() ) - {self.initial_symbol} ):
             grammar_lines.append( create_grammar_line( non_terminal, self.productions[non_terminal] ) )
 
         return "\n".join( grammar_lines )
@@ -278,7 +278,7 @@ class ChomskyGrammar():
 
         for non_terminal in self.productions.keys():
 
-            if self.non_terminal_has_transitions_with( non_terminal, epsilon_production ):
+            if self.has_production( non_terminal, epsilon_production ):
 
                 if non_terminal == self.initial_symbol:
 
@@ -290,19 +290,9 @@ class ChomskyGrammar():
 
         return True
 
-    def non_terminal_has_transitions_with(self, non_terminal_to_check, production_to_check):
-        productions = self.productions[non_terminal_to_check]
-
-        for production in productions:
-
-            if production == production_to_check:
-                return True
-
-        return False
-
     def has_recursion_on_the_non_terminal(self, non_terminal_to_check):
         """
-            Return `True` if the given ``non_terminal_to_check` is recursive with himself.
+            Return `True` if the given `non_terminal_to_check` is recursive with himself.
         """
         recursive_terminals = DynamicIterationSet([non_terminal_to_check])
 
@@ -327,50 +317,88 @@ class ChomskyGrammar():
         # log( 1, "recursive_terminals: %s", recursive_terminals )
         return False
 
+    def get_non_terminal_epsilon(self):
+        """
+            Creates the non terminal's epsilon set, within all non terminal's which lead to epsilon
+            with 0 or more transitions.
+        """
+        old_counter = -1
+        current_counter = 0
+
+        production_keys = self.productions.keys()
+        non_terminal_epsilon = DynamicIterationSet()
+
+        for non_terminal_start in production_keys:
+
+            if self.has_production( non_terminal_start, epsilon_production ):
+                non_terminal_epsilon.add( non_terminal_start )
+
+        while current_counter != old_counter:
+            old_counter = current_counter
+
+            for non_terminal_start in production_keys:
+                productions = self.productions[non_terminal_start]
+
+                for production in productions:
+                    # log( 1, "production: %s", production )
+                    all_symbols_go_to_epsilon = False
+
+                    for symbol in production:
+                        # log( 1, "symbol: %s", symbol )
+
+                        if type( symbol ) is NonTerminal:
+
+                            if symbol in non_terminal_epsilon:
+                                all_symbols_go_to_epsilon = True
+                                continue
+
+                        all_symbols_go_to_epsilon = False
+                        break
+
+                    if all_symbols_go_to_epsilon and non_terminal_start not in non_terminal_epsilon:
+                        non_terminal_epsilon.add( non_terminal_start )
+                        current_counter += 1
+
+        # log( 1, "non_terminal_epsilon: %s", non_terminal_epsilon )
+        return non_terminal_epsilon
+
     def convert_to_epsilon_free(self):
         """
             Convert the current grammar to a epsilon free grammar.
         """
+        non_terminal_epsilon = self.get_non_terminal_epsilon()
 
-        for non_terminal in set( self.productions.keys() ):
+        for non_terminal_start in set( self.productions.keys() ):
+            non_terminal_productions = set( self.productions[non_terminal_start] )
 
-            if self.non_terminal_has_transitions_with( non_terminal, epsilon_production ):
-                self._remove_production_from_non_terminal( non_terminal, epsilon_production )
-                non_terminal_productions = set( self.productions[non_terminal] )
+            for production in non_terminal_productions:
 
-                for production in non_terminal_productions:
-                    production_non_terminals = production.get_non_terminals()
-                    not_go_to_epsilon = self.not_go_to_epsilon( production_non_terminals )
+                for combination in production.combinations( non_terminal_epsilon ):
+                    self.add_production( non_terminal_start, combination )
 
-                    for combination in production.combinations( not_go_to_epsilon ):
-                        self.add_production( non_terminal, combination )
+            if non_terminal_start == self.initial_symbol:
 
-            if non_terminal == self.initial_symbol:
-
-                if self.has_recursion_on_the_non_terminal( non_terminal ):
-                    new_initial_symbol = self._get_new_initial_symbol()
+                if self.has_recursion_on_the_non_terminal( non_terminal_start ):
+                    new_initial_symbol = self.get_new_initial_symbol()
                     self.initial_symbol = new_initial_symbol
+                    self.copy_productions_for_one_non_terminal( non_terminal_start, new_initial_symbol )
 
-                    self.add_production( new_initial_symbol, epsilon_production )
-                    self._copy_productions_for_one_non_terminal( new_initial_symbol, non_terminal )
+            self.remove_production_from_non_terminal( non_terminal_start, epsilon_production )
 
-    def not_go_to_epsilon(self, non_terminals_to_check):
+    def remove_production_from_non_terminal(self, start_non_terminal, production):
         """
-            Get a list of on terminal's which does not go epsilon.
+            Given a `start_non_terminal` remove its `production`.
         """
-        not_go_to_epsilon = []
+        self.productions[start_non_terminal].discard( production )
 
-        for non_terminal in non_terminals_to_check:
+    def copy_productions_for_one_non_terminal(self, non_terminal_source, non_terminal_destine, secondGrammar=None):
+        """
+            Given one start production `non_terminal_source` and a `non_terminal_destine`, copy all
+            productions from the source symbol to the destine symbol.
 
-            if not self.has_production( non_terminal, epsilon_production ):
-                not_go_to_epsilon.append( non_terminal )
-
-        return not_go_to_epsilon
-
-    def _remove_production_from_non_terminal(self, non_terminal, production):
-        self.productions[non_terminal].discard( production )
-
-    def _copy_productions_for_one_non_terminal(self, non_terminal_destine, non_terminal_source, secondGrammar=None):
+            If a `secondGrammar` is given, copy the symbols from the source at the current grammar
+            to the destine at the `secondGrammar`.
+        """
 
         if secondGrammar:
             secondGrammarProductions = secondGrammar.productions[non_terminal_source]
@@ -380,6 +408,31 @@ class ChomskyGrammar():
 
         for production in secondGrammarProductions:
             self.add_production( non_terminal_destine, production )
+
+    def get_new_initial_symbol(self, secondGrammar=None):
+        """
+            Search for a new initial symbol name until find one in the form S'''... and returns it.
+
+            If given a `secondGrammar`, also try to find a new initial symbol which is unique for
+            both grammars.
+        """
+        current_symbols = set()
+        new_initial_symbol = 'S'
+
+        for non_terminal in self.productions.keys():
+            current_symbols.add( non_terminal )
+
+        if secondGrammar:
+
+            for non_terminal in secondGrammar.productions.keys():
+                current_symbols.add( non_terminal )
+
+        while True:
+            new_initial_symbol += "'"
+
+            if new_initial_symbol not in current_symbols:
+                return Production( symbols=[NonTerminal( new_initial_symbol )], lock=True )
+
 
     def left_recursion(self):
         """
@@ -429,15 +482,15 @@ class ChomskyGrammar():
         first = {}
         production_keys = self.productions.keys()
 
-        current_count = 0
+        current_counter = 0
         processed_symbols = -1
 
         # Create the initial FIRST's sets
         for symbol in production_keys:
             first[symbol] = set()
 
-        while processed_symbols != current_count:
-            processed_symbols = current_count
+        while processed_symbols != current_counter:
+            processed_symbols = current_counter
 
             for start_symbol in production_keys:
                 start_productions = self.productions[start_symbol]
@@ -453,13 +506,13 @@ class ChomskyGrammar():
 
                             if symbol not in first[start_symbol]:
                                 first[start_symbol].add( symbol )
-                                current_count += 1
+                                current_counter += 1
                             break
 
                         if type( symbol ) is NonTerminal:
 
                             if Production.copy_productions_except_epsilon( first[symbol], first[start_symbol] ):
-                                current_count += 1
+                                current_counter += 1
 
                             # log( 1, "symbol: %s, production: %-6s, first: %s", symbol, production, first[symbol] )
                             if epsilon_production in first[symbol]:
@@ -469,7 +522,7 @@ class ChomskyGrammar():
 
                                     if epsilon_production not in first[start_symbol]:
                                         first[start_symbol].add( epsilon_production )
-                                        current_count += 1
+                                        current_counter += 1
 
                             else:
                                 break
@@ -506,7 +559,7 @@ class ChomskyGrammar():
         follow = {}
         production_keys = self.productions.keys()
 
-        current_count = 0
+        current_counter = 0
         processed_symbols = -1
 
         if not first:
@@ -519,8 +572,8 @@ class ChomskyGrammar():
         # First put $ (the end of input marker) in Follow(S) (S is the start symbol)
         follow[self.initial_symbol].add( end_of_string_terminal )
 
-        while processed_symbols != current_count:
-            processed_symbols = current_count
+        while processed_symbols != current_counter:
+            processed_symbols = current_counter
 
             for start_symbol in production_keys:
                 start_productions = self.productions[start_symbol]
@@ -539,19 +592,19 @@ class ChomskyGrammar():
 
                                 if Production.copy_productions_except_epsilon( following_first, follow[current_symbol] ):
                                     # log( 1, "1. start_symbol: %s, current_symbol: %s, next_symbol: %-4s, Adding: %s", start_symbol, current_symbol, next_symbol, following_first )
-                                    current_count += 1
+                                    current_counter += 1
 
                                 if epsilon_production in following_first:
 
                                     if Production.copy_productions_except_epsilon( follow[start_symbol], follow[current_symbol] ):
                                         # log( 1, "2. start_symbol: %s, current_symbol: %s, next_symbol: %-4s, Adding: %s", start_symbol, current_symbol, next_symbol, follow[start_symbol] )
-                                        current_count += 1
+                                        current_counter += 1
 
                             else:
 
                                 if Production.copy_productions_except_epsilon( follow[start_symbol], follow[current_symbol] ):
                                     # log( 1, "3. start_symbol: %s, current_symbol: %s, next_symbol: %-4s, Adding: %s", start_symbol, current_symbol, next_symbol, follow[start_symbol] )
-                                    current_count += 1
+                                    current_counter += 1
 
         return follow
 

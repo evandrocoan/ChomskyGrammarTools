@@ -10,7 +10,7 @@ from .utilities import get_representation
 from debug_tools import getLogger
 
 # level 4 - Abstract Syntax Tree Parsing
-log = getLogger( 127-4, os.path.basename( os.path.dirname( os.path.abspath ( __file__ ) ) ) )
+log = getLogger( 127-4, __name__ )
 
 
 class LockableType(object):
