@@ -49,6 +49,7 @@ class Production(LockableType):
         ## Caches the length of this symbol, useful after its changes have been locked by `lock()`
         self.len = 0
         self._original_len = self._len
+        self._original_str = self._str
 
         if symbols:
 
@@ -182,6 +183,7 @@ class Production(LockableType):
             self.add( epsilon_terminal.new( True ) )
 
         self.trim_epsilons()
+        # log( 1, "self: \n%s", self )
 
     def remove_non_terminal(self, index):
         """
@@ -214,6 +216,7 @@ class Production(LockableType):
         self.sequence = 0
 
         for old_symbol in old_symbols:
+            # log( 1, "old_symbol: %s, len: %s", old_symbol, len( old_symbol ) )
 
             if len( old_symbol ):
                 self.add( old_symbol.new( True ) )
@@ -270,8 +273,8 @@ class Production(LockableType):
         if symbol.locked:
             raise RuntimeError( "You can only add `unlocked` symbols in a production! %s" % symbol )
 
-        # Epsilon symbols have length 0
         if len( symbol ) == 0:
+            # log( 1, "Epsilon symbols have length 0" )
 
             if self.has_epsilon:
                 return
@@ -284,7 +287,9 @@ class Production(LockableType):
 
         symbol.sequence = self.sequence
         symbol.lock()
+
         self.symbols.append( symbol )
+        # log( 1, "self.symbols: %s (%s)", self.symbols, type( self.symbols ) )
 
     def _merge_terminals(self, new_symbol):
         """
@@ -310,6 +315,7 @@ class Production(LockableType):
         """
         super().unlock()
         self._len = self._original_len
+        self._str = self._original_str
 
     def lock(self):
         """

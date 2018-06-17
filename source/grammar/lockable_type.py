@@ -32,6 +32,7 @@ class LockableType(object):
         """
         super().__setattr__('locked', False)
         self._original_len = self._len
+        self._original_str = self._str
 
         ## Controls whether the attributes changes of this object are allow or not
         self.locked = False
@@ -111,6 +112,7 @@ class LockableType(object):
         """
         self.__dict__['locked'] = False
         self._len = self._original_len
+        self._str = self._original_str
 
     def lock(self):
         """
