@@ -141,7 +141,7 @@ class Production(LockableType):
             n_items_permutation = list( itertools.permutations( non_terminals, permutation_size ) )
 
             for permutation in n_items_permutation:
-                new_production = self.new( True )
+                new_production = self.new()
 
                 try:
                     new_production.filter_non_terminals( permutation, non_terminals_to_ignore )
@@ -150,7 +150,7 @@ class Production(LockableType):
                     error = str( error )
 
                     if error.startswith( "Invalid production creation! Production with no length:" ):
-                        new_production = epsilon_production.new( True )
+                        new_production = epsilon_production.new()
 
                     else:
                         raise RuntimeError( error )
@@ -175,7 +175,7 @@ class Production(LockableType):
                     self.symbols[symbol.sequence - 1] = epsilon_terminal
 
         if not len( self ):
-            self.add( epsilon_terminal.new( True ) )
+            self.add( epsilon_terminal.new() )
 
         self.trim_epsilons()
         # log( 1, "self: \n%s", self )
@@ -204,7 +204,7 @@ class Production(LockableType):
         """
 
         if new_copy:
-            self = self.new( True )
+            self = self.new()
 
         old_symbols = self.symbols
         self.symbols = []
@@ -214,10 +214,10 @@ class Production(LockableType):
             # log( 1, "old_symbol: %s, len: %s", old_symbol, len( old_symbol ) )
 
             if len( old_symbol ):
-                self.add( old_symbol.new( True ) )
+                self.add( old_symbol.new() )
 
         if not len( self ):
-            self.add( epsilon_terminal.new( True ) )
+            self.add( epsilon_terminal.new() )
 
         self.lock()
         return self

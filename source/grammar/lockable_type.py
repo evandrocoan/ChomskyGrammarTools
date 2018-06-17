@@ -136,7 +136,7 @@ class LockableType(object):
         self._hash = hash( self._str() )
         self.locked = True
 
-    def new(self, unlocked=False):
+    def new(self, unlocked=True):
         """
             Creates and return a new copy of the current a object.
         """

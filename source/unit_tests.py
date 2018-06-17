@@ -137,7 +137,7 @@ class TestProduction(TestingUtilities):
         """, sort_alphabetically_and_by_length( production.combinations() ) )
 
     def test_productionNonTerminalRemovalSymbolFromBAa(self):
-        production = Production( symbols=[self.ntB, self.ntA, self.ta.new( True )], lock=True )
+        production = Production( symbols=[self.ntB, self.ntA, self.ta.new()], lock=True )
 
         self.assertTextEqual(
         """
@@ -149,7 +149,7 @@ class TestProduction(TestingUtilities):
 
     def test_productionNonTerminalRemovalSymbolFromaAa(self):
         LockableType._USE_STRING = False
-        production = Production( symbols=[self.ta, self.ntA, self.ta.new( True )], lock=True )
+        production = Production( symbols=[self.ta, self.ntA, self.ta.new()], lock=True )
 
         self.assertTextEqual(
         r"""
@@ -161,7 +161,7 @@ class TestProduction(TestingUtilities):
     def test_productionFilterNonTerminalsFromaAa(self):
         LockableType._USE_STRING = False
 
-        production = Production( symbols=[self.ta, self.ntA, self.ta.new( True )] )
+        production = Production( symbols=[self.ta, self.ntA, self.ta.new()] )
         production.filter_non_terminals([], [])
 
         self.assertTextEqual(

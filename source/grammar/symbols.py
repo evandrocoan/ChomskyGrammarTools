@@ -99,7 +99,7 @@ class ChomskyGrammarSymbol(LockableType):
         """
 
         if new_copy:
-            self = self.new( True )
+            self = self.new()
 
         if len( self ):
             new_symbols = []
