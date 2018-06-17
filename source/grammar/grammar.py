@@ -18,6 +18,7 @@ from .production import end_of_string_terminal
 
 from .utilities import getCleanSpaces
 from .utilities import DynamicIterationSet
+from .utilities import sort_alphabetically_and_by_length
 
 from .tree_transformer import ChomskyGrammarTreeTransformer
 
@@ -105,7 +106,9 @@ class ChomskyGrammar():
 
             log( 4, "productions:        %s", productions )
             log( 4, "productions_string: %s", productions_string )
-            return "{:>{biggest}} -> {}".format( str( non_terminal_start ), " | ".join( sorted( productions_string ) ), biggest=biggest )
+
+            return "{:>{biggest}} -> {}".format( str( non_terminal_start ),
+                    " | ".join( sort_alphabetically_and_by_length( productions_string ) ), biggest=biggest )
 
         if self.initial_symbol in self.productions:
             grammar_lines.append( create_grammar_line( self.initial_symbol, self.productions[self.initial_symbol] ) )
@@ -113,7 +116,7 @@ class ChomskyGrammar():
         else:
             raise RuntimeError( "Your grammar has an invalid initial_symbol! %s, %s" % ( self.initial_symbol, self.productions ) )
 
-        for non_terminal in sorted( set( self.productions.keys() ) - {self.initial_symbol} ):
+        for non_terminal in sort_alphabetically_and_by_length( set( self.productions.keys() ) - {self.initial_symbol} ):
             grammar_lines.append( create_grammar_line( non_terminal, self.productions[non_terminal] ) )
 
         return "\n".join( grammar_lines )

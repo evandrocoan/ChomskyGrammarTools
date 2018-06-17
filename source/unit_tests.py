@@ -736,7 +736,7 @@ class TestChomskyGrammar(TestingUtilities):
 
         self.assertTextEqual(
         """
-            +  S -> a AB bb CC 1a A b A BC | ba | c
+            +  S -> c | ba | a AB bb CC 1a A b A BC
             +  A -> &
             + AB -> &
             + BC -> &
@@ -753,7 +753,7 @@ class TestChomskyGrammar(TestingUtilities):
 
         self.assertTextEqual(
         """
-            + S -> A cc D | abcd
+            + S -> abcd | A cc D
             + A -> &
             + D -> &
         """, str( firstGrammar ) )
