@@ -417,9 +417,13 @@ class ChomskyGrammar():
 
     def remove_production_from_non_terminal(self, start_non_terminal, production):
         """
-            Given a `start_non_terminal` remove its `production`.
+            Given a `start_non_terminal` remove its `production`. It if was the last production,
+            then the `start_non_terminal` symbol is removed from the grammar.
         """
         self.productions[start_non_terminal].discard( production )
+
+        if not self.productions[start_non_terminal]:
+            del self.productions[start_non_terminal]
 
     def copy_productions_for_one_non_terminal(self, non_terminal_source, non_terminal_destine, secondGrammar=None):
         """
@@ -540,6 +544,33 @@ class ChomskyGrammar():
                         fertile.add( start_symbol )
 
         return fertile
+
+    def eliminate_infertile(self):
+        """
+            Eliminates all non fertile non terminal's symbols with their productions from this grammar.
+        """
+        fertile = self.fertile()
+        production_keys = set( self.productions.keys() )
+
+        for start_symbol in production_keys:
+            start_productions = set( self.productions[start_symbol] )
+
+            for production in start_productions:
+                all_fertile = True
+
+                for symbol in production:
+
+                    if type( symbol ) is NonTerminal:
+
+                        if symbol in fertile:
+                            continue
+
+                        else:
+                            all_fertile = False
+                            break
+
+                if not all_fertile:
+                    self.remove_production_from_non_terminal( start_symbol, production )
 
     def first_non_terminal(self):
         """

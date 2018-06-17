@@ -321,6 +321,43 @@ class TestGrammarFertileSymbols(TestingUtilities):
             + ]
         """, sort_alphabetically_and_by_length( fertile ) )
 
+    def test_grammarGetFertileNonTerminalsChapter4Item5Example1(self):
+        firstGrammar = ChomskyGrammar.load_from_text_lines( wrap_text(
+        """
+            S -> aS | B C | B D
+            A -> cC | A B
+            B -> bB | &
+            C -> aA | B C
+            D -> d D d | c
+        """ ) )
+        fertile = firstGrammar.fertile()
+
+        self.assertTextEqual(
+        """
+            + [B
+            + , D
+            + , S
+            + ]
+        """, sort_alphabetically_and_by_length( fertile ) )
+
+    def test_grammarEliminateNonFertileNonTerminalsChapter4Item5Example1(self):
+        firstGrammar = ChomskyGrammar.load_from_text_lines( wrap_text(
+        """
+            S -> aS | B C | B D
+            A -> cC | A B
+            B -> bB | &
+            C -> aA | B C
+            D -> d D d | c
+        """ ) )
+        firstGrammar.eliminate_infertile()
+
+        self.assertTextEqual(
+        """
+            + S -> a S | B D
+            + B -> & | b B
+            + D -> c | d D d
+        """, firstGrammar )
+
     # def test_grammarGenerateSentencesOfnAsSize5(self):
     #     firstGrammar = Grammar.load_from_text_lines(
     #     """
