@@ -28,12 +28,34 @@ from grammar.testing_utilities import TestingUtilities
 
 
 class TestChomskyGrammar(TestingUtilities):
-    """
-        Tests the Grammar class.
-    """
 
-    def tearDown(self):
-        LockableType._USE_STRING = True
+    def test_grammarProductionsDictionaryKeyError(self):
+        LockableType._USE_STRING = False
+
+        non_terminal_A = NonTerminal( 'A' )
+        production_A = Production( [non_terminal_A], True )
+
+        # print( "production_A:", hash( production_A ) )
+        # print( "non_terminal_A:", hash( non_terminal_A ) )
+
+        dictionary = {}
+        dictionary[production_A] = 'cow'
+
+        self.assertTextEqual(
+        """
+            cow
+        """, dictionary[non_terminal_A] )
+
+    def test_grammarInvalidNonTerminalException(self):
+
+        with self.assertRaisesRegex( RuntimeError, "Invalid Non Terminal `D` added to the grammar" ):
+            firstGrammar = ChomskyGrammar.load_from_text_lines( wrap_text(
+            """
+                S -> Ab | A Dc
+                B -> bB | Ad | &
+                A -> aA | &
+            """ ) )
+            firstGrammar.assure_existing_symbols()
 
     def test_grammarEpsilonProductionEvalutesTrueOnIf(self):
 
@@ -55,7 +77,7 @@ class TestChomskyGrammar(TestingUtilities):
         if not Production( symbols=[Terminal( "b" )], lock=True ):
             self.fail( "Production did not evaluate to `True`" )
 
-    def test_grammarNonTerminalHasTransitionsWithChapter5Example1First(self):
+    def test_grammarNonTerminalHasProductionChapter5Example1First(self):
         firstGrammar = ChomskyGrammar.load_from_text_lines( wrap_text(
         """
             S -> Ab | A Bc
@@ -72,7 +94,7 @@ class TestChomskyGrammar(TestingUtilities):
         self.assertFalse( firstGrammar.has_production( non_terminal_S, production_S ) )
         self.assertTrue( firstGrammar.has_production( non_terminal_S, production_A ) )
 
-    def test_grammarHasOnNonTerminalChapter5Example1First(self):
+    def test_grammarHasRecursionOnNonTerminalChapter5Example1First(self):
         firstGrammar = ChomskyGrammar.load_from_text_lines( wrap_text(
         """
             S -> Ab | A Bc
@@ -84,6 +106,9 @@ class TestChomskyGrammar(TestingUtilities):
 
         self.assertFalse( firstGrammar.has_recursion_on_the_non_terminal( non_terminal_S ) )
         self.assertTrue( firstGrammar.has_recursion_on_the_non_terminal( non_terminal_A ) )
+
+
+class TestGrammarEpsilonConversion(TestingUtilities):
 
     def test_grammarConvertToEpsilonFreeChapter5Example1First(self):
         firstGrammar = ChomskyGrammar.load_from_text_lines( wrap_text(
@@ -217,137 +242,8 @@ class TestChomskyGrammar(TestingUtilities):
 
         self.assertTrue( firstGrammar.is_epsilon_free() )
 
-    # def test_grammarHasLeftRecursionCalculationOfChapter5Example1First(self):
-    #     firstGrammar = ChomskyGrammar.load_from_text_lines( wrap_text(
-    #     """
-    #         S -> Ab | A Bc
-    #         A -> aA | &
-    #         B -> bB | Ad | &
-    #     """ ) )
 
-    #     self.assertTextEqual(
-    #     """
-    #         not implemented yet
-    #     """, dictionary_to_string( firstGrammar.left_recursion() ) )
-
-    #     self.assertFalse( firstGrammar.has_left_recursion() )
-
-    # def test_grammarIsFactoredCalculationOfChapter5Example1First(self):
-    #     firstGrammar = ChomskyGrammar.load_from_text_lines( wrap_text(
-    #     """
-    #         S -> Ab | A Bc
-    #         A -> aA | &
-    #         B -> bB | Ad | &
-    #     """ ) )
-
-    #     self.assertTextEqual(
-    #     """
-    #         not implemented yet
-    #     """, dictionary_to_string( firstGrammar.factors() ) )
-
-    #     self.assertFalse( firstGrammar.is_factored() )
-
-    def test_grammarNonTerminalFirstCalculationOfChapter5Example1First(self):
-        firstGrammar = ChomskyGrammar.load_from_text_lines( wrap_text(
-        """
-            S -> Ab | A Bc
-            A -> aA | &
-            B -> bB | Ad | &
-        """ ) )
-        first_non_terminal = firstGrammar.first_non_terminal()
-
-        self.assertTextEqual(
-        """
-            + S: A B
-            + A:
-            + B: A
-        """, dictionary_to_string( first_non_terminal ) )
-
-    def test_grammarFirstCalculationOfChapter5Example1First(self):
-        firstGrammar = ChomskyGrammar.load_from_text_lines( wrap_text(
-        """
-            S -> Ab | A Bc
-            A -> aA | &
-            B -> bB | Ad | &
-        """ ) )
-        first = firstGrammar.first()
-
-        self.assertTextEqual(
-        """
-            + S: a b c d
-            + A: & a
-            + B: & a b d
-        """, dictionary_to_string( first ) )
-
-    def test_grammarFollowCalculationOfChapter5Example1First(self):
-        firstGrammar = ChomskyGrammar.load_from_text_lines( wrap_text(
-        """
-            S -> Ab | A Bc
-            A -> aA | &
-            B -> bB | Ad | &
-        """ ) )
-        follow = firstGrammar.follow()
-
-        self.assertTextEqual(
-        """
-            + S: $
-            + A: $ a b d
-            + B: c
-        """, dictionary_to_string( follow ) )
-
-    def test_grammarFirstNonTermianlCalculationOfChapter5Example1Follow(self):
-        firstGrammar = ChomskyGrammar.load_from_text_lines( wrap_text(
-        """
-            S -> A B C
-            A -> aA | &
-            B -> bB | A Cd
-            C -> cC | &
-        """ ) )
-        first_non_terminal = firstGrammar.first_non_terminal()
-
-        self.assertTextEqual(
-        """
-            + S: A B C
-            + A:
-            + B: A C
-            + C:
-        """, dictionary_to_string( first_non_terminal ) )
-
-    def test_grammarFirstCalculationOfChapter5Example1Follow(self):
-        firstGrammar = ChomskyGrammar.load_from_text_lines( wrap_text(
-        """
-            S -> A B C
-            A -> aA | &
-            B -> bB | A Cd
-            C -> cC | &
-        """ ) )
-        first = firstGrammar.first()
-
-        self.assertTextEqual(
-        """
-            + S: a b c d
-            + A: & a
-            + B: a b c d
-            + C: & c
-        """, dictionary_to_string( first ) )
-
-    def test_grammarFollowCalculationOfChapter5Example1Follow(self):
-        firstGrammar = ChomskyGrammar.load_from_text_lines( wrap_text(
-        """
-            S -> A B C
-            A -> aA | &
-            B -> bB | A Cd
-            C -> cC | &
-        """ ) )
-        follow = firstGrammar.follow()
-
-        self.assertTextEqual(
-        """
-            + S: $
-            + A: $ a b c d
-            + B: $ c
-            + C: $ d
-        """, dictionary_to_string( follow ) )
+class TestGrammarFertileSymbols(TestingUtilities):
 
     def test_grammarFertileNonTerminalsChapter5Example1Follow(self):
         firstGrammar = ChomskyGrammar.load_from_text_lines( wrap_text(
@@ -385,26 +281,6 @@ class TestChomskyGrammar(TestingUtilities):
             + , S
             + ]
         """, sort_alphabetically_and_by_length( fertile ) )
-
-    def test_grammarFirstCalculationOfChapter5FollowExample2(self):
-        firstGrammar = ChomskyGrammar.load_from_text_lines( wrap_text(
-        """
-            E  -> T E'
-            E' -> + T E' | &
-            T  -> F T'
-            T' -> * F T' | &
-            F  -> ( E ) | id
-        """ ) )
-        first = firstGrammar.first()
-
-        self.assertTextEqual(
-        """
-            +  E: ( id
-            + E': & +
-            +  T: ( id
-            + T': & *
-            +  F: ( id
-        """, dictionary_to_string( first ) )
 
     def test_grammarFertileNonTerminalsChapter5FollowExample2(self):
         firstGrammar = ChomskyGrammar.load_from_text_lines( wrap_text(
@@ -445,305 +321,51 @@ class TestChomskyGrammar(TestingUtilities):
             + ]
         """, sort_alphabetically_and_by_length( fertile ) )
 
-    def test_grammarFirstNonTerminalCalculationOfChapter5FollowExample2(self):
-        firstGrammar = ChomskyGrammar.load_from_text_lines( wrap_text(
-        """
-            E  -> T E'
-            E' -> + T E' | &
-            T  -> F T'
-            T' -> * F T' | &
-            F  -> ( E ) | id
-        """ ) )
-        first_non_terminal = firstGrammar.first_non_terminal()
+    # def test_grammarGenerateSentencesOfnAsSize5(self):
+    #     firstGrammar = Grammar.load_from_text_lines(
+    #     """
+    #         A -> aA | a
+    #     """ )
+    #     generate_sentences = []
+    #     firstGrammar.generate_sentences_of_size_n( 5, generate_sentences )
 
-        self.assertTextEqual(
-        """
-            +  E: F T
-            + E':
-            +  T: F
-            + T':
-            +  F:
-        """, dictionary_to_string( first_non_terminal ) )
+    #     self.assertTextEqual(
+    #     """
+    #         + ['a', 'aa', 'aaa', 'aaaa', 'aaaaa']
+    #     """, str( generate_sentences ) )
 
-    def test_grammarFollowCalculationOfChapter5FollowExample2(self):
-        firstGrammar = ChomskyGrammar.load_from_text_lines( wrap_text(
-        """
-            E  -> T E'
-            E' -> + T E' | &
-            T  -> F T'
-            T' -> * F T' | &
-            F  -> ( E ) | id
-        """ ) )
-        follow = firstGrammar.follow()
+    # def test_grammarHasLeftRecursionCalculationOfChapter5Example1First(self):
+    #     firstGrammar = ChomskyGrammar.load_from_text_lines( wrap_text(
+    #     """
+    #         S -> Ab | A Bc
+    #         A -> aA | &
+    #         B -> bB | Ad | &
+    #     """ ) )
 
-        self.assertTextEqual(
-        """
-            +  E: $ )
-            + E': $ )
-            +  T: $ ) +
-            + T': $ ) +
-            +  F: $ ) * +
-        """, dictionary_to_string( follow ) )
+    #     self.assertTextEqual(
+    #     """
+    #         not implemented yet
+    #     """, dictionary_to_string( firstGrammar.left_recursion() ) )
 
-    def test_grammarFirstCalculationOfChapter5FollowExample3(self):
-        firstGrammar = ChomskyGrammar.load_from_text_lines( wrap_text(
-        """
-            S -> Ab C D | E F
-            A -> aA | &
-            C -> E C F | c
-            D -> C D | dD d | &
-            E -> eE | &
-            F -> F S | fF | g
-        """ ) )
-        first = firstGrammar.first()
+    #     self.assertFalse( firstGrammar.has_left_recursion() )
 
-        self.assertTextEqual(
-        """
-            + S: a b e f g
-            + A: & a
-            + C: c e
-            + D: & c d e
-            + E: & e
-            + F: f g
-        """, dictionary_to_string( first ) )
+    # def test_grammarIsFactoredCalculationOfChapter5Example1First(self):
+    #     firstGrammar = ChomskyGrammar.load_from_text_lines( wrap_text(
+    #     """
+    #         S -> Ab | A Bc
+    #         A -> aA | &
+    #         B -> bB | Ad | &
+    #     """ ) )
 
-    def test_grammarFirstNonTerminalCalculationOfChapter5FollowExample3(self):
-        firstGrammar = ChomskyGrammar.load_from_text_lines( wrap_text(
-        """
-            S -> Ab C D | E F
-            A -> aA | &
-            C -> E C F | c
-            D -> C D | dD d | &
-            E -> eE | &
-            F -> F S | fF | g
-        """ ) )
-        first_non_terminal = firstGrammar.first_non_terminal()
+    #     self.assertTextEqual(
+    #     """
+    #         not implemented yet
+    #     """, dictionary_to_string( firstGrammar.factors() ) )
 
-        self.assertTextEqual(
-        """
-            + S: A E F
-            + A:
-            + C: C E
-            + D: C E
-            + E:
-            + F: F
-        """, dictionary_to_string( first_non_terminal ) )
+    #     self.assertFalse( firstGrammar.is_factored() )
 
-    def test_grammarFollowCalculationOfChapter5FollowExample3(self):
-        firstGrammar = ChomskyGrammar.load_from_text_lines( wrap_text(
-        """
-            S -> Ab C D | E F
-            A -> aA | &
-            C -> E C F | c
-            D -> C D | dD d | &
-            E -> eE | &
-            F -> F S | fF | g
-        """ ) )
-        follow = firstGrammar.follow()
 
-        self.assertTextEqual(
-        """
-            + S: $ a b c d e f g
-            + A: b
-            + C: $ a b c d e f g
-            + D: $ a b c d e f g
-            + E: c e f g
-            + F: $ a b c d e f g
-        """, dictionary_to_string( follow ) )
-
-    def test_grammarFirstCalculationOfChapter5FollowExample4(self):
-        firstGrammar = ChomskyGrammar.load_from_text_lines( wrap_text(
-        """
-            S -> A C | C e B | B a
-            A -> a A | B C
-            B -> b B | A B | &
-            C -> c C | &
-        """ ) )
-        # sys.setrecursionlimit( 2000 )
-        first = firstGrammar.first()
-
-        self.assertTextEqual(
-        """
-            + S: & a b c e
-            + A: & a b c
-            + B: & a b c
-            + C: & c
-        """, dictionary_to_string( first ) )
-
-    def test_grammarFirstNonTerminalCalculationOfChapter5FollowExample4(self):
-        firstGrammar = ChomskyGrammar.load_from_text_lines( wrap_text(
-        """
-            S -> A C | C e B | B a
-            A -> a A | B C
-            B -> b B | A B | &
-            C -> c C | &
-        """ ) )
-        # sys.setrecursionlimit( 2000 )
-        first_non_terminal = firstGrammar.first_non_terminal()
-
-        self.assertTextEqual(
-        """
-            + S: A B C
-            + A: A B C
-            + B: A B C
-            + C:
-        """, dictionary_to_string( first_non_terminal ) )
-
-    def test_grammarFollowCalculationOfChapter5FollowExample4(self):
-        firstGrammar = ChomskyGrammar.load_from_text_lines( wrap_text(
-        """
-            S -> A C | C e B | B a
-            A -> a A | B C
-            B -> b B | A B | &
-            C -> c C | &
-        """ ) )
-        # sys.setrecursionlimit( 2000 )
-        follow = firstGrammar.follow()
-
-        self.assertTextEqual(
-        """
-            + S: $
-            + A: $ a b c
-            + B: $ a b c
-            + C: $ a b c e
-        """, dictionary_to_string( follow ) )
-
-    def test_grammarProductionsDictionaryKeyError(self):
-        LockableType._USE_STRING = False
-
-        non_terminal_A = NonTerminal( 'A' )
-        production_A = Production( [non_terminal_A], True )
-
-        # print( "production_A:", hash( production_A ) )
-        # print( "non_terminal_A:", hash( non_terminal_A ) )
-
-        dictionary = {}
-        dictionary[production_A] = 'cow'
-
-        self.assertTextEqual(
-        """
-            cow
-        """, dictionary[non_terminal_A] )
-
-    def test_grammarSingleAmbiguityCase(self):
-        firstGrammar = ChomskyGrammar.parse( wrap_text(
-        """
-            S -> S S | &
-        """ ) )
-
-        self.assertTextEqual(
-        """
-            + productions
-            +   non_terminal_start
-            +     non_terminal  S
-            +   space
-            +   non_terminals
-            +     production
-            +       space
-            +       non_terminal  S
-            +       space
-            +       non_terminal  S
-            +       space
-            +     production
-            +       space
-            +       epsilon
-        """, firstGrammar.pretty() )
-
-    def test_grammarInvalidNonTerminalException(self):
-
-        with self.assertRaisesRegex( RuntimeError, "Invalid Non Terminal `D` added to the grammar" ):
-            firstGrammar = ChomskyGrammar.load_from_text_lines( wrap_text(
-            """
-                S -> Ab | A Dc
-                B -> bB | Ad | &
-                A -> aA | &
-            """ ) )
-            firstGrammar.assure_existing_symbols()
-
-    def test_grammarTransformationTreeParsingParenStarPlusSymbols(self):
-        LockableType._USE_STRING = False
-
-        firstGrammar = ChomskyGrammar.parse( wrap_text(
-        r"""
-            E  -> T E'
-            E' -> + T E' | &
-            T  -> F T'
-            T' -> * F T'
-            F  -> ( E ) | id
-        """ ) )
-        firstGrammar = ChomskyGrammarTreeTransformer().transform( firstGrammar )
-
-        self.assertTextEqual(
-        r"""
-            + Tree(productions, [Production locked: False, str: , symbols: [NonTerminal locked: True, str: E,
-            + sequence: 1, len: 1;], sequence: 1, len: 0;
-            + , Tree(space, []), Tree(space, []), Tree(non_terminals, [Production locked: False, str: , symbols:
-            + [NonTerminal locked: True, str: T, sequence: 1, len: 1;, NonTerminal locked: True, str: E',
-            + sequence: 2, len: 1;], sequence: 2, len: 0;
-            + ]), Tree(end_symbol, [Tree(new_line, [Token(NEWLINE, '\n')])]), Production locked: False, str: ,
-            + symbols: [NonTerminal locked: True, str: E', sequence: 1, len: 1;], sequence: 1, len: 0;
-            + , Tree(space, []), Tree(non_terminals, [Production locked: False, str: , symbols: [Terminal locked:
-            + True, str: +, sequence: 1, len: 1;, NonTerminal locked: True, str: T, sequence: 2, len: 1;,
-            + NonTerminal locked: True, str: E', sequence: 3, len: 1;], sequence: 3, len: 0;
-            + , Production locked: False, str: , symbols: [Terminal locked: True, str: &, sequence: 1, len: 0;],
-            + sequence: 1, len: 0;
-            + ]), Tree(end_symbol, [Tree(new_line, [Token(NEWLINE, '\n')])]), Production locked: False, str: ,
-            + symbols: [NonTerminal locked: True, str: T, sequence: 1, len: 1;], sequence: 1, len: 0;
-            + , Tree(space, []), Tree(space, []), Tree(non_terminals, [Production locked: False, str: , symbols:
-            + [NonTerminal locked: True, str: F, sequence: 1, len: 1;, NonTerminal locked: True, str: T',
-            + sequence: 2, len: 1;], sequence: 2, len: 0;
-            + ]), Tree(end_symbol, [Tree(new_line, [Token(NEWLINE, '\n')])]), Production locked: False, str: ,
-            + symbols: [NonTerminal locked: True, str: T', sequence: 1, len: 1;], sequence: 1, len: 0;
-            + , Tree(space, []), Tree(non_terminals, [Production locked: False, str: , symbols: [Terminal locked:
-            + True, str: *, sequence: 1, len: 1;, NonTerminal locked: True, str: F, sequence: 2, len: 1;,
-            + NonTerminal locked: True, str: T', sequence: 3, len: 1;], sequence: 3, len: 0;
-            + ]), Tree(end_symbol, [Tree(new_line, [Token(NEWLINE, '\n')])]), Production locked: False, str: ,
-            + symbols: [NonTerminal locked: True, str: F, sequence: 1, len: 1;], sequence: 1, len: 0;
-            + , Tree(space, []), Tree(space, []), Tree(non_terminals, [Production locked: False, str: , symbols:
-            + [Terminal locked: True, str: (, sequence: 1, len: 1;, NonTerminal locked: True, str: E, sequence: 2,
-            + len: 1;, Terminal locked: True, str: ), sequence: 3, len: 1;], sequence: 3, len: 0;
-            + , Production locked: False, str: , symbols: [Terminal locked: True, str: id, sequence: 1, len: 2;],
-            + sequence: 1, len: 0;
-            + ])])
-        """, wrap_text( firstGrammar, wrap=100 ) )
-
-    def test_grammarTransformationParsingComplexSingleProduction(self):
-        LockableType._USE_STRING = False
-
-        firstGrammar = ChomskyGrammar.parse( wrap_text(
-        """
-            S -> aABbbCC1aAbA BC | ba | c
-        """ ) )
-        firstGrammar = ChomskyGrammarTreeTransformer().transform( firstGrammar )
-
-        self.assertTextEqual(
-        """
-            + productions
-            +   S
-            +   space
-            +   non_terminals
-            +     a AB bb CC 1a A b A BC
-            +     ba
-            +     c
-        """, firstGrammar.pretty() )
-
-        self.assertTextEqual( wrap_text(
-        r"""
-            + Tree(productions, [Production locked: False, str: , symbols: [NonTerminal locked: True, str: S,
-            + sequence: 1, len: 1;], sequence: 1, len: 0;
-            + , Tree(space, []), Tree(non_terminals, [Production locked: False, str: , symbols: [Terminal locked:
-            + True, str: a, sequence: 1, len: 1;, NonTerminal locked: True, str: AB, sequence: 2, len: 1;,
-            + Terminal locked: True, str: bb, sequence: 3, len: 2;, NonTerminal locked: True, str: CC, sequence:
-            + 4, len: 1;, Terminal locked: True, str: 1a, sequence: 5, len: 2;, NonTerminal locked: True, str: A,
-            + sequence: 6, len: 1;, Terminal locked: True, str: b, sequence: 7, len: 1;, NonTerminal locked: True,
-            + str: A, sequence: 8, len: 1;, NonTerminal locked: True, str: BC, sequence: 9, len: 1;], sequence: 9,
-            + len: 0;
-            + , Production locked: False, str: , symbols: [Terminal locked: True, str: ba, sequence: 1, len: 2;],
-            + sequence: 1, len: 0;
-            + , Production locked: False, str: , symbols: [Terminal locked: True, str: c, sequence: 1, len: 1;],
-            + sequence: 1, len: 0;
-            + ])])
-        """ ), wrap_text( str( firstGrammar ), wrap=100 ) )
+class TestGrammarTreeParsing(TestingUtilities):
 
     def test_grammarTreeParsingComplexSingleProduction(self):
         firstGrammar = ChomskyGrammar.parse( wrap_text(
@@ -969,24 +591,117 @@ class TestChomskyGrammar(TestingUtilities):
             +     space
         """, firstGrammar.pretty() )
 
-    # def test_grammarGenerateSentencesOfnAsSize5(self):
-    #     firstGrammar = Grammar.load_from_text_lines(
-    #     """
-    #         A -> aA | a
-    #     """ )
-    #     generate_sentences = []
-    #     firstGrammar.generate_sentences_of_size_n( 5, generate_sentences )
+    def test_grammarSingleAmbiguityCase(self):
+        firstGrammar = ChomskyGrammar.parse( wrap_text(
+        """
+            S -> S S | &
+        """ ) )
 
-    #     self.assertTextEqual(
-    #     """
-    #         + ['a', 'aa', 'aaa', 'aaaa', 'aaaaa']
-    #     """, str( generate_sentences ) )
+        self.assertTextEqual(
+        """
+            + productions
+            +   non_terminal_start
+            +     non_terminal  S
+            +   space
+            +   non_terminals
+            +     production
+            +       space
+            +       non_terminal  S
+            +       space
+            +       non_terminal  S
+            +       space
+            +     production
+            +       space
+            +       epsilon
+        """, firstGrammar.pretty() )
+
+    def test_grammarTransformationTreeParsingParenStarPlusSymbols(self):
+        LockableType._USE_STRING = False
+
+        firstGrammar = ChomskyGrammar.parse( wrap_text(
+        r"""
+            E  -> T E'
+            E' -> + T E' | &
+            T  -> F T'
+            T' -> * F T'
+            F  -> ( E ) | id
+        """ ) )
+        firstGrammar = ChomskyGrammarTreeTransformer().transform( firstGrammar )
+
+        self.assertTextEqual(
+        r"""
+            + Tree(productions, [Production locked: False, str: , symbols: [NonTerminal locked: True, str: E,
+            + sequence: 1, len: 1;], sequence: 1, len: 0;
+            + , Tree(space, []), Tree(space, []), Tree(non_terminals, [Production locked: False, str: , symbols:
+            + [NonTerminal locked: True, str: T, sequence: 1, len: 1;, NonTerminal locked: True, str: E',
+            + sequence: 2, len: 1;], sequence: 2, len: 0;
+            + ]), Tree(end_symbol, [Tree(new_line, [Token(NEWLINE, '\n')])]), Production locked: False, str: ,
+            + symbols: [NonTerminal locked: True, str: E', sequence: 1, len: 1;], sequence: 1, len: 0;
+            + , Tree(space, []), Tree(non_terminals, [Production locked: False, str: , symbols: [Terminal locked:
+            + True, str: +, sequence: 1, len: 1;, NonTerminal locked: True, str: T, sequence: 2, len: 1;,
+            + NonTerminal locked: True, str: E', sequence: 3, len: 1;], sequence: 3, len: 0;
+            + , Production locked: False, str: , symbols: [Terminal locked: True, str: &, sequence: 1, len: 0;],
+            + sequence: 1, len: 0;
+            + ]), Tree(end_symbol, [Tree(new_line, [Token(NEWLINE, '\n')])]), Production locked: False, str: ,
+            + symbols: [NonTerminal locked: True, str: T, sequence: 1, len: 1;], sequence: 1, len: 0;
+            + , Tree(space, []), Tree(space, []), Tree(non_terminals, [Production locked: False, str: , symbols:
+            + [NonTerminal locked: True, str: F, sequence: 1, len: 1;, NonTerminal locked: True, str: T',
+            + sequence: 2, len: 1;], sequence: 2, len: 0;
+            + ]), Tree(end_symbol, [Tree(new_line, [Token(NEWLINE, '\n')])]), Production locked: False, str: ,
+            + symbols: [NonTerminal locked: True, str: T', sequence: 1, len: 1;], sequence: 1, len: 0;
+            + , Tree(space, []), Tree(non_terminals, [Production locked: False, str: , symbols: [Terminal locked:
+            + True, str: *, sequence: 1, len: 1;, NonTerminal locked: True, str: F, sequence: 2, len: 1;,
+            + NonTerminal locked: True, str: T', sequence: 3, len: 1;], sequence: 3, len: 0;
+            + ]), Tree(end_symbol, [Tree(new_line, [Token(NEWLINE, '\n')])]), Production locked: False, str: ,
+            + symbols: [NonTerminal locked: True, str: F, sequence: 1, len: 1;], sequence: 1, len: 0;
+            + , Tree(space, []), Tree(space, []), Tree(non_terminals, [Production locked: False, str: , symbols:
+            + [Terminal locked: True, str: (, sequence: 1, len: 1;, NonTerminal locked: True, str: E, sequence: 2,
+            + len: 1;, Terminal locked: True, str: ), sequence: 3, len: 1;], sequence: 3, len: 0;
+            + , Production locked: False, str: , symbols: [Terminal locked: True, str: id, sequence: 1, len: 2;],
+            + sequence: 1, len: 0;
+            + ])])
+        """, wrap_text( firstGrammar, wrap=100 ) )
+
+    def test_grammarTransformationParsingComplexSingleProduction(self):
+        LockableType._USE_STRING = False
+
+        firstGrammar = ChomskyGrammar.parse( wrap_text(
+        """
+            S -> aABbbCC1aAbA BC | ba | c
+        """ ) )
+        firstGrammar = ChomskyGrammarTreeTransformer().transform( firstGrammar )
+
+        self.assertTextEqual(
+        """
+            + productions
+            +   S
+            +   space
+            +   non_terminals
+            +     a AB bb CC 1a A b A BC
+            +     ba
+            +     c
+        """, firstGrammar.pretty() )
+
+        self.assertTextEqual( wrap_text(
+        r"""
+            + Tree(productions, [Production locked: False, str: , symbols: [NonTerminal locked: True, str: S,
+            + sequence: 1, len: 1;], sequence: 1, len: 0;
+            + , Tree(space, []), Tree(non_terminals, [Production locked: False, str: , symbols: [Terminal locked:
+            + True, str: a, sequence: 1, len: 1;, NonTerminal locked: True, str: AB, sequence: 2, len: 1;,
+            + Terminal locked: True, str: bb, sequence: 3, len: 2;, NonTerminal locked: True, str: CC, sequence:
+            + 4, len: 1;, Terminal locked: True, str: 1a, sequence: 5, len: 2;, NonTerminal locked: True, str: A,
+            + sequence: 6, len: 1;, Terminal locked: True, str: b, sequence: 7, len: 1;, NonTerminal locked: True,
+            + str: A, sequence: 8, len: 1;, NonTerminal locked: True, str: BC, sequence: 9, len: 1;], sequence: 9,
+            + len: 0;
+            + , Production locked: False, str: , symbols: [Terminal locked: True, str: ba, sequence: 1, len: 2;],
+            + sequence: 1, len: 0;
+            + , Production locked: False, str: , symbols: [Terminal locked: True, str: c, sequence: 1, len: 1;],
+            + sequence: 1, len: 0;
+            + ])])
+        """ ), wrap_text( str( firstGrammar ), wrap=100 ) )
 
 
 class TestProduction(TestingUtilities):
-    """
-        Tests the Production class.
-    """
 
     def setUp(self):
         """
@@ -1162,6 +877,294 @@ class TestProduction(TestingUtilities):
         r"""
             + [Terminal locked: True, str: a, sequence: 1, len: 1;]
         """, sort_alphabetically_and_by_length( production ) )
+
+
+class TestGrammarFirstAndFollow(TestingUtilities):
+
+    def test_grammarNonTerminalFirstCalculationOfChapter5Example1First(self):
+        firstGrammar = ChomskyGrammar.load_from_text_lines( wrap_text(
+        """
+            S -> Ab | A Bc
+            A -> aA | &
+            B -> bB | Ad | &
+        """ ) )
+        first_non_terminal = firstGrammar.first_non_terminal()
+
+        self.assertTextEqual(
+        """
+            + S: A B
+            + A:
+            + B: A
+        """, dictionary_to_string( first_non_terminal ) )
+
+    def test_grammarFirstCalculationOfChapter5Example1First(self):
+        firstGrammar = ChomskyGrammar.load_from_text_lines( wrap_text(
+        """
+            S -> Ab | A Bc
+            A -> aA | &
+            B -> bB | Ad | &
+        """ ) )
+        first = firstGrammar.first()
+
+        self.assertTextEqual(
+        """
+            + S: a b c d
+            + A: & a
+            + B: & a b d
+        """, dictionary_to_string( first ) )
+
+    def test_grammarFollowCalculationOfChapter5Example1First(self):
+        firstGrammar = ChomskyGrammar.load_from_text_lines( wrap_text(
+        """
+            S -> Ab | A Bc
+            A -> aA | &
+            B -> bB | Ad | &
+        """ ) )
+        follow = firstGrammar.follow()
+
+        self.assertTextEqual(
+        """
+            + S: $
+            + A: $ a b d
+            + B: c
+        """, dictionary_to_string( follow ) )
+
+    def test_grammarFirstNonTermianlCalculationOfChapter5Example1Follow(self):
+        firstGrammar = ChomskyGrammar.load_from_text_lines( wrap_text(
+        """
+            S -> A B C
+            A -> aA | &
+            B -> bB | A Cd
+            C -> cC | &
+        """ ) )
+        first_non_terminal = firstGrammar.first_non_terminal()
+
+        self.assertTextEqual(
+        """
+            + S: A B C
+            + A:
+            + B: A C
+            + C:
+        """, dictionary_to_string( first_non_terminal ) )
+
+    def test_grammarFirstCalculationOfChapter5Example1Follow(self):
+        firstGrammar = ChomskyGrammar.load_from_text_lines( wrap_text(
+        """
+            S -> A B C
+            A -> aA | &
+            B -> bB | A Cd
+            C -> cC | &
+        """ ) )
+        first = firstGrammar.first()
+
+        self.assertTextEqual(
+        """
+            + S: a b c d
+            + A: & a
+            + B: a b c d
+            + C: & c
+        """, dictionary_to_string( first ) )
+
+    def test_grammarFollowCalculationOfChapter5Example1Follow(self):
+        firstGrammar = ChomskyGrammar.load_from_text_lines( wrap_text(
+        """
+            S -> A B C
+            A -> aA | &
+            B -> bB | A Cd
+            C -> cC | &
+        """ ) )
+        follow = firstGrammar.follow()
+
+        self.assertTextEqual(
+        """
+            + S: $
+            + A: $ a b c d
+            + B: $ c
+            + C: $ d
+        """, dictionary_to_string( follow ) )
+
+    def test_grammarFirstCalculationOfChapter5FollowExample2(self):
+        firstGrammar = ChomskyGrammar.load_from_text_lines( wrap_text(
+        """
+            E  -> T E'
+            E' -> + T E' | &
+            T  -> F T'
+            T' -> * F T' | &
+            F  -> ( E ) | id
+        """ ) )
+        first = firstGrammar.first()
+
+        self.assertTextEqual(
+        """
+            +  E: ( id
+            + E': & +
+            +  T: ( id
+            + T': & *
+            +  F: ( id
+        """, dictionary_to_string( first ) )
+
+    def test_grammarFirstNonTerminalCalculationOfChapter5FollowExample2(self):
+        firstGrammar = ChomskyGrammar.load_from_text_lines( wrap_text(
+        """
+            E  -> T E'
+            E' -> + T E' | &
+            T  -> F T'
+            T' -> * F T' | &
+            F  -> ( E ) | id
+        """ ) )
+        first_non_terminal = firstGrammar.first_non_terminal()
+
+        self.assertTextEqual(
+        """
+            +  E: F T
+            + E':
+            +  T: F
+            + T':
+            +  F:
+        """, dictionary_to_string( first_non_terminal ) )
+
+    def test_grammarFollowCalculationOfChapter5FollowExample2(self):
+        firstGrammar = ChomskyGrammar.load_from_text_lines( wrap_text(
+        """
+            E  -> T E'
+            E' -> + T E' | &
+            T  -> F T'
+            T' -> * F T' | &
+            F  -> ( E ) | id
+        """ ) )
+        follow = firstGrammar.follow()
+
+        self.assertTextEqual(
+        """
+            +  E: $ )
+            + E': $ )
+            +  T: $ ) +
+            + T': $ ) +
+            +  F: $ ) * +
+        """, dictionary_to_string( follow ) )
+
+    def test_grammarFirstCalculationOfChapter5FollowExample3(self):
+        firstGrammar = ChomskyGrammar.load_from_text_lines( wrap_text(
+        """
+            S -> Ab C D | E F
+            A -> aA | &
+            C -> E C F | c
+            D -> C D | dD d | &
+            E -> eE | &
+            F -> F S | fF | g
+        """ ) )
+        first = firstGrammar.first()
+
+        self.assertTextEqual(
+        """
+            + S: a b e f g
+            + A: & a
+            + C: c e
+            + D: & c d e
+            + E: & e
+            + F: f g
+        """, dictionary_to_string( first ) )
+
+    def test_grammarFirstNonTerminalCalculationOfChapter5FollowExample3(self):
+        firstGrammar = ChomskyGrammar.load_from_text_lines( wrap_text(
+        """
+            S -> Ab C D | E F
+            A -> aA | &
+            C -> E C F | c
+            D -> C D | dD d | &
+            E -> eE | &
+            F -> F S | fF | g
+        """ ) )
+        first_non_terminal = firstGrammar.first_non_terminal()
+
+        self.assertTextEqual(
+        """
+            + S: A E F
+            + A:
+            + C: C E
+            + D: C E
+            + E:
+            + F: F
+        """, dictionary_to_string( first_non_terminal ) )
+
+    def test_grammarFollowCalculationOfChapter5FollowExample3(self):
+        firstGrammar = ChomskyGrammar.load_from_text_lines( wrap_text(
+        """
+            S -> Ab C D | E F
+            A -> aA | &
+            C -> E C F | c
+            D -> C D | dD d | &
+            E -> eE | &
+            F -> F S | fF | g
+        """ ) )
+        follow = firstGrammar.follow()
+
+        self.assertTextEqual(
+        """
+            + S: $ a b c d e f g
+            + A: b
+            + C: $ a b c d e f g
+            + D: $ a b c d e f g
+            + E: c e f g
+            + F: $ a b c d e f g
+        """, dictionary_to_string( follow ) )
+
+    def test_grammarFirstCalculationOfChapter5FollowExample4(self):
+        firstGrammar = ChomskyGrammar.load_from_text_lines( wrap_text(
+        """
+            S -> A C | C e B | B a
+            A -> a A | B C
+            B -> b B | A B | &
+            C -> c C | &
+        """ ) )
+        # sys.setrecursionlimit( 2000 )
+        first = firstGrammar.first()
+
+        self.assertTextEqual(
+        """
+            + S: & a b c e
+            + A: & a b c
+            + B: & a b c
+            + C: & c
+        """, dictionary_to_string( first ) )
+
+    def test_grammarFirstNonTerminalCalculationOfChapter5FollowExample4(self):
+        firstGrammar = ChomskyGrammar.load_from_text_lines( wrap_text(
+        """
+            S -> A C | C e B | B a
+            A -> a A | B C
+            B -> b B | A B | &
+            C -> c C | &
+        """ ) )
+        # sys.setrecursionlimit( 2000 )
+        first_non_terminal = firstGrammar.first_non_terminal()
+
+        self.assertTextEqual(
+        """
+            + S: A B C
+            + A: A B C
+            + B: A B C
+            + C:
+        """, dictionary_to_string( first_non_terminal ) )
+
+    def test_grammarFollowCalculationOfChapter5FollowExample4(self):
+        firstGrammar = ChomskyGrammar.load_from_text_lines( wrap_text(
+        """
+            S -> A C | C e B | B a
+            A -> a A | B C
+            B -> b B | A B | &
+            C -> c C | &
+        """ ) )
+        # sys.setrecursionlimit( 2000 )
+        follow = firstGrammar.follow()
+
+        self.assertTextEqual(
+        """
+            + S: $
+            + A: $ a b c
+            + B: $ a b c
+            + C: $ a b c e
+        """, dictionary_to_string( follow ) )
 
 
 if __name__ == "__main__":
