@@ -211,7 +211,7 @@ class TestGrammarEpsilonConversion(TestingUtilities):
         """ ) )
 
         self.assertTextEqual(
-        """
+        r"""
             + [Production locked: True, str: A, symbols: [NonTerminal locked: True, str: A, sequence: 1, len: 1;],
             + sequence: 1, len: 1;
             + , Production locked: True, str: B, symbols: [NonTerminal locked: True, str: B, sequence: 1, len:
@@ -229,7 +229,7 @@ class TestGrammarEpsilonConversion(TestingUtilities):
         """ ) )
 
         self.assertTextEqual(
-        """
+        r"""
             + [Production locked: True, str: A, symbols: [NonTerminal locked: True, str: A, sequence: 1, len: 1;],
             + sequence: 1, len: 1;
             + , Production locked: True, str: B, symbols: [NonTerminal locked: True, str: B, sequence: 1, len:
@@ -277,7 +277,7 @@ class TestGrammarFertileSymbols(TestingUtilities):
         fertile = firstGrammar.fertile()
 
         self.assertTextEqual(
-        """
+        r"""
             + [Production locked: True, str: A, symbols: [NonTerminal locked: True, str: A, sequence: 1, len: 1;], sequence: 1, len: 1;
             + , Production locked: True, str: B, symbols: [NonTerminal locked: True, str: B, sequence: 1, len: 1;], sequence: 1, len: 1;
             + , Production locked: True, str: C, symbols: [NonTerminal locked: True, str: C, sequence: 1, len: 1;], sequence: 1, len: 1;
@@ -296,7 +296,7 @@ class TestGrammarFertileSymbols(TestingUtilities):
         fertile = firstGrammar.fertile()
 
         self.assertTextEqual(
-        """
+        r"""
             + [Production locked: True, str: B, symbols: [NonTerminal locked: True, str: B, sequence: 1, len: 1;], sequence: 1, len: 1;
             + , Production locked: True, str: C, symbols: [NonTerminal locked: True, str: C, sequence: 1, len: 1;], sequence: 1, len: 1;
             + , Production locked: True, str: S, symbols: [NonTerminal locked: True, str: S, sequence: 1, len: 1;], sequence: 1, len: 1;
@@ -315,7 +315,7 @@ class TestGrammarFertileSymbols(TestingUtilities):
         fertile = firstGrammar.fertile()
 
         self.assertTextEqual(
-        """
+        r"""
             + [Production locked: True, str: E, symbols: [NonTerminal locked: True, str: E, sequence: 1, len: 1;], sequence: 1, len: 1;
             + , Production locked: True, str: E', symbols: [NonTerminal locked: True, str: E', sequence: 1, len: 1;], sequence: 1, len: 1;
             + , Production locked: True, str: F, symbols: [NonTerminal locked: True, str: F, sequence: 1, len: 1;], sequence: 1, len: 1;
@@ -336,7 +336,7 @@ class TestGrammarFertileSymbols(TestingUtilities):
         fertile = firstGrammar.fertile()
 
         self.assertTextEqual(
-        """
+        r"""
             + [Production locked: True, str: E', symbols: [NonTerminal locked: True, str: E', sequence: 1, len: 1;], sequence: 1, len: 1;
             + , Production locked: True, str: T', symbols: [NonTerminal locked: True, str: T', sequence: 1, len: 1;], sequence: 1, len: 1;
             + ]
@@ -354,7 +354,7 @@ class TestGrammarFertileSymbols(TestingUtilities):
         fertile = firstGrammar.fertile()
 
         self.assertTextEqual(
-        """
+        r"""
             + [Production locked: True, str: B, symbols: [NonTerminal locked: True, str: B, sequence: 1, len: 1;], sequence: 1, len: 1;
             + , Production locked: True, str: D, symbols: [NonTerminal locked: True, str: D, sequence: 1, len: 1;], sequence: 1, len: 1;
             + , Production locked: True, str: S, symbols: [NonTerminal locked: True, str: S, sequence: 1, len: 1;], sequence: 1, len: 1;
@@ -704,7 +704,7 @@ class TestGrammarTreeTransformation(TestingUtilities):
 
     def test_grammarTransformationTreeParsingParenStarPlusSymbols(self):
         firstGrammar = ChomskyGrammar.parse( wrap_text(
-        r"""
+        """
             E  -> T E'
             E' -> + T E' | &
             T  -> F T'
@@ -808,9 +808,11 @@ class TestProduction(TestingUtilities):
         production = Production( symbols, lock=True )
 
         self.assertTextEqual(
-        """
-            + A B C D
-        """, production )
+        r"""
+            + Production locked: True, str: A B C D, symbols: [NonTerminal locked: True, str: A, sequence: 1, len:
+            + 1;, NonTerminal locked: True, str: B, sequence: 2, len: 1;, NonTerminal locked: True, str: C,
+            + sequence: 3, len: 1;, NonTerminal locked: True, str: D, sequence: 4, len: 1;], sequence: 4, len: 4;
+        """, wrap_text( repr( production ), wrap=100 ) )
 
     def test_combinationNonTerminalRemovalSymbolFromABCD(self):
         symbols = [self.ntA, self.ntB, self.ntC, self.ntD]
@@ -860,7 +862,7 @@ class TestProduction(TestingUtilities):
         production = Production( symbols, lock=True )
 
         self.assertTextEqual(
-        """
+        r"""
             + [Production locked: True, str: &, symbols: [Terminal locked: True, str: &, sequence: 1, len: 0;],
             + sequence: 1, len: 0;
             + , Production locked: True, str: A, symbols: [NonTerminal locked: True, str: A, sequence: 1, len:
@@ -883,7 +885,7 @@ class TestProduction(TestingUtilities):
         production = Production( symbols, lock=True )
 
         self.assertTextEqual(
-        """
+        r"""
             + [Production locked: True, str: &, symbols: [Terminal locked: True, str: &, sequence: 1, len: 0;],
             + sequence: 1, len: 0;
             + , Production locked: True, str: A, symbols: [NonTerminal locked: True, str: A, sequence: 1, len:
@@ -898,7 +900,7 @@ class TestProduction(TestingUtilities):
         production = Production( symbols, lock=True )
 
         self.assertTextEqual(
-        """
+        r"""
             + [Production locked: True, str: &, symbols: [Terminal locked: True, str: &, sequence: 1, len: 0;],
             + sequence: 1, len: 0;
             + ]
@@ -909,7 +911,7 @@ class TestProduction(TestingUtilities):
         production = Production( symbols, lock=True )
 
         self.assertTextEqual(
-        """
+        r"""
             + [Production locked: True, str: a, symbols: [Terminal locked: True, str: a, sequence: 1, len: 1;],
             + sequence: 1, len: 1;
             + ]
@@ -920,7 +922,7 @@ class TestProduction(TestingUtilities):
         production = Production( symbols, lock=True )
 
         self.assertTextEqual(
-        """
+        r"""
             + [Production locked: True, str: a, symbols: [Terminal locked: True, str: a, sequence: 1, len: 1;],
             + sequence: 1, len: 1;
             + , Production locked: True, str: A a, symbols: [NonTerminal locked: True, str: A, sequence: 1, len:
