@@ -755,6 +755,27 @@ class ChomskyGrammar():
                 if production in simple_non_terminals:
                     self.remove_production_from_non_terminal( start_symbol, production )
 
+    def convert_to_proper(self):
+        """
+            1. Call `convert_to_epsilon_free()` because it can create cycles
+            2. Call `eliminate_simple_non_terminals()` because it can create unuseful (infertile and unreachable) symbols.
+            3. Call `eliminate_unuseful()` to finally clear the grammar.
+        """
+        self.convert_to_epsilon_free()
+        self.eliminate_simple_non_terminals()
+        self.eliminate_unuseful()
+
+    def is_empty(self):
+        """
+            Return `True` if this grammar is empty, i.e., generates no sentences.
+
+            Removes all unuseful symbols, and if the initial symbol was removed, then a new initial
+            symbol only with the production `S -> S` will be added to this grammar.
+        """
+        self.eliminate_unuseful()
+        initial_symbol = self.initial_symbol
+        return self.has_production( initial_symbol, initial_symbol ) and len( self.productions[initial_symbol] ) == 1
+
     def first_non_terminal(self):
         """
             Calculates the start production symbols non terminal's FIRST set.

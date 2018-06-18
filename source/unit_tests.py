@@ -124,6 +124,25 @@ class TestChomskyGrammar(TestingUtilities):
         self.assertFalse( firstGrammar.has_recursion_on_the_non_terminal( non_terminal_S ) )
         self.assertTrue( firstGrammar.has_recursion_on_the_non_terminal( non_terminal_A ) )
 
+    def test_grammarIsEmptyStoS(self):
+        LockableType._USE_STRING = True
+        firstGrammar = ChomskyGrammar.load_from_text_lines( wrap_text(
+        """
+            S -> B
+            B -> B
+        """ ) )
+
+        self.assertTrue( firstGrammar.is_empty() )
+
+    def test_grammarIsEmptyStoSorEpsilon(self):
+        LockableType._USE_STRING = True
+        firstGrammar = ChomskyGrammar.load_from_text_lines( wrap_text(
+        """
+            S -> S | &
+        """ ) )
+
+        self.assertFalse( firstGrammar.is_empty() )
+
 
 class TestGrammarEpsilonConversion(TestingUtilities):
 
