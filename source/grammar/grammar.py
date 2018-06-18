@@ -417,6 +417,7 @@ class ChomskyGrammar():
         """
             Convert the current grammar to a epsilon free grammar.
         """
+        # log( 1, "self: \n%s", self )
         non_terminal_epsilon = self.get_non_terminal_epsilon()
 
         for non_terminal_start in set( self.productions.keys() ):
@@ -425,23 +426,19 @@ class ChomskyGrammar():
             for production in non_terminal_productions:
 
                 for combination in production.combinations( non_terminal_epsilon ):
+                    # log( 1, "combination: %s", combination )
                     self.add_production( non_terminal_start, combination )
-
-            if non_terminal_start == self.initial_symbol:
-
-                if self.has_recursion_on_the_non_terminal( non_terminal_start ):
-                    new_initial_symbol = self.get_new_initial_symbol()
-                    self.initial_symbol = new_initial_symbol
-                    self.copy_productions_for_one_non_terminal( non_terminal_start, new_initial_symbol )
 
             self.remove_production_from_non_terminal( non_terminal_start, epsilon_production )
 
         if self.initial_symbol in non_terminal_epsilon:
-            new_initial_symbol = self.get_new_initial_symbol()
-            self.add_production( new_initial_symbol, epsilon_production )
 
-            self.copy_productions_for_one_non_terminal( self.initial_symbol, new_initial_symbol )
-            self.initial_symbol = new_initial_symbol
+            if self.has_recursion_on_the_non_terminal( self.initial_symbol ):
+                new_initial_symbol = self.get_new_initial_symbol()
+                self.copy_productions_for_one_non_terminal( self.initial_symbol, new_initial_symbol )
+                self.initial_symbol = new_initial_symbol
+
+            self.add_production( self.initial_symbol, epsilon_production )
 
     def remove_production_from_non_terminal(self, start_symbol, production):
         """

@@ -138,10 +138,48 @@ class TestGrammarEpsilonConversion(TestingUtilities):
 
         self.assertTextEqual(
         """
-            + S' -> & | A | B | A B
+            + S -> & | A | B | A B
+            + A -> a | a A
+            + B -> b | b B
+        """, firstGrammar )
+
+        self.assertTrue( firstGrammar.is_epsilon_free() )
+
+    def test_grammarConvertToEpsilonFreeChapter4Item4Example1Mutated(self):
+        firstGrammar = ChomskyGrammar.load_from_text_lines( wrap_text(
+        """
+            S -> A B | S S
+            A -> aA | &
+            B -> bB | &
+        """ ) )
+        firstGrammar.convert_to_epsilon_free()
+
+        self.assertTextEqual(
+        """
+            + S' -> & | A | B | A B | S S
             +  A -> a | a A
             +  B -> b | b B
-            +  S -> A | B | A B
+            +  S -> A | B | A B | S S
+        """, firstGrammar )
+
+        self.assertTrue( firstGrammar.is_epsilon_free() )
+
+    def test_grammarConvertToEpsilonFreeChapter4Item4Example2Mutated(self):
+        firstGrammar = ChomskyGrammar.load_from_text_lines( wrap_text(
+        """
+            S -> c S c | B a
+            A -> aA | A B C | &
+            B -> bB | C A | &
+            C -> c C c | A S
+        """ ) )
+        firstGrammar.convert_to_epsilon_free()
+
+        self.assertTextEqual(
+        """
+            + S -> a | B a | c S c
+            + A -> a | C | a A | A C | B C | A B C
+            + B -> b | C | b B | C A
+            + C -> S | A S | c C c
         """, firstGrammar )
 
         self.assertTrue( firstGrammar.is_epsilon_free() )
@@ -194,10 +232,9 @@ class TestGrammarEpsilonConversion(TestingUtilities):
 
         self.assertTextEqual(
         """
-            + S' -> b | c | S | A b | A c | B c | A S | B S | A B c | A B S
-            +  A -> a | a A
-            +  B -> b | d | A d | b B
-            +  S -> b | c | S | A b | A c | B c | A S | B S | A B c | A B S
+            + S -> b | c | S | A b | A c | B c | A S | B S | A B c | A B S
+            + A -> a | a A
+            + B -> b | d | A d | b B
         """, firstGrammar )
 
         self.assertTrue( firstGrammar.is_epsilon_free() )
@@ -213,10 +250,9 @@ class TestGrammarEpsilonConversion(TestingUtilities):
 
         self.assertTextEqual(
         """
-            + S' -> & | b | c | A | B | A b | A c | B c | A B | A B c
-            +  A -> a | a A
-            +  B -> b | d | A d | b B
-            +  S -> b | c | A | B | A b | A c | B c | A B | A B c
+            + S -> & | b | c | A | B | A b | A c | B c | A B | A B c
+            + A -> a | a A
+            + B -> b | d | A d | b B
         """, firstGrammar )
 
         self.assertTrue( firstGrammar.is_epsilon_free() )
@@ -362,7 +398,7 @@ class TestGrammarFertileSymbols(TestingUtilities):
             + ]
         """, sort_alphabetically_and_by_length( fertile ) )
 
-    def test_grammarGetFertileNonTerminalsChapter4Item5Example1(self):
+    def test_grammarGetFertileNonTerminalsChapter4Item1Example1(self):
         firstGrammar = ChomskyGrammar.load_from_text_lines( wrap_text(
         """
             S -> aS | B C | B D

@@ -183,6 +183,7 @@ class Production(LockableType):
             self.add( epsilon_terminal.new() )
 
         self.trim_epsilons()
+        self.lock()
         # log( 1, "self: \n%s", self )
 
     def remove_non_terminal(self, index):
@@ -224,7 +225,6 @@ class Production(LockableType):
         if not len( self ):
             self.add( epsilon_terminal.new() )
 
-        self.lock()
         return self
 
     def _copy_construc(self, other):
@@ -311,6 +311,7 @@ class Production(LockableType):
         self.len = len( self )
         self._len = lambda : self.len
 
+        self.trim_epsilons()
         self.check_consistency()
         super().lock()
 
