@@ -11,7 +11,6 @@ from debug_tools import getLogger
 from .symbols import Terminal
 from .symbols import NonTerminal
 
-from .utilities import get_unique_hash
 from .lockable_type import LockableType
 
 # level 4 - Abstract Syntax Tree Parsing

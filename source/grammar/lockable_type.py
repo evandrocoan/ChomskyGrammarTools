@@ -31,8 +31,6 @@ class LockableType(object):
             https://stackoverflow.com/questions/3870982/how-to-handle-call-to-setattr-from-init
         """
         super().__setattr__('locked', False)
-        self._original_len = self._len
-        self._original_str = self._str
 
         ## Controls whether the attributes changes of this object are allow or not
         self.locked = False
@@ -41,7 +39,11 @@ class LockableType(object):
         self.str = ""
 
         ## An unique identifier for any LockableType object
-        self.unique_hash = get_unique_hash()
+        self._hash = get_unique_hash()
+
+        self._original_len = self._len
+        self._original_str = self._str
+        self._original_hash = self._hash
 
     def __setattr__(self, name, value):
         """
@@ -80,7 +82,7 @@ class LockableType(object):
         if self._USE_STRING:
             return self.__str__()
 
-        return get_representation( self, ignore={'unique_hash'}, emquote=self._EMQUOTE_STRING )
+        return get_representation( self, ignore={'hash'}, emquote=self._EMQUOTE_STRING )
 
     def __str__(self):
         """
@@ -94,7 +96,7 @@ class LockableType(object):
         if self._USE_STRING:
             return super().__str__()
 
-        return get_representation( self, ignore={'unique_hash'}, emquote=self._EMQUOTE_STRING )
+        return get_representation( self, ignore={'hash'}, emquote=self._EMQUOTE_STRING )
 
     def __len__(self):
         """
@@ -117,6 +119,7 @@ class LockableType(object):
         self.__dict__['locked'] = False
         self._len = self._original_len
         self._str = self._original_str
+        self._hash = self._original_hash
 
     def lock(self):
         """
