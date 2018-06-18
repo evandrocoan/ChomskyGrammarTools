@@ -454,6 +454,10 @@ class TestGrammarFertileSymbols(TestingUtilities):
 
         self.assertTextEqual(
         """
+            + S -> S a | b F d
+            + A -> & | a A
+            + C -> & | ca
+            + F -> A b | a C | b F d
         """, firstGrammar )
 
     # def test_grammarGenerateSentencesOfnAsSize5(self):
