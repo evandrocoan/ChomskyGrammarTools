@@ -645,7 +645,7 @@ class TestGrammarFertileSymbols(TestingUtilities):
         self.assertTextEqual(
         """
             + S -> F G H
-            + F -> a | c | H | d G
+            + F -> a | c | d G
             + G -> a | c | d G
             + H -> c
         """, firstGrammar )

@@ -798,13 +798,15 @@ class ChomskyGrammar():
             Checks whether there is fertile derivation cycle. If so, then this grammar generates a
             infinite language.
         """
-        self.eliminate_simple_non_terminals()
-        self.eliminate_unuseful()
 
-        for start_symbol in self.productions.keys():
+        if not self.is_empty():
+            self.eliminate_simple_non_terminals()
+            self.eliminate_unuseful()
 
-            if self.has_recursion_on_the_non_terminal( start_symbol ):
-                return True
+            for start_symbol in self.productions.keys():
+
+                if self.has_recursion_on_the_non_terminal( start_symbol ):
+                    return True
 
         return False
 
