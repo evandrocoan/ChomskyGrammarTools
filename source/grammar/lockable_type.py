@@ -120,8 +120,8 @@ class LockableType(object):
 
     def lock(self):
         """
-            Block further changes to this object attributes and save its string representation for
-            faster access.
+            Block further changes to this object attributes and cache its length and string
+            representation for faster access.
         """
 
         if self.locked:

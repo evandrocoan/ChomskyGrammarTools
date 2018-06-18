@@ -302,14 +302,12 @@ class Production(LockableType):
 
     def lock(self):
         """
-            Block further changes to this object attributes and save its length for faster access.
+            Call `trim_epsilons()`, `check_consistency()` and its super class `lock()` to block
+            further changes to this object attributes.
         """
 
         if self.locked:
             return
-
-        self.len = len( self )
-        self._len = lambda : self.len
 
         self.trim_epsilons()
         self.check_consistency()
