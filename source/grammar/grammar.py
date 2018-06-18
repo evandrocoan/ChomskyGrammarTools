@@ -699,6 +699,45 @@ class ChomskyGrammar():
         self.eliminate_infertile()
         self.eliminate_unreachable()
 
+    def get_simple_non_terminals(self):
+        """
+            For each non terminal start symbol, calculates the reachable terminal only by simple
+            productions.
+
+            @return a dictionary with the non terminal's reachable by simple productions for each
+                non terminal start symbol
+        """
+        self.convert_to_epsilon_free()
+
+        simple_non_terminals = {}
+        production_keys = self.productions.keys()
+
+        old_counter = -1
+        current_counter = 0
+
+        # Create the initial simple_non_terminals's sets within their own as elements
+        for symbol in production_keys:
+            simple_non_terminals[symbol] = set([symbol])
+
+        while old_counter != current_counter:
+            old_counter = current_counter
+
+            for start_symbol in production_keys:
+                start_productions = self.productions[start_symbol]
+
+                for production in start_productions:
+
+                    if len( production ) == 1:
+                        non_terminal = production.get_non_terminals( 0 )
+
+                        if non_terminal:
+
+                            if Production.copy_productions_except_epsilon(
+                                    simple_non_terminals[non_terminal], simple_non_terminals[start_symbol] ):
+                                current_counter += 1
+
+        return simple_non_terminals
+
     def first_non_terminal(self):
         """
             Calculates the start production symbols non terminal's FIRST set.

@@ -339,7 +339,7 @@ class Production(LockableType):
             Get all Terminal's this symbol is composed by, on their respective sequence/ordering.
 
             If `index` is provided greater than `-1`, instead of returning a list, return the list
-            nth element. If the `index` is out of range, the last set item will be returned instead.
+            nth element. If the `index` is out of range, then an empty set will be returned.
         """
         return self._get_symbols( Terminal, index )
 
@@ -348,7 +348,7 @@ class Production(LockableType):
             Get all NonTerminal's this symbol is composed by, on their respective sequence/ordering.
 
             If `index` is provided greater than `-1`, instead of returning a list, return the list
-            nth element. If the `index` is out of range, the last set item will be returned instead.
+            nth element. If the `index` is out of range, then an empty set will be returned.
         """
         return self._get_symbols( NonTerminal, index )
 
@@ -366,7 +366,7 @@ class Production(LockableType):
                 return symbols[index]
 
             else:
-                return symbols[-1]
+                return set()
 
         return symbols
 

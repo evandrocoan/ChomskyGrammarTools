@@ -516,6 +516,70 @@ class TestGrammarFertileSymbols(TestingUtilities):
             + F -> A b | a C | b F d
         """, firstGrammar )
 
+    def test_grammarGetNonTerminalSimpleSymbolsChapter4Item3Example1(self):
+        firstGrammar = ChomskyGrammar.load_from_text_lines( wrap_text(
+        """
+            S -> a F G | b F d | S a
+            A -> a A | &
+            B -> c G | a C G
+            C -> c B a | c a | &
+            D -> d C c | &
+            F -> b F d | a C | A b | G A
+            G -> B c | B C a
+        """ ) )
+        simple_non_terminals = firstGrammar.get_simple_non_terminals()
+
+        self.assertTextEqual(
+        r"""
+            + Production locked: True, str: A, symbols: [NonTerminal locked: True, str: A, sequence: 1, len: 1;], sequence: 1, len: 1;
+            + Production locked: True, str: B, symbols: [NonTerminal locked: True, str: B, sequence: 1, len: 1;], sequence: 1, len: 1;
+            + Production locked: True, str: C, symbols: [NonTerminal locked: True, str: C, sequence: 1, len: 1;], sequence: 1, len: 1;
+            + Production locked: True, str: D, symbols: [NonTerminal locked: True, str: D, sequence: 1, len: 1;], sequence: 1, len: 1;
+            + Production locked: True, str: F, symbols: [NonTerminal locked: True, str: F, sequence: 1, len: 1;], sequence: 1, len: 1;
+            + Production locked: True, str: G, symbols: [NonTerminal locked: True, str: G, sequence: 1, len: 1;], sequence: 1, len: 1;
+            + Production locked: True, str: S, symbols: [NonTerminal locked: True, str: S, sequence: 1, len: 1;], sequence: 1, len: 1;
+        """, wrap_text( convert_to_text_lines( simple_non_terminals, new_line=False ), wrap=120 ) )
+
+    def test_grammarGetNonTerminalSimpleSymbolsChapter4Item5Example1(self):
+        LockableType._USE_STRING = True
+        firstGrammar = ChomskyGrammar.load_from_text_lines( wrap_text(
+        """
+            S -> F G H
+            F -> G | a
+            G -> dG | H | a
+            H -> c
+        """ ) )
+        simple_non_terminals = firstGrammar.get_simple_non_terminals()
+
+        self.assertTextEqual(
+        """
+            + S: S
+            + F: F G H
+            + G: G H
+            + H: H
+        """, dictionary_to_string( simple_non_terminals ) )
+
+    def test_grammarGetNonTerminalSimpleSymbolsChapter4Item5Example2(self):
+        LockableType._USE_STRING = True
+        firstGrammar = ChomskyGrammar.load_from_text_lines( wrap_text(
+        """
+            S -> a B c D e
+            B -> b B | E | F
+            D -> d D | F | d
+            E -> e E | e
+            F -> f F | f
+        """ ) )
+        simple_non_terminals = firstGrammar.get_simple_non_terminals()
+
+        self.assertTextEqual(
+        """
+            + S: S
+            + B: B E F
+            + D: D F
+            + E: E
+            + F: F
+        """, dictionary_to_string( simple_non_terminals ) )
+
     # def test_grammarGenerateSentencesOfnAsSize5(self):
     #     firstGrammar = Grammar.load_from_text_lines(
     #     """

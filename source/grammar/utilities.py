@@ -141,7 +141,7 @@ def dictionary_to_string(dictionary):
     return "\n".join( strings )
 
 
-def convert_to_text_lines(iterable, use_repr=True):
+def convert_to_text_lines(iterable, use_repr=True, new_line=True):
     """
         Given a dictionary with a list for each string key, call `sort_dictionary_lists()` and
         return a string representation by line of its entries.
@@ -152,7 +152,7 @@ def convert_to_text_lines(iterable, use_repr=True):
     for item in iterable:
         strings.append( "{}".format( repr( item ) ) )
 
-    return "\n".join( strings )
+    return ( "\n" if new_line else "" ).join( strings )
 
 
 def ignore_exceptions(function_to_decorate):
