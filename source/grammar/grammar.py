@@ -441,17 +441,16 @@ class ChomskyGrammar():
             Given a `start_symbol` remove its `production`.
 
             If was the last production, then the `start_symbol` symbol is also removed from the
-            grammar `productions`.
+            grammar `productions` and everywhere it is mentioned.
         """
         self.productions[start_symbol].discard( production )
 
         if not self.productions[start_symbol]:
-            del self.productions[start_symbol]
-            self.clean_initial_symbol( start_symbol )
+            self.remove_start_non_terminal( start_symbol )
 
     def remove_start_non_terminal(self, start_non_terminal):
         """
-            Given a `start_non_terminal` remove it from the grammar.
+            Given a `start_non_terminal` remove it from the grammar and all productions which to it.
 
             If it was a initial symbol, `clean_initial_symbol()` will also be called.
         """
@@ -612,7 +611,12 @@ class ChomskyGrammar():
         production_keys = set( self.productions.keys() )
 
         for start_symbol in production_keys:
-            # log( 1, "start_symbol: %s", start_symbol )
+            # log( 1, "start_symbol: %s (%d)", start_symbol, start_symbol in self.productions )
+
+            if start_symbol not in self.productions:
+                continue
+
+            # While iterating over this set, production keys may be removed indirectly
             start_productions = set( self.productions[start_symbol] )
 
             for production in start_productions:
