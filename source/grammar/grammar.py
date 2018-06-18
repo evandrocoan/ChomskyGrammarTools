@@ -436,22 +436,52 @@ class ChomskyGrammar():
 
             self.remove_production_from_non_terminal( non_terminal_start, epsilon_production )
 
-    def remove_production_from_non_terminal(self, start_non_terminal, production):
+    def remove_production_from_non_terminal(self, start_symbol, production):
         """
-            Given a `start_non_terminal` remove its `production`. It if was the last production,
-            then the `start_non_terminal` symbol is removed from the grammar.
+            Given a `start_symbol` remove its `production`.
+
+            If was the last production, then the `start_symbol` symbol is removed from the grammar
+            by calling `remove_start_non_terminal()`.
         """
-        self.productions[start_non_terminal].discard( production )
+        self.productions[start_symbol].discard( production )
 
-        if not self.productions[start_non_terminal]:
-            del self.productions[start_non_terminal]
+        if not self.productions[start_symbol]:
+            self.remove_start_non_terminal( start_symbol )
 
-            if self.initial_symbol == start_non_terminal:
-                # log( 1, "WARNING: Removing the gramar initial symbol!" )
-                new_initial_symbol = self.get_new_initial_symbol()
+    def remove_start_non_terminal(self, start_non_terminal):
+        """
+            Given a `start_non_terminal` remove it from the grammar.
 
-                self.add_production( new_initial_symbol, new_initial_symbol )
-                self.initial_symbol = new_initial_symbol
+            If it was a initial symbol, `clean_initial_symbol()` will also be called.
+        """
+        production_keys = set( self.productions.keys() )
+
+        for start_symbol in production_keys:
+            start_productions = set( self.productions[start_symbol] )
+
+            for production in start_productions:
+
+                for symbol in production:
+
+                    if symbol == start_non_terminal:
+                        self.remove_production_from_non_terminal( start_symbol, production )
+                        break
+
+        del self.productions[start_non_terminal]
+        self.clean_initial_symbol( start_non_terminal )
+
+    def clean_initial_symbol(self, start_symbol):
+        """
+            Replace the current initial symbol creating a new empty initial symbol such `S -> S` by
+            querying `get_new_initial_symbol()` for a new initial symbol.
+        """
+
+        if self.initial_symbol == start_symbol:
+            # log( 1, "WARNING: Removing the gramar initial symbol!" )
+            new_initial_symbol = self.get_new_initial_symbol()
+
+            self.add_production( new_initial_symbol, new_initial_symbol )
+            self.initial_symbol = new_initial_symbol
 
     def copy_productions_for_one_non_terminal(self, non_terminal_source, non_terminal_destine, secondGrammar=None):
         """
@@ -575,7 +605,7 @@ class ChomskyGrammar():
 
     def eliminate_infertile(self):
         """
-            Eliminates all non fertile non terminal's symbols with their productions from this grammar.
+            Eliminates all non fertile non terminal's symbols with their productions.
         """
         fertile = self.fertile()
         production_keys = set( self.productions.keys() )
@@ -621,6 +651,36 @@ class ChomskyGrammar():
                         reachable_non_terminals.add( symbol )
 
         return reachable_terminals | set( reachable_non_terminals )
+
+    def eliminate_unreachable(self):
+        """
+            Eliminates all unreachable terminal's and non terminal symbols with their productions.
+        """
+        reachable = self.reachable()
+        production_keys = set( self.productions.keys() )
+
+        for start_symbol in production_keys:
+
+            if start_symbol not in reachable:
+                self.remove_start_non_terminal( start_symbol )
+                continue
+
+            start_productions = set( self.productions[start_symbol] )
+
+            for production in start_productions:
+                all_reachable = True
+
+                for symbol in production:
+
+                    if symbol in reachable:
+                        continue
+
+                    else:
+                        all_reachable = False
+                        break
+
+                if not all_reachable:
+                    self.remove_production_from_non_terminal( start_symbol, production )
 
     def first_non_terminal(self):
         """

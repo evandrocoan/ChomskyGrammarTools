@@ -379,7 +379,27 @@ class TestGrammarFertileSymbols(TestingUtilities):
             + D -> c | d D d
         """, firstGrammar )
 
-    def test_grammarGetReachableNonTerminalsChapter4Item2Example1(self):
+    def test_grammarEliminateUnreachableSymbolsChapter4Item1Example1(self):
+        firstGrammar = ChomskyGrammar.load_from_text_lines( wrap_text(
+        """
+            S -> aS | B C | B D
+            A -> cC | A B
+            B -> bB | &
+            C -> aA | B C
+            D -> d D d | c
+        """ ) )
+        firstGrammar.eliminate_unreachable()
+
+        self.assertTextEqual(
+        """
+            + S -> a S | B C | B D
+            + A -> c C | A B
+            + B -> & | b B
+            + C -> a A | B C
+            + D -> c | d D d
+        """, firstGrammar )
+
+    def test_grammarGetReachableChapter4Item1Example2(self):
         firstGrammar = ChomskyGrammar.load_from_text_lines( wrap_text(
         """
             S -> aSa | dDd
@@ -400,6 +420,41 @@ class TestGrammarFertileSymbols(TestingUtilities):
             + NonTerminal locked: True, str: D, sequence: 2, len: 1;
             + NonTerminal locked: True, str: S, sequence: 1, len: 1;
         """, convert_to_text_lines( reachable ) )
+
+    def test_grammarEliminateUneachableSymbolsChapter4Item1Example2(self):
+        firstGrammar = ChomskyGrammar.load_from_text_lines( wrap_text(
+        """
+            S -> aSa | dDd
+            A -> aB | Cc | a
+            B -> dD | bB | b
+            C -> Aa | dD | c
+            D -> bbB | d
+        """ ) )
+        firstGrammar.eliminate_unreachable()
+
+        self.assertTextEqual(
+        """
+            + S -> a S a | d D d
+            + B -> b | b B | d D
+            + D -> d | bb B
+        """, firstGrammar )
+
+    def test_grammarEliminateUnusefulSymbolsChapter4Item1Example3(self):
+        firstGrammar = ChomskyGrammar.load_from_text_lines( wrap_text(
+        """
+            S -> a F G | b F d | S a
+            A -> a A | &
+            B -> c G | a C G
+            C -> c B a | c a | &
+            D -> d C c | &
+            F -> b F d | a C | A b | G A
+            G -> B c | B C a
+        """ ) )
+        firstGrammar.eliminate_unuseful()
+
+        self.assertTextEqual(
+        """
+        """, firstGrammar )
 
     # def test_grammarGenerateSentencesOfnAsSize5(self):
     #     firstGrammar = Grammar.load_from_text_lines(
