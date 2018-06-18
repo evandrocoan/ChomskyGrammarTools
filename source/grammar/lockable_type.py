@@ -92,6 +92,9 @@ class LockableType(object):
         return self._str()
 
     def _str(self):
+        """
+            Caches the string representation of this object, after locking its attributes changes with `lock()`
+        """
 
         if self._USE_STRING:
             return super().__str__()
@@ -131,10 +134,10 @@ class LockableType(object):
             return
 
         self.str = str( self )
-        self._str = lambda : self.str
+        self._str = lambda: self.str
 
         self.len = len( self )
-        self._len = lambda : self.len
+        self._len = lambda: self.len
 
         self._hash = hash( self._str() )
         self.locked = True
@@ -144,6 +147,8 @@ class LockableType(object):
             Creates and return a new copy of the current a object.
         """
         new_copy = copy.deepcopy( self )
+        # log( 1, "self: %s", self )
+        # log( 1, "new_copy: %s", new_copy )
 
         if unlocked:
             new_copy.unlock()

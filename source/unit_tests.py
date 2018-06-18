@@ -1061,7 +1061,7 @@ class TestProduction(TestingUtilities):
     def test_combinationFilterNonTerminalsFromaAa(self):
         symbols = [self.ta, self.ntA, self.ta.new()]
         production = Production( symbols )
-        production.filter_non_terminals( [], symbols )
+        production.filter_non_terminals( symbols, [] )
 
         self.assertTextEqual(
         r"""
@@ -1071,7 +1071,7 @@ class TestProduction(TestingUtilities):
     def test_combinationFilterNonTerminalsFromAa(self):
         symbols = [self.ntA, self.ta]
         production = Production( symbols )
-        production.filter_non_terminals([], symbols)
+        production.filter_non_terminals( symbols, [] )
 
         self.assertTextEqual(
         r"""

@@ -50,6 +50,7 @@ class Production(LockableType):
             for symbol in symbols:
                 self.add( symbol )
 
+        # log( 1, "symbols: %s", symbols )
         if lock:
             self.lock()
 
@@ -77,11 +78,20 @@ class Production(LockableType):
             Return a nice string representation of this set.
         """
         symbols_str = []
+        # log( 1, "self.symbols: %s", self.symbols )
 
         for symbol in self.symbols:
             symbols_str.append( str( symbol ) )
 
         return " ".join( symbols_str )
+
+    def _len(self):
+        lengths = []
+
+        for symbol in self.symbols:
+            lengths.append( len( symbol ) )
+
+        return sum( lengths )
 
     def __lt__(self, other):
         """
@@ -147,7 +157,7 @@ class Production(LockableType):
                 new_production = self.new()
 
                 try:
-                    new_production.filter_non_terminals( permutation, non_terminal_epsilon )
+                    new_production.filter_non_terminals( non_terminal_epsilon, permutation )
 
                 except RuntimeError as error:
                     error = str( error )
@@ -158,24 +168,24 @@ class Production(LockableType):
                     else:
                         raise RuntimeError( error )
 
-                # log( 1, "new_production: %s", new_production )
+                # log( 1, "new_production: %s (%s)", new_production, repr( new_production ) )
                 combinations.add( new_production )
 
         # log( 1, "combinations: \n%s", combinations )
         return combinations
 
-    def filter_non_terminals(self, non_terminals_to_keep, non_terminal_epsilon):
+    def filter_non_terminals(self, non_terminal_epsilon, non_terminals_to_keep):
         """
-            Removes all non terminal's not present on the given list `non_terminals_to_keep`, but
-            removes all non terminal's in the list `non_terminal_epsilon`.
+            Removes all non terminal's in the list `non_terminal_epsilon`, except the ones inside
+            the list `non_terminals_to_keep`.
         """
-        # log( 1, "non_terminals_to_keep: %s, non_terminal_epsilon: %s", non_terminals_to_keep, non_terminal_epsilon )
+        # log( 1, "non_terminal_epsilon: %s, non_terminals_to_keep: %s", non_terminal_epsilon, non_terminals_to_keep )
 
         for symbol in self.symbols:
 
             if type( symbol ) is NonTerminal:
 
-                if symbol not in non_terminals_to_keep and symbol in non_terminal_epsilon:
+                if symbol in non_terminal_epsilon and symbol not in non_terminals_to_keep:
                     self.symbols[symbol.sequence - 1] = epsilon_terminal
 
         if not len( self ):
@@ -222,7 +232,10 @@ class Production(LockableType):
                 self.add( old_symbol.new() )
 
         if not len( self ):
-            self.add( epsilon_terminal.new() )
+            new_epsilon = epsilon_terminal.new()
+
+            # log( 1, "new_epsilon: %s", new_epsilon )
+            self.add( new_epsilon )
 
         return self
 
@@ -265,6 +278,7 @@ class Production(LockableType):
             Add a new symbol to the production. If the last added symbol and the current are
             Terminal ones, the old terminal is going to be removed and merged into the new one.
         """
+        # log( 1, "symbol: %s", symbol )
 
         if type( symbol ) not in ( Terminal, NonTerminal ):
             raise RuntimeError( "You can only add Terminal's and NonTerminal's! %s (%s)" % ( symbol, type( symbol ) ) )
@@ -311,14 +325,6 @@ class Production(LockableType):
         self.trim_epsilons()
         self.check_consistency()
         super().lock()
-
-    def _len(self):
-        lengths = []
-
-        for symbol in self.symbols:
-            lengths.append( len( symbol ) )
-
-        return sum( lengths )
 
     def check_consistency(self):
         """
