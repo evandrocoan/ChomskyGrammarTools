@@ -436,6 +436,13 @@ class ChomskyGrammar():
 
             self.remove_production_from_non_terminal( non_terminal_start, epsilon_production )
 
+        if self.initial_symbol in non_terminal_epsilon:
+            new_initial_symbol = self.get_new_initial_symbol()
+            self.add_production( new_initial_symbol, epsilon_production )
+
+            self.copy_productions_for_one_non_terminal( self.initial_symbol, new_initial_symbol )
+            self.initial_symbol = new_initial_symbol
+
     def remove_production_from_non_terminal(self, start_symbol, production):
         """
             Given a `start_symbol` remove its `production`.

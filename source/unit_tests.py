@@ -127,6 +127,25 @@ class TestChomskyGrammar(TestingUtilities):
 
 class TestGrammarEpsilonConversion(TestingUtilities):
 
+    def test_grammarConvertToEpsilonFreeChapter4Item4Example1(self):
+        firstGrammar = ChomskyGrammar.load_from_text_lines( wrap_text(
+        """
+            S -> A B
+            A -> aA | &
+            B -> bB | &
+        """ ) )
+        firstGrammar.convert_to_epsilon_free()
+
+        self.assertTextEqual(
+        """
+            + S' -> & | A | B | A B
+            +  A -> a | a A
+            +  B -> b | b B
+            +  S -> A | B | A B
+        """, firstGrammar )
+
+        self.assertTrue( firstGrammar.is_epsilon_free() )
+
     def test_grammarConvertToEpsilonFreeChapter5Example1First(self):
         firstGrammar = ChomskyGrammar.load_from_text_lines( wrap_text(
         """
@@ -194,9 +213,10 @@ class TestGrammarEpsilonConversion(TestingUtilities):
 
         self.assertTextEqual(
         """
-            + S -> b | c | A | B | A b | A c | B c | A B | A B c
-            + A -> a | a A
-            + B -> b | d | A d | b B
+            + S' -> & | b | c | A | B | A b | A c | B c | A B | A B c
+            +  A -> a | a A
+            +  B -> b | d | A d | b B
+            +  S -> b | c | A | B | A b | A c | B c | A B | A B c
         """, firstGrammar )
 
         self.assertTrue( firstGrammar.is_epsilon_free() )
