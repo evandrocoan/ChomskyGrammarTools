@@ -617,10 +617,10 @@ class ChomskyGrammar():
         for start_symbol in production_keys:
             # log( 1, "start_symbol: %s (%d)", start_symbol, start_symbol in self.productions )
 
+            # While iterating over this set, production keys may be removed indirectly
             if start_symbol not in self.productions:
                 continue
 
-            # While iterating over this set, production keys may be removed indirectly
             start_productions = set( self.productions[start_symbol] )
 
             for production in start_productions:
@@ -742,13 +742,20 @@ class ChomskyGrammar():
             Eliminates all unreachable terminal's and non terminal symbols with their productions.
         """
         simple_non_terminals = self.get_simple_non_terminals()
-        production_keys = self.productions.keys()
+        production_keys = set( self.productions.keys() )
 
         for start_symbol in production_keys:
-            start_productions = set( self.productions[start_symbol] )
 
             for production in simple_non_terminals[start_symbol]:
                 self.copy_productions_for_one_non_terminal( production, start_symbol )
+
+        for start_symbol in production_keys:
+
+            # While iterating over this set, production keys may be removed indirectly
+            if start_symbol not in self.productions:
+                continue
+
+            start_productions = set( self.productions[start_symbol] )
 
             for production in start_productions:
 
@@ -767,7 +774,7 @@ class ChomskyGrammar():
 
     def is_empty(self):
         """
-            Return `True` if this grammar is empty, i.e., generates no sentences.
+            Return `True` if this grammar language is empty, i.e., generates no sentences.
 
             Removes all unuseful symbols, and if the initial symbol was removed, then a new initial
             symbol only with the production `S -> S` will be added to this grammar.
@@ -775,6 +782,31 @@ class ChomskyGrammar():
         self.eliminate_unuseful()
         initial_symbol = self.initial_symbol
         return self.has_production( initial_symbol, initial_symbol ) and len( self.productions[initial_symbol] ) == 1
+
+    def is_finite(self):
+        """
+            Return `True` if this grammar language is finite, i.e., generates a finite set of sentences.
+
+            Call `is_empty()` and `is_infinite()` and if both are `False`, then this language is finite.
+        """
+        return not self.is_empty() and not self.is_infinite()
+
+    def is_infinite(self):
+        """
+            Return `True` if this grammar language is infinite, i.e., generates a infinite set of sentences.
+
+            Checks whether there is fertile derivation cycle. If so, then this grammar generates a
+            infinite language.
+        """
+        self.eliminate_simple_non_terminals()
+        self.eliminate_unuseful()
+
+        for start_symbol in self.productions.keys():
+
+            if self.has_recursion_on_the_non_terminal( start_symbol ):
+                return True
+
+        return False
 
     def first_non_terminal(self):
         """

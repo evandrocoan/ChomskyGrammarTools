@@ -125,7 +125,6 @@ class TestChomskyGrammar(TestingUtilities):
         self.assertTrue( firstGrammar.has_recursion_on_the_non_terminal( non_terminal_A ) )
 
     def test_grammarIsEmptyStoS(self):
-        LockableType._USE_STRING = True
         firstGrammar = ChomskyGrammar.load_from_text_lines( wrap_text(
         """
             S -> B
@@ -135,13 +134,46 @@ class TestChomskyGrammar(TestingUtilities):
         self.assertTrue( firstGrammar.is_empty() )
 
     def test_grammarIsEmptyStoSorEpsilon(self):
-        LockableType._USE_STRING = True
         firstGrammar = ChomskyGrammar.load_from_text_lines( wrap_text(
         """
             S -> S | &
         """ ) )
 
         self.assertFalse( firstGrammar.is_empty() )
+
+    def test_grammarIsFiniteStoS(self):
+        firstGrammar = ChomskyGrammar.load_from_text_lines( wrap_text(
+        """
+            S -> B
+            B -> B
+        """ ) )
+
+        self.assertFalse( firstGrammar.is_finite() )
+
+    def test_grammarIsFiniteStoSorEpsilon(self):
+        firstGrammar = ChomskyGrammar.load_from_text_lines( wrap_text(
+        """
+            S -> S | &
+        """ ) )
+
+        self.assertTrue( firstGrammar.is_finite() )
+
+    def test_grammarIsInfiniteStoS(self):
+        firstGrammar = ChomskyGrammar.load_from_text_lines( wrap_text(
+        """
+            S -> B
+            B -> B
+        """ ) )
+
+        self.assertFalse( firstGrammar.is_infinite() )
+
+    def test_grammarIsInfiniteStoSorEpsilon(self):
+        firstGrammar = ChomskyGrammar.load_from_text_lines( wrap_text(
+        """
+            S -> aS | &
+        """ ) )
+
+        self.assertTrue( firstGrammar.is_infinite() )
 
 
 class TestGrammarEpsilonConversion(TestingUtilities):
