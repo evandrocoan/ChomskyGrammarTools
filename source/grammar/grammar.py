@@ -708,7 +708,6 @@ class ChomskyGrammar():
                 non terminal start symbol
         """
         self.convert_to_epsilon_free()
-
         simple_non_terminals = {}
         production_keys = self.productions.keys()
 
@@ -737,6 +736,24 @@ class ChomskyGrammar():
                                 current_counter += 1
 
         return simple_non_terminals
+
+    def eliminate_simple_non_terminals(self):
+        """
+            Eliminates all unreachable terminal's and non terminal symbols with their productions.
+        """
+        simple_non_terminals = self.get_simple_non_terminals()
+        production_keys = self.productions.keys()
+
+        for start_symbol in production_keys:
+            start_productions = set( self.productions[start_symbol] )
+
+            for production in simple_non_terminals[start_symbol]:
+                self.copy_productions_for_one_non_terminal( production, start_symbol )
+
+            for production in start_productions:
+
+                if production in simple_non_terminals:
+                    self.remove_production_from_non_terminal( start_symbol, production )
 
     def first_non_terminal(self):
         """

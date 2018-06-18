@@ -580,6 +580,46 @@ class TestGrammarFertileSymbols(TestingUtilities):
             + F: F
         """, dictionary_to_string( simple_non_terminals ) )
 
+    def test_grammarEliminateNonTerminalSimpleSymbolsChapter4Item5Example1(self):
+        LockableType._USE_STRING = True
+        firstGrammar = ChomskyGrammar.load_from_text_lines( wrap_text(
+        """
+            S -> F G H
+            F -> G | a
+            G -> dG | H | a
+            H -> c
+        """ ) )
+        firstGrammar.eliminate_simple_non_terminals()
+
+        self.assertTextEqual(
+        """
+            + S -> F G H
+            + F -> a | c | H | d G
+            + G -> a | c | d G
+            + H -> c
+        """, firstGrammar )
+
+    def test_grammarEliminateNonTerminalSimpleSymbolsChapter4Item5Example2(self):
+        LockableType._USE_STRING = True
+        firstGrammar = ChomskyGrammar.load_from_text_lines( wrap_text(
+        """
+            S -> a B c D e
+            B -> b B | E | F
+            D -> d D | F | d
+            E -> e E | e
+            F -> f F | f
+        """ ) )
+        firstGrammar.eliminate_simple_non_terminals()
+
+        self.assertTextEqual(
+        """
+            + S -> a B c D e
+            + B -> e | f | b B | e E | f F
+            + D -> d | f | d D | f F
+            + E -> e | e E
+            + F -> f | f F
+        """, firstGrammar )
+
     # def test_grammarGenerateSentencesOfnAsSize5(self):
     #     firstGrammar = Grammar.load_from_text_lines(
     #     """
