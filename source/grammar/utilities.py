@@ -100,8 +100,8 @@ def sort_correctly(iterable):
         https://stackoverflow.com/questions/2669059/how-to-sort-alpha-numeric-set-in-python
     """
     convert = lambda text: int( text ) if text.isdigit() else text
-    alphanum_key = lambda key: [convert( characters ) for characters in re.split( '([0-9]+)', key )]
-    return sorted( iterable, key=alphanum_key )
+    alphanum_key = lambda key: [convert( characters ) for characters in re.split( '([0-9]+)', str( key ).lower() )]
+    return sorted( sorted( iterable, key=alphanum_key ), key=lambda item: str( item ).istitle() )
 
 
 def get_largest_item_size(iterable):
@@ -137,6 +137,20 @@ def dictionary_to_string(dictionary):
 
         strings.append( "{:>{largest_key}}: {}".format( str( key ), " ".join( elements_strings ),
                 largest_key=largest_key ) )
+
+    return "\n".join( strings )
+
+
+def convert_to_text_lines(iterable, use_repr=True):
+    """
+        Given a dictionary with a list for each string key, call `sort_dictionary_lists()` and
+        return a string representation by line of its entries.
+    """
+    strings = []
+    iterable = sort_correctly( iterable )
+
+    for item in iterable:
+        strings.append( "{}".format( repr( item ) ) )
 
     return "\n".join( strings )
 

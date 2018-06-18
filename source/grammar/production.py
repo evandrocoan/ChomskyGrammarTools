@@ -67,6 +67,10 @@ class Production(LockableType):
             super().__setattr__( name, value )
 
     def __repr__(self):
+
+        if self._USE_STRING:
+            return super().__repr__()
+
         return super().__repr__() + '\n'
 
     def __str__(self):
@@ -326,17 +330,41 @@ class Production(LockableType):
         if not self.symbols:
             raise RuntimeError( "Invalid production creation! Production with no length: `%s`" % self.symbols )
 
-    def get_terminals(self):
+    def get_terminals(self, index=-1):
         """
             Get all Terminal's this symbol is composed by, on their respective sequence/ordering.
-        """
-        return self._get_symbols( Terminal )
 
-    def get_non_terminals(self):
+            If `index` is provided greater than `-1`, instead of returning a list, return the list
+            nth element. If the `index` is out of range, the last set item will be returned instead.
+        """
+        return self._get_symbols( Terminal, index )
+
+    def get_non_terminals(self, index=-1):
         """
             Get all NonTerminal's this symbol is composed by, on their respective sequence/ordering.
+
+            If `index` is provided greater than `-1`, instead of returning a list, return the list
+            nth element. If the `index` is out of range, the last set item will be returned instead.
         """
-        return self._get_symbols( NonTerminal )
+        return self._get_symbols( NonTerminal, index )
+
+    def _get_symbols(self, symbolType, index=-1):
+        symbols = []
+
+        for symbol in self.symbols:
+
+            if type( symbol ) is symbolType:
+                symbols.append( symbol )
+
+        if index > -1:
+
+            if index < len( symbols ):
+                return symbols[index]
+
+            else:
+                return symbols[-1]
+
+        return symbols
 
     def is_last(self, symbol):
         """
@@ -347,16 +375,6 @@ class Production(LockableType):
             size.
         """
         return symbol.sequence >= self.symbols[-1].sequence
-
-    def _get_symbols(self, symbolType):
-        symbols = []
-
-        for symbol in self.symbols:
-
-            if type( symbol ) is symbolType:
-                symbols.append( symbol )
-
-        return symbols
 
     @staticmethod
     def copy_productions_except_epsilon(source, destine):

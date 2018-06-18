@@ -13,6 +13,7 @@ from grammar.grammar import ChomskyGrammar
 from grammar.utilities import wrap_text
 from grammar.utilities import getCleanSpaces
 from grammar.utilities import dictionary_to_string
+from grammar.utilities import convert_to_text_lines
 from grammar.utilities import sort_alphabetically_and_by_length
 
 from grammar.symbols import Terminal
@@ -93,6 +94,22 @@ class TestChomskyGrammar(TestingUtilities):
 
         self.assertFalse( firstGrammar.has_production( non_terminal_S, production_S ) )
         self.assertTrue( firstGrammar.has_production( non_terminal_S, production_A ) )
+
+    def test_grammarRemovingInitialSymbolChapter5Example1FirstMutated(self):
+        firstGrammar = ChomskyGrammar.load_from_text_lines( wrap_text(
+        """
+            S -> S
+            A -> aA | &
+            B -> bB | Ad | &
+        """ ) )
+        firstGrammar.remove_production_from_non_terminal( firstGrammar.initial_symbol, firstGrammar.initial_symbol )
+
+        self.assertTextEqual(
+        """
+            + S' -> S'
+            +  A -> & | a A
+            +  B -> & | A d | b B
+        """, firstGrammar )
 
     def test_grammarHasRecursionOnNonTerminalChapter5Example1First(self):
         firstGrammar = ChomskyGrammar.load_from_text_lines( wrap_text(
@@ -245,6 +262,10 @@ class TestGrammarEpsilonConversion(TestingUtilities):
 
 class TestGrammarFertileSymbols(TestingUtilities):
 
+    def setUp(self):
+        super().setUp()
+        LockableType._USE_STRING = False
+
     def test_grammarFertileNonTerminalsChapter5Example1Follow(self):
         firstGrammar = ChomskyGrammar.load_from_text_lines( wrap_text(
         """
@@ -257,10 +278,10 @@ class TestGrammarFertileSymbols(TestingUtilities):
 
         self.assertTextEqual(
         """
-            + [A
-            + , B
-            + , C
-            + , S
+            + [Production locked: True, str: A, symbols: [NonTerminal locked: True, str: A, sequence: 1, len: 1;], sequence: 1, len: 1;
+            + , Production locked: True, str: B, symbols: [NonTerminal locked: True, str: B, sequence: 1, len: 1;], sequence: 1, len: 1;
+            + , Production locked: True, str: C, symbols: [NonTerminal locked: True, str: C, sequence: 1, len: 1;], sequence: 1, len: 1;
+            + , Production locked: True, str: S, symbols: [NonTerminal locked: True, str: S, sequence: 1, len: 1;], sequence: 1, len: 1;
             + ]
         """, sort_alphabetically_and_by_length( fertile ) )
 
@@ -276,9 +297,9 @@ class TestGrammarFertileSymbols(TestingUtilities):
 
         self.assertTextEqual(
         """
-            + [B
-            + , C
-            + , S
+            + [Production locked: True, str: B, symbols: [NonTerminal locked: True, str: B, sequence: 1, len: 1;], sequence: 1, len: 1;
+            + , Production locked: True, str: C, symbols: [NonTerminal locked: True, str: C, sequence: 1, len: 1;], sequence: 1, len: 1;
+            + , Production locked: True, str: S, symbols: [NonTerminal locked: True, str: S, sequence: 1, len: 1;], sequence: 1, len: 1;
             + ]
         """, sort_alphabetically_and_by_length( fertile ) )
 
@@ -295,11 +316,11 @@ class TestGrammarFertileSymbols(TestingUtilities):
 
         self.assertTextEqual(
         """
-            + [E
-            + , E'
-            + , F
-            + , T
-            + , T'
+            + [Production locked: True, str: E, symbols: [NonTerminal locked: True, str: E, sequence: 1, len: 1;], sequence: 1, len: 1;
+            + , Production locked: True, str: E', symbols: [NonTerminal locked: True, str: E', sequence: 1, len: 1;], sequence: 1, len: 1;
+            + , Production locked: True, str: F, symbols: [NonTerminal locked: True, str: F, sequence: 1, len: 1;], sequence: 1, len: 1;
+            + , Production locked: True, str: T, symbols: [NonTerminal locked: True, str: T, sequence: 1, len: 1;], sequence: 1, len: 1;
+            + , Production locked: True, str: T', symbols: [NonTerminal locked: True, str: T', sequence: 1, len: 1;], sequence: 1, len: 1;
             + ]
         """, sort_alphabetically_and_by_length( fertile ) )
 
@@ -316,8 +337,8 @@ class TestGrammarFertileSymbols(TestingUtilities):
 
         self.assertTextEqual(
         """
-            + [E'
-            + , T'
+            + [Production locked: True, str: E', symbols: [NonTerminal locked: True, str: E', sequence: 1, len: 1;], sequence: 1, len: 1;
+            + , Production locked: True, str: T', symbols: [NonTerminal locked: True, str: T', sequence: 1, len: 1;], sequence: 1, len: 1;
             + ]
         """, sort_alphabetically_and_by_length( fertile ) )
 
@@ -334,13 +355,13 @@ class TestGrammarFertileSymbols(TestingUtilities):
 
         self.assertTextEqual(
         """
-            + [B
-            + , D
-            + , S
+            + [Production locked: True, str: B, symbols: [NonTerminal locked: True, str: B, sequence: 1, len: 1;], sequence: 1, len: 1;
+            + , Production locked: True, str: D, symbols: [NonTerminal locked: True, str: D, sequence: 1, len: 1;], sequence: 1, len: 1;
+            + , Production locked: True, str: S, symbols: [NonTerminal locked: True, str: S, sequence: 1, len: 1;], sequence: 1, len: 1;
             + ]
         """, sort_alphabetically_and_by_length( fertile ) )
 
-    def test_grammarEliminateNonFertileNonTerminalsChapter4Item5Example1(self):
+    def test_grammarEliminateNonFertileNonTerminalsChapter4Item1Example1(self):
         firstGrammar = ChomskyGrammar.load_from_text_lines( wrap_text(
         """
             S -> aS | B C | B D
@@ -357,6 +378,28 @@ class TestGrammarFertileSymbols(TestingUtilities):
             + B -> & | b B
             + D -> c | d D d
         """, firstGrammar )
+
+    def test_grammarGetReachableNonTerminalsChapter4Item2Example1(self):
+        firstGrammar = ChomskyGrammar.load_from_text_lines( wrap_text(
+        """
+            S -> aSa | dDd
+            A -> aB | Cc | a
+            B -> dD | bB | b
+            C -> Aa | dD | c
+            D -> bbB | d
+        """ ) )
+        reachable = firstGrammar.reachable()
+
+        self.assertTextEqual(
+        """
+            + Terminal locked: True, str: a, sequence: 1, len: 1;
+            + Terminal locked: True, str: b, sequence: 1, len: 1;
+            + Terminal locked: True, str: bb, sequence: 1, len: 2;
+            + Terminal locked: True, str: d, sequence: 1, len: 1;
+            + NonTerminal locked: True, str: B, sequence: 2, len: 1;
+            + NonTerminal locked: True, str: D, sequence: 2, len: 1;
+            + NonTerminal locked: True, str: S, sequence: 1, len: 1;
+        """, convert_to_text_lines( reachable ) )
 
     # def test_grammarGenerateSentencesOfnAsSize5(self):
     #     firstGrammar = Grammar.load_from_text_lines(
@@ -652,9 +695,14 @@ class TestGrammarTreeParsing(TestingUtilities):
             +       epsilon
         """, firstGrammar.pretty() )
 
-    def test_grammarTransformationTreeParsingParenStarPlusSymbols(self):
+
+class TestGrammarTreeTransformation(TestingUtilities):
+
+    def setUp(self):
+        super().setUp()
         LockableType._USE_STRING = False
 
+    def test_grammarTransformationTreeParsingParenStarPlusSymbols(self):
         firstGrammar = ChomskyGrammar.parse( wrap_text(
         r"""
             E  -> T E'
@@ -700,8 +748,6 @@ class TestGrammarTreeParsing(TestingUtilities):
         """, wrap_text( firstGrammar, wrap=100 ) )
 
     def test_grammarTransformationParsingComplexSingleProduction(self):
-        LockableType._USE_STRING = False
-
         firstGrammar = ChomskyGrammar.parse( wrap_text(
         """
             S -> aABbbCC1aAbA BC | ba | c

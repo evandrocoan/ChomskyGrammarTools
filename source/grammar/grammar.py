@@ -133,17 +133,33 @@ class ChomskyGrammar():
         log( 4, "biggest_label_length: %s", biggest_label_length )
         return biggest_label_length
 
-    def __init__(self, initial_symbol="", productions=None):
+    def __init__(self):
         """
-            Create a new grammar. Optionally, you can pass a `initial_symbol` string and dictionary
-            with the grammar productions on the format {'1': {( 'a', '' ), ( 'a', 'A' )}}.
+            Create a new grammar.
         """
-
         ## A dictionary with productions this grammar can generates
-        self.productions = productions if productions else {}
+        self.productions = {}
+        self._initial_symbol = ""
 
-        ## This grammar initial symbol as a simple string or NonTerminal
-        self.initial_symbol = initial_symbol
+    @property
+    def initial_symbol(self):
+        """
+            Returns the current initial symbol.
+        """
+        return self._initial_symbol
+
+    @initial_symbol.setter
+    def initial_symbol(self, value):
+        """
+            Set the initial symbol assuring it has the minimum requirements.
+        """
+
+        if isinstance( value, Production ) and len( value ) == 1:
+            value.lock()
+            self._initial_symbol = value
+
+        else:
+            raise ValueError( "Error: The initial must be an Production with length 1! %s" % repr( value ) )
 
     def __len__(self):
         """
@@ -191,6 +207,7 @@ class ChomskyGrammar():
                             current_level = node
 
                             if len( grammar.initial_symbol ) == 0:
+                                log( 4, "setting initial_symbol: %s", grammar.initial_symbol )
                                 grammar.initial_symbol = current_level
 
                     if level_name == 'non_terminals':
@@ -287,7 +304,8 @@ class ChomskyGrammar():
 
     def assure_existing_symbols(self):
         """
-            Checks whether the grammar uses non existent non terminal symbols as `S -> Aa | a`.
+            Checks whether the grammar uses non existent non terminal symbols as `S -> Aa | a` or if
+            there is a empty start symbol `S ->`.
         """
         production_keys = self.productions.keys()
         start_non_terminals = self.get_symbols_composition( production_keys, NonTerminal )
@@ -299,6 +317,9 @@ class ChomskyGrammar():
 
                 if non_terminal not in start_non_terminals:
                     raise RuntimeError( "Invalid Non Terminal `%s` added to the grammar: \n%s" % ( non_terminal, self ) )
+
+        if self.initial_symbol not in self.productions:
+            raise ValueError( "Error: The new initial symbol has not productions! %s" % repr( self.initial_symbol ) )
 
     def is_epsilon_free(self):
         """
@@ -424,6 +445,13 @@ class ChomskyGrammar():
 
         if not self.productions[start_non_terminal]:
             del self.productions[start_non_terminal]
+
+            if self.initial_symbol == start_non_terminal:
+                # log( 1, "WARNING: Removing the gramar initial symbol!" )
+                new_initial_symbol = self.get_new_initial_symbol()
+
+                self.add_production( new_initial_symbol, new_initial_symbol )
+                self.initial_symbol = new_initial_symbol
 
     def copy_productions_for_one_non_terminal(self, non_terminal_source, non_terminal_destine, secondGrammar=None):
         """
@@ -571,6 +599,28 @@ class ChomskyGrammar():
 
                 if not all_fertile:
                     self.remove_production_from_non_terminal( start_symbol, production )
+
+    def reachable(self):
+        """
+            Return a set with the reachable terminal's and non terminal's symbols.
+        """
+        reachable_terminals = set()
+        reachable_non_terminals = DynamicIterationSet( [self.initial_symbol.get_non_terminals(0)] )
+
+        for start_symbol in reachable_non_terminals:
+            start_productions = self.productions[start_symbol]
+
+            for production in start_productions:
+
+                for symbol in production:
+
+                    if type( symbol ) is Terminal:
+                        reachable_terminals.add( symbol )
+
+                    if type( symbol ) is NonTerminal:
+                        reachable_non_terminals.add( symbol )
+
+        return reachable_terminals | set( reachable_non_terminals )
 
     def first_non_terminal(self):
         """
