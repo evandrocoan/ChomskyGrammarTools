@@ -706,7 +706,7 @@ class TestGrammarFactoringAndRecursionSymbols(TestingUtilities):
         firstGrammar = ChomskyGrammar.load_from_text_lines( wrap_text(
         """
             E -> E + T | T
-            T -> T * T | F
+            T -> T * F | F
             F -> ( E ) | id
         """ ) )
 
@@ -722,13 +722,46 @@ class TestGrammarFactoringAndRecursionSymbols(TestingUtilities):
         firstGrammar = ChomskyGrammar.load_from_text_lines( wrap_text(
         """
             E -> E + T | T
-            T -> T * T | F
+            T -> T * F | F
             F -> ( E ) | id
         """ ) )
         firstGrammar.eliminate_left_recursion()
 
         self.assertTextEqual(
         """
+            +  E -> T E'
+            + E' -> & | + T E'
+            +  F -> id | ( E )
+            +  T -> F T'
+            + T' -> & | * F T'
+        """, firstGrammar )
+
+        self.assertFalse( firstGrammar.has_left_recursion() )
+
+    def test_grammarEliminateLeftRecursionCalculationOfChapter5Item5Example2WithoutSimpleTerminals(self):
+        firstGrammar = ChomskyGrammar.load_from_text_lines( wrap_text(
+        """
+            E -> E + T | T
+            T -> T * F | F
+            F -> ( E ) | id
+        """ ) )
+        firstGrammar.eliminate_simple_non_terminals()
+
+        self.assertTextEqual(
+        """
+            + E -> id | ( E ) | E + T | T * F
+            + F -> id | ( E )
+            + T -> id | ( E ) | T * F
+        """, firstGrammar )
+        firstGrammar.eliminate_left_recursion()
+
+        self.assertTextEqual(
+        """
+            +  E -> id E' | ( E ) E' | T * F E'
+            + E' -> & | + T E'
+            +  F -> id | ( E )
+            +  T -> id T' | ( E ) T'
+            + T' -> & | * F T'
         """, firstGrammar )
 
         self.assertFalse( firstGrammar.has_left_recursion() )
@@ -742,6 +775,14 @@ class TestGrammarFactoringAndRecursionSymbols(TestingUtilities):
         """ ) )
 
         self.assertFalse( firstGrammar.has_left_recursion() )
+        firstGrammar.eliminate_left_recursion()
+
+        self.assertTextEqual(
+        """
+            + E -> T | a E + T
+            + F -> id | ( E )
+            + T -> F | b T * T
+        """, firstGrammar )
 
     def test_grammarHasLeftRecursionCalculationOfChapter5Item6Example1(self):
         firstGrammar = ChomskyGrammar.load_from_text_lines( wrap_text(
@@ -784,6 +825,13 @@ class TestGrammarFactoringAndRecursionSymbols(TestingUtilities):
         """ ) )
 
         self.assertFalse( firstGrammar.has_left_recursion() )
+        firstGrammar.eliminate_left_recursion()
+
+        self.assertTextEqual(
+        """
+            + S -> a A a | b S b
+            + A -> d | a A ac | b S bc
+        """, firstGrammar )
 
     def test_grammarHasLeftRecursionCalculationOfChapter5Item6Example2(self):
         firstGrammar = ChomskyGrammar.load_from_text_lines( wrap_text(
@@ -811,6 +859,14 @@ class TestGrammarFactoringAndRecursionSymbols(TestingUtilities):
         """ ) )
 
         self.assertFalse( firstGrammar.has_left_recursion() )
+        firstGrammar.eliminate_left_recursion()
+
+        self.assertTextEqual(
+        """
+            + S -> a S | a A b
+            + A -> a | a A b | b B c
+            + B -> e | a S a | b B d
+        """, firstGrammar )
 
     # def test_grammarIsFactoredCalculationOfChapter5Example1First(self):
     #     firstGrammar = ChomskyGrammar.load_from_text_lines( wrap_text(

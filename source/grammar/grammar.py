@@ -821,6 +821,36 @@ class ChomskyGrammar():
 
         return simple_non_terminals
 
+    def has_simple_cycle(self):
+        """
+            Determines whether this grammar has direct cycle of simple non terminals `A +=> A` on
+            any of its start non terminal's symbols.
+        """
+
+        for non_terminal_to_check in self.productions.keys():
+            recursive_terminals = DynamicIterationSet([non_terminal_to_check])
+
+            for non_terminal in recursive_terminals:
+                productions = self.productions[non_terminal]
+
+                for production in productions:
+                    # log( 1, "production: %s", production )
+
+                    for symbol in production:
+                        # log( 1, "symbol: %s", symbol )
+
+                        if type( symbol ) is NonTerminal and len( production ) == 1:
+
+                            if symbol == non_terminal_to_check:
+                                # log( 1, "recursive_terminals: %s", recursive_terminals )
+                                return True
+
+                            if symbol not in recursive_terminals:
+                                recursive_terminals.add( symbol )
+
+            # log( 1, "recursive_terminals: %s", recursive_terminals )
+            return False
+
     def eliminate_simple_non_terminals(self):
         """
             Eliminates all unreachable terminal's and non terminal symbols with their productions.
@@ -853,7 +883,10 @@ class ChomskyGrammar():
             3. Call `eliminate_unuseful()` to finally clear the grammar.
         """
         self.convert_to_epsilon_free()
-        self.eliminate_simple_non_terminals()
+
+        if self.has_simple_cycle():
+            self.eliminate_simple_non_terminals()
+
         self.eliminate_unuseful()
 
     def is_empty(self):
