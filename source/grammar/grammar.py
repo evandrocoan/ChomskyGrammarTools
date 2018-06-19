@@ -136,7 +136,9 @@ class ChomskyGrammar():
 
     def initial_symbol_as_first(self):
         """
-            Return a lists with all start symbols, but with the grammar initial symbol as first.
+            Return a lists with all start symbols, but with the grammar initial symbol as first and
+            the following symbols in sorted accordingly to `sort_alphabetically_and_by_length()`
+            function. See that function documentation for the sorting order.
         """
         initial_symbol = self.initial_symbol
         production_keys = sort_alphabetically_and_by_length( list( set( self.productions.keys() ) - {initial_symbol} ) )
@@ -576,6 +578,9 @@ class ChomskyGrammar():
     def eliminate_left_recursion(self):
         """
             Eliminates direct or indirect left recursion from this grammar.
+
+            The indirect recursion elimination order is defined by the `initial_symbol_as_first()`
+            function. See that function documentation for the sorting order.
         """
         # log( 1, "self: \n%s", self )
 

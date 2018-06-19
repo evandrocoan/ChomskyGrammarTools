@@ -82,11 +82,11 @@ def sort_dictionary_lists(dictionary):
 
 def sort_alphabetically_and_by_length(iterable):
     """
-        Give a iterable, call `sorted` accordingly:
-        1. sorts normally by alphabetical order
-        2. sorts by descending length
+        Give an `iterable`, sort its elements accordingly to the following criteria:
+            1. Sorts normally by alphabetical order
+            2. Sorts by descending length
 
-        how to sort by length of string followed by alphabetical order?
+        How to sort by length of string followed by alphabetical order?
         https://stackoverflow.com/questions/4659524/how-to-sort-by-length-of-string-followed-by-alphabetical-order
     """
     return sorted( sorted( natsorted( iterable, key=lambda item: str( item ).lower() ),
