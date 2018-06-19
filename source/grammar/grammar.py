@@ -245,6 +245,7 @@ class ChomskyGrammar():
         if start_symbol not in self.productions:
             self.productions[start_symbol] = set()
 
+        # log( 1, "Adding production: %s -> %s", start_symbol, production )
         self.productions[start_symbol].add( production )
 
     def has_production(self, start_symbol, production):
@@ -434,7 +435,7 @@ class ChomskyGrammar():
         if self.initial_symbol in non_terminal_epsilon:
 
             if self.has_recursion_on_the_non_terminal( self.initial_symbol ):
-                new_initial_symbol = self.get_new_initial_symbol()
+                new_initial_symbol = self.get_new_symbol()
                 self.copy_productions_for_one_non_terminal( self.initial_symbol, new_initial_symbol )
                 self.initial_symbol = new_initial_symbol
 
@@ -477,12 +478,12 @@ class ChomskyGrammar():
     def clean_initial_symbol(self, start_symbol):
         """
             Replace the current initial symbol creating a new empty initial symbol such `S -> S` by
-            querying `get_new_initial_symbol()` for a new initial symbol.
+            querying `get_new_symbol()` for a new initial symbol.
         """
 
         if self.initial_symbol == start_symbol:
             # log( 1, "WARNING: Removing the gramar initial symbol!" )
-            new_initial_symbol = self.get_new_initial_symbol()
+            new_initial_symbol = self.get_new_symbol()
 
             self.add_production( new_initial_symbol, new_initial_symbol )
             self.initial_symbol = new_initial_symbol
@@ -505,39 +506,36 @@ class ChomskyGrammar():
         for production in secondGrammarProductions:
             self.add_production( non_terminal_destine, production )
 
-    def get_new_initial_symbol(self, secondGrammar=None):
+    def get_new_symbol(self, new_symbol='S'):
         """
-            Search for a new initial symbol name until find one in the form S'''... and returns it.
+            Given a `new_symbol` initial name, search for a new symbol name until find one in the
+            form S'''... and returns it.
+        """
+        new_symbol = str( new_symbol )
 
-            If given a `secondGrammar`, also try to find a new initial symbol which is unique for
-            both grammars.
-        """
+        if not new_symbol:
+            raise RuntimeError( "The new_symbol `%s` has not length! (%s)\n%s" % ( new_symbol, repr( new_symbol ), self ) )
+
         current_symbols = set()
-        new_initial_symbol = 'S'
 
         for non_terminal in self.productions.keys():
             current_symbols.add( non_terminal )
 
-        if secondGrammar:
-
-            for non_terminal in secondGrammar.productions.keys():
-                current_symbols.add( non_terminal )
-
         while True:
-            new_initial_symbol += "'"
+            new_symbol += "'"
 
-            if new_initial_symbol not in current_symbols:
-                return Production( symbols=[NonTerminal( new_initial_symbol )], lock=True )
-
+            if new_symbol not in current_symbols:
+                return Production( symbols=[NonTerminal( new_symbol )], lock=True )
 
     def left_recursion(self):
         """
-            Returns a set with a tuple (non terminal, recursion_type) where `non terminal` is a
-            grammar recursive non terminal's and `recursion_type` the type of the recursion which
+            Returns a set with tuples (non terminal, recursion_type) where `non terminal` is a
+            grammar recursive non terminal and `recursion_type` the type of the recursion which
             can be 'direct' or 'indirect'.
         """
-        left_recursion = set()
         self.convert_to_proper()
+
+        left_recursion = set()
         first_non_terminal = self.first_non_terminal()
 
         for first in first_non_terminal.keys():
@@ -558,6 +556,71 @@ class ChomskyGrammar():
                     left_recursion.add( ( first, 'indirect' ) )
 
         return left_recursion
+
+    def eliminate_left_recursion(self):
+        """
+            Eliminates direct or indirect left recursion from this grammar.
+        """
+        self.convert_to_proper()
+        # log( 1, "self: \n%s", self )
+
+        production_keys = list( self.productions.keys() )
+        non_terminals_count = len( self.productions )
+
+        for maximum_index in range( 0, non_terminals_count ):
+            outter_start_symbol = production_keys[maximum_index]
+            outter_productions = set( self.productions[outter_start_symbol] )
+            # log( 1, "outter_start_symbol: %s", outter_start_symbol )
+            # log( 1, "outter_productions: %s", outter_productions )
+
+            # Eliminate indirect left recursion
+            for index in range( 0, maximum_index ):
+                inner_start_symbol = production_keys[index]
+                inner_productions = set( self.productions[inner_start_symbol] )
+
+                for outter_production in outter_productions:
+
+                    if type( outter_production[0] ) is NonTerminal:
+
+                        if outter_production[0] == inner_start_symbol:
+
+                            for inner_production in inner_productions:
+                                new_production = outter_production.replace( 0, inner_production )
+                                self.add_production( outter_start_symbol, new_production )
+                                self.remove_production_from_non_terminal( outter_start_symbol, outter_production )
+
+            # Eliminate direct left recursion
+            outter_productions = set( self.productions[outter_start_symbol] )
+            new_outter_start_symbol = self.get_new_symbol( outter_start_symbol )
+            outter_productions_recursive = set()
+
+            for outter_production in outter_productions:
+
+                if type( outter_production[0] ) is NonTerminal:
+
+                    if outter_production[0] == outter_start_symbol:
+                        outter_productions_recursive.add( outter_production )
+
+            # log( 1, "outter_productions: %s", outter_productions )
+            # log( 1, "outter_productions_recursive: %s", outter_productions_recursive )
+            if outter_productions_recursive:
+
+                for outter_production in outter_productions:
+
+                    if outter_production in outter_productions_recursive:
+                        new_production = outter_production.new()
+                        new_production.remove_non_terminal( 0 )
+                        new_production.add( new_outter_start_symbol[0].new() )
+                        self.add_production( new_outter_start_symbol, new_production )
+
+                    else:
+                        new_production = outter_production.new()
+                        new_production.add( new_outter_start_symbol[0].new() )
+                        self.add_production( outter_start_symbol, new_production )
+
+                    self.remove_production_from_non_terminal( outter_start_symbol, outter_production )
+
+                self.add_production( new_outter_start_symbol, epsilon_production.new() )
 
     def has_left_recursion(self):
         """

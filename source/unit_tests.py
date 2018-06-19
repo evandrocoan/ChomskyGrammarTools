@@ -681,7 +681,18 @@ class TestGrammarFactoringAndRecursionSymbols(TestingUtilities):
             + (S, 'direct')
         """, convert_to_text_lines( firstGrammar.left_recursion() ) )
 
-        self.assertTrue( firstGrammar.has_left_recursion() )
+    def test_grammarEliminateLeftRecursionCalculationOfChapter5Item5Example1(self):
+        firstGrammar = ChomskyGrammar.load_from_text_lines( wrap_text(
+        """
+            S -> Sa | b
+        """ ) )
+        firstGrammar.eliminate_left_recursion()
+
+        self.assertTextEqual(
+        """
+            +  S -> b S'
+            + S' -> & | a S'
+        """, firstGrammar )
 
     def test_grammarHasLeftRecursionCalculationOfChapter5Item5Example1Mutated(self):
         firstGrammar = ChomskyGrammar.load_from_text_lines( wrap_text(
@@ -707,6 +718,21 @@ class TestGrammarFactoringAndRecursionSymbols(TestingUtilities):
 
         self.assertTrue( firstGrammar.has_left_recursion() )
 
+    def test_grammarEliminateLeftRecursionCalculationOfChapter5Item5Example2(self):
+        firstGrammar = ChomskyGrammar.load_from_text_lines( wrap_text(
+        """
+            E -> E + T | T
+            T -> T * T | F
+            F -> ( E ) | id
+        """ ) )
+        firstGrammar.eliminate_left_recursion()
+
+        self.assertTextEqual(
+        """
+        """, firstGrammar )
+
+        self.assertFalse( firstGrammar.has_left_recursion() )
+
     def test_grammarHasLeftRecursionCalculationOfChapter5Item5Example2Mutated(self):
         firstGrammar = ChomskyGrammar.load_from_text_lines( wrap_text(
         """
@@ -731,6 +757,24 @@ class TestGrammarFactoringAndRecursionSymbols(TestingUtilities):
         """, convert_to_text_lines( firstGrammar.left_recursion() ) )
 
         self.assertTrue( firstGrammar.has_left_recursion() )
+
+    def test_grammarEliminateLeftRecursionOfChapter5Item6Example1(self):
+        firstGrammar = ChomskyGrammar.load_from_text_lines( wrap_text(
+        """
+            S -> Aa | Sb
+            A -> Sc | d
+        """ ) )
+        firstGrammar.eliminate_left_recursion()
+
+        self.assertTextEqual(
+        """
+            +  S -> A a S'
+            +  A -> d A'
+            + A' -> & | a S' c A'
+            + S' -> & | b S'
+        """, firstGrammar )
+
+        self.assertFalse( firstGrammar.has_left_recursion() )
 
     def test_grammarHasLeftRecursionCalculationOfChapter5Item6Example1Mutated(self):
         firstGrammar = ChomskyGrammar.load_from_text_lines( wrap_text(

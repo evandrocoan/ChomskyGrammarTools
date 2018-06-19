@@ -210,6 +210,32 @@ class Production(LockableType):
                     self.symbols[symbol.sequence - 1] = epsilon_terminal
                     break
 
+    def replace(self, target_index, new_production):
+        """
+            Given an `target_index` starting from 0, replace the nth symbol with the given
+            `new_production` symbols.
+        """
+        self = self.new()
+        old_symbols = self.symbols
+
+        self.symbols = []
+        self.sequence = 0
+
+        for index, old_symbol in enumerate( old_symbols ):
+            # log( 1, "old_symbol: %s, len: %s", old_symbol, len( old_symbol ) )
+
+            if index == target_index:
+
+                for symbol in new_production:
+                    self.add( symbol.new() )
+
+                continue
+
+            self.add( old_symbol.new() )
+
+        self.trim_epsilons()
+        return self
+
     def trim_epsilons(self, new_copy=False):
         """
             Removes all meaningless epsilon's, i.e., with no meaning, useless.
