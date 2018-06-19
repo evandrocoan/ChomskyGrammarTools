@@ -18,6 +18,8 @@ from .production import end_of_string_terminal
 
 from .utilities import getCleanSpaces
 from .utilities import DynamicIterationSet
+from .utilities import dictionary_to_string
+from .utilities import convert_to_text_lines
 from .utilities import sort_alphabetically_and_by_length
 
 from .tree_transformer import ChomskyGrammarTreeTransformer
@@ -99,7 +101,7 @@ class ChomskyGrammar():
         grammar_lines = []
         biggest = self._get_table_biggest_elements()
 
-        def create_grammar_line(non_terminal_start, productions):
+        def create_grammar_line(start_symbol, productions):
             productions_string = []
 
             for production in productions:
@@ -108,7 +110,7 @@ class ChomskyGrammar():
             log( 4, "productions:        %s", productions )
             log( 4, "productions_string: %s", productions_string )
 
-            return "{:>{biggest}} -> {}".format( str( non_terminal_start ),
+            return "{:>{biggest}} -> {}".format( str( start_symbol ),
                     " | ".join( sort_alphabetically_and_by_length( productions_string ) ), biggest=biggest )
 
         if self.initial_symbol in self.productions:
@@ -266,12 +268,12 @@ class ChomskyGrammar():
         """
         return production in self.productions[start_symbol]
 
-    def terminals_productions(self, non_terminal_start):
+    def terminals_productions(self, start_symbol):
         """
-            Given the non terminal `non_terminal_start`, return all reachable productions only composed
+            Given the non terminal `start_symbol`, return all reachable productions only composed
             with terminal's.
         """
-        productions = self.productions[non_terminal_start]
+        productions = self.productions[start_symbol]
         reachable_terminals = set()
 
         for production in productions:
@@ -323,8 +325,8 @@ class ChomskyGrammar():
         production_keys = self.productions.keys()
         start_non_terminals = self.get_symbols_composition( production_keys, NonTerminal )
 
-        for non_terminal_start in production_keys:
-            non_terminals = self.get_non_terminals( non_terminal_start )
+        for start_symbol in production_keys:
+            non_terminals = self.get_non_terminals( start_symbol )
 
             for non_terminal in non_terminals:
 
@@ -392,16 +394,16 @@ class ChomskyGrammar():
         production_keys = self.productions.keys()
         non_terminal_epsilon = DynamicIterationSet()
 
-        for non_terminal_start in production_keys:
+        for start_symbol in production_keys:
 
-            if self.has_production( non_terminal_start, epsilon_production ):
-                non_terminal_epsilon.add( non_terminal_start )
+            if self.has_production( start_symbol, epsilon_production ):
+                non_terminal_epsilon.add( start_symbol )
 
         while current_counter != old_counter:
             old_counter = current_counter
 
-            for non_terminal_start in production_keys:
-                productions = self.productions[non_terminal_start]
+            for start_symbol in production_keys:
+                productions = self.productions[start_symbol]
 
                 for production in productions:
                     # log( 1, "production: %s", production )
@@ -419,8 +421,8 @@ class ChomskyGrammar():
                         all_symbols_go_to_epsilon = False
                         break
 
-                    if all_symbols_go_to_epsilon and non_terminal_start not in non_terminal_epsilon:
-                        non_terminal_epsilon.add( non_terminal_start )
+                    if all_symbols_go_to_epsilon and start_symbol not in non_terminal_epsilon:
+                        non_terminal_epsilon.add( start_symbol )
                         current_counter += 1
 
         # log( 1, "non_terminal_epsilon: %s", non_terminal_epsilon )
@@ -433,16 +435,16 @@ class ChomskyGrammar():
         # log( 1, "self: \n%s", self )
         non_terminal_epsilon = self.get_non_terminal_epsilon()
 
-        for non_terminal_start in set( self.productions.keys() ):
-            non_terminal_productions = set( self.productions[non_terminal_start] )
+        for start_symbol in set( self.productions.keys() ):
+            non_terminal_productions = set( self.productions[start_symbol] )
 
             for production in non_terminal_productions:
 
                 for combination in production.combinations( non_terminal_epsilon ):
                     # log( 1, "combination: %s", combination )
-                    self.add_production( non_terminal_start, combination )
+                    self.add_production( start_symbol, combination )
 
-            self.remove_production_from_non_terminal( non_terminal_start, epsilon_production )
+            self.remove_production_from_non_terminal( start_symbol, epsilon_production )
 
         if self.initial_symbol in non_terminal_epsilon:
 
@@ -664,19 +666,16 @@ class ChomskyGrammar():
             Returns a dictionary with this grammar nondeterministic factors set for each non
             deterministic non terminal start symbol.
         """
+        log( 1, "self: \n%s", self )
+        self.remove_indirect_factors()
+
         factors = set()
-        first_terminals = self.first_terminals()
+        production_keys = self.productions.keys()
 
-        for first in first_terminals.keys():
+        for start_symbol in production_keys:
+            productions = self.productions[start_symbol]
 
-            if first in first_terminals[first]:
-                is_direct = False
-
-                for production in self.productions[first]:
-
-                    if production[0] == first:
-                        is_direct = True
-                        break
+            for production in productions:
 
                 if is_direct:
                     factors.add( ( first, 'direct' ) )
@@ -685,6 +684,33 @@ class ChomskyGrammar():
                     factors.add( ( first, 'indirect' ) )
 
         return factors
+
+    def remove_indirect_factors(self):
+        """
+            Converts all indirect factors from this grammar to direct factors.
+        """
+        recursive_terminals = DynamicIterationSet([non_terminal_to_check])
+
+        for non_terminal in recursive_terminals:
+            productions = self.productions[non_terminal]
+
+            for production in productions:
+                # log( 1, "production: %s", production )
+
+                for symbol in production:
+                    # log( 1, "symbol: %s", symbol )
+
+                    if type( symbol ) is NonTerminal:
+
+                        if symbol == non_terminal_to_check:
+                            # log( 1, "recursive_terminals: %s", recursive_terminals )
+                            return True
+
+                        if symbol not in recursive_terminals:
+                            recursive_terminals.add( symbol )
+
+        # log( 1, "recursive_terminals: %s", recursive_terminals )
+        return False
 
     def factor_it(self, maximum_steps=10):
         """
@@ -711,12 +737,12 @@ class ChomskyGrammar():
         current_counter = 0
 
         # Create the initial fertile Non Terminal's sets
-        for non_terminal_start in production_keys:
-            current_terminals = self.terminals_productions( non_terminal_start )
-            # log( 1, "non_terminal_start: %s, current_terminals: %s", non_terminal_start, current_terminals )
+        for start_symbol in production_keys:
+            current_terminals = self.terminals_productions( start_symbol )
+            # log( 1, "start_symbol: %s, current_terminals: %s", start_symbol, current_terminals )
 
             if current_terminals:
-                fertile.add( non_terminal_start )
+                fertile.add( start_symbol )
 
         while old_counter != current_counter:
             old_counter = current_counter
