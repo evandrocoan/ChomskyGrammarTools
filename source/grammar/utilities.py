@@ -89,7 +89,9 @@ def sort_alphabetically_and_by_length(iterable):
         how to sort by length of string followed by alphabetical order?
         https://stackoverflow.com/questions/4659524/how-to-sort-by-length-of-string-followed-by-alphabetical-order
     """
-    return sorted( sorted( natsorted( iterable, key=lambda item: str( item ).lower() ), key=lambda item: str( item ).istitle() ), key=len )
+    return sorted( sorted( natsorted( iterable, key=lambda item: str( item ).lower() ),
+                          key=lambda item: str( item ).istitle() ),
+                  key=lambda item: len( str( item ) ) )
 
 
 def sort_correctly(iterable):

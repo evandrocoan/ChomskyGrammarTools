@@ -117,7 +117,7 @@ class ChomskyGrammar():
         else:
             raise RuntimeError( "Your grammar has an invalid initial_symbol! %s, %s" % ( self.initial_symbol, self.productions ) )
 
-        for non_terminal in sorted( set( self.productions.keys() ) - {self.initial_symbol} ):
+        for non_terminal in sort_alphabetically_and_by_length( set( self.productions.keys() ) - {self.initial_symbol} ):
             grammar_lines.append( create_grammar_line( non_terminal, self.productions[non_terminal] ) )
 
         return "\n".join( grammar_lines )

@@ -428,9 +428,9 @@ class TestGrammarFertileSymbols(TestingUtilities):
         self.assertTextEqual(
         r"""
             + [Production locked: True, str: E, symbols: [NonTerminal locked: True, str: E, sequence: 1, len: 1;], sequence: 1, len: 1;
-            + , Production locked: True, str: E', symbols: [NonTerminal locked: True, str: E', sequence: 1, len: 1;], sequence: 1, len: 1;
             + , Production locked: True, str: F, symbols: [NonTerminal locked: True, str: F, sequence: 1, len: 1;], sequence: 1, len: 1;
             + , Production locked: True, str: T, symbols: [NonTerminal locked: True, str: T, sequence: 1, len: 1;], sequence: 1, len: 1;
+            + , Production locked: True, str: E', symbols: [NonTerminal locked: True, str: E', sequence: 1, len: 1;], sequence: 1, len: 1;
             + , Production locked: True, str: T', symbols: [NonTerminal locked: True, str: T', sequence: 1, len: 1;], sequence: 1, len: 1;
             + ]
         """, sort_alphabetically_and_by_length( fertile ) )
@@ -734,9 +734,9 @@ class TestGrammarFactoringAndRecursionSymbols(TestingUtilities):
         self.assertTextEqual(
         """
             +  E -> T E'
-            + E' -> & | + T E'
             +  F -> id | ( E )
             +  T -> F T'
+            + E' -> & | + T E'
             + T' -> & | * F T'
         """, firstGrammar )
 
@@ -762,9 +762,9 @@ class TestGrammarFactoringAndRecursionSymbols(TestingUtilities):
         self.assertTextEqual(
         """
             +  E -> id E' | ( E ) E' | T * F E'
-            + E' -> & | + T E'
             +  F -> id | ( E )
             +  T -> id T' | ( E ) T'
+            + E' -> & | + T E'
             + T' -> & | * F T'
         """, firstGrammar )
 
@@ -867,8 +867,8 @@ class TestGrammarFactoringAndRecursionSymbols(TestingUtilities):
         """
             +  S -> A b | a S
             +  A -> a A' | B c A'
-            + A' -> & | b A'
             +  B -> e B' | a S a B' | a A' ba B'
+            + A' -> & | b A'
             + B' -> & | d B' | c A' ba B'
         """, firstGrammar )
 
@@ -905,10 +905,10 @@ class TestGrammarFactoringAndRecursionSymbols(TestingUtilities):
         """
             + S' -> & | b B' d | a A' b B' d | b B' da A' b B' d
             +  A -> a A' | b B' da A'
-            + A' -> & | b B' da A'
             +  B -> b B' | A b B'
-            + B' -> & | c B'
             +  S -> B d
+            + A' -> & | b B' da A'
+            + B' -> & | c B'
         """, firstGrammar )
 
         self.assertFalse( firstGrammar.has_left_recursion() )
@@ -1013,7 +1013,7 @@ class TestGrammarTreeParsing(TestingUtilities):
             + AB -> &
             + BC -> &
             + CC -> &
-        """, str( firstGrammar ) )
+        """, firstGrammar )
 
     def test_grammarInputParsingSymbolMerging(self):
         firstGrammar = ChomskyGrammar.load_from_text_lines(
