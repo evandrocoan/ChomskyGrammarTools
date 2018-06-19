@@ -521,7 +521,7 @@ class ChomskyGrammar():
         current_symbols = set()
 
         for non_terminal in self.productions.keys():
-            current_symbols.add( non_terminal )
+            current_symbols.add( str( non_terminal ) )
 
         while True:
             new_symbol += "'"
@@ -572,6 +572,7 @@ class ChomskyGrammar():
 
         if self.has_left_recursion():
             self.convert_to_proper()
+            # log( 1, "self: \n%s", self )
 
         else:
             return
@@ -682,7 +683,7 @@ class ChomskyGrammar():
         """
             Determines whether this grammar is factored, i.e., deterministic or nondeterministic.
         """
-        return not self.factors()
+        return not self.has_left_recursion() and not self.factors()
 
     def fertile(self):
         """

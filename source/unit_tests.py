@@ -892,6 +892,46 @@ class TestGrammarFactoringAndRecursionSymbols(TestingUtilities):
             + B -> e | a S a | b B d
         """, firstGrammar )
 
+    def test_grammarEliminateLeftRecursionCalculationOfExercise6List3ItemC(self):
+        firstGrammar = ChomskyGrammar.load_from_text_lines( wrap_text(
+        """
+            S -> Bd | &
+            B -> Ab | Bc
+            A -> Sa | &
+        """ ) )
+        firstGrammar.eliminate_left_recursion()
+
+        self.assertTextEqual(
+        """
+            + S' -> & | b B' d | a A' b B' d | b B' da A' b B' d
+            +  A -> a A' | b B' da A'
+            + A' -> & | b B' da A'
+            +  B -> b B' | A b B'
+            + B' -> & | c B'
+            +  S -> B d
+        """, firstGrammar )
+
+        self.assertFalse( firstGrammar.has_left_recursion() )
+
+    def test_grammarConvertToProperCalculationOfExercise6List3ItemC(self):
+        firstGrammar = ChomskyGrammar.load_from_text_lines( wrap_text(
+        """
+            S -> Bd | &
+            B -> Ab | Bc
+            A -> Sa | &
+        """ ) )
+        firstGrammar.convert_to_epsilon_free()
+
+        self.assertTextEqual(
+        """
+            + S' -> & | B d
+            +  A -> a | S a
+            +  B -> b | A b | B c
+            +  S -> B d
+        """, firstGrammar )
+
+        self.assertTrue( firstGrammar.is_epsilon_free() )
+
     def test_grammarIsFactoredCalculationOfChapter5Example1First(self):
         firstGrammar = ChomskyGrammar.load_from_text_lines( wrap_text(
         """
