@@ -726,8 +726,8 @@ class TestGrammarFactoringAndRecursionSymbols(TestingUtilities):
         firstGrammar = ChomskyGrammar.load_from_text_lines( wrap_text(
         """
             E -> E + T | T
-            T -> T * F | F
             F -> ( E ) | id
+            T -> T * F | F
         """ ) )
         firstGrammar.eliminate_left_recursion()
 
@@ -735,7 +735,7 @@ class TestGrammarFactoringAndRecursionSymbols(TestingUtilities):
         """
             +  E -> T E'
             +  F -> id | ( E )
-            +  T -> F T'
+            +  T -> id T' | ( E ) T'
             + E' -> & | + T E'
             + T' -> & | * F T'
         """, firstGrammar )
@@ -896,19 +896,19 @@ class TestGrammarFactoringAndRecursionSymbols(TestingUtilities):
         firstGrammar = ChomskyGrammar.load_from_text_lines( wrap_text(
         """
             S -> Bd | &
-            B -> Ab | Bc
             A -> Sa | &
+            B -> Ab | Bc
         """ ) )
         firstGrammar.eliminate_left_recursion()
 
         self.assertTextEqual(
         """
-            + S' -> & | b B' d | a A' b B' d | b B' da A' b B' d
-            +  A -> a A' | b B' da A'
-            +  B -> b B' | A b B'
-            +  S -> B d
-            + A' -> & | b B' da A'
-            + B' -> & | c B'
+            +  S' -> & | B d
+            +   A -> a | S a
+            +   B -> b B' | ab B' | S ab B'
+            +   S -> b B' d S'' | ab B' d S''
+            +  B' -> & | c B'
+            + S'' -> & | ab B' d S''
         """, firstGrammar )
 
         self.assertFalse( firstGrammar.has_left_recursion() )
@@ -917,8 +917,8 @@ class TestGrammarFactoringAndRecursionSymbols(TestingUtilities):
         firstGrammar = ChomskyGrammar.load_from_text_lines( wrap_text(
         """
             S -> Bd | &
-            B -> Ab | Bc
             A -> Sa | &
+            B -> Ab | Bc
         """ ) )
         firstGrammar.convert_to_epsilon_free()
 

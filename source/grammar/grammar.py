@@ -134,6 +134,15 @@ class ChomskyGrammar():
         log( 4, "biggest_label_length: %s", biggest_label_length )
         return biggest_label_length
 
+    def initial_symbol_as_first(self):
+        """
+            Return a lists with all start symbols, but with the grammar initial symbol as first.
+        """
+        initial_symbol = self.initial_symbol
+        production_keys = sort_alphabetically_and_by_length( list( set( self.productions.keys() ) - {initial_symbol} ) )
+        production_keys.insert( 0, initial_symbol )
+        return production_keys
+
     def __init__(self):
         """
             Create a new grammar.
@@ -577,7 +586,7 @@ class ChomskyGrammar():
         else:
             return
 
-        production_keys = list( self.productions.keys() )
+        production_keys = self.initial_symbol_as_first()
         non_terminals_count = len( production_keys )
 
         for maximum_index in range( 0, non_terminals_count ):
