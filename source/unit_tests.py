@@ -591,8 +591,10 @@ class TestGrammarFertileSymbols(TestingUtilities):
             + Production locked: True, str: S, symbols: [NonTerminal locked: True, str: S, sequence: 1, len: 1;], sequence: 1, len: 1;
         """, wrap_text( convert_to_text_lines( simple_non_terminals, new_line=False ), wrap=120 ) )
 
+
+class TestGrammarFactoringAndRecursionSymbols(TestingUtilities):
+
     def test_grammarGetNonTerminalSimpleSymbolsChapter4Item5Example1(self):
-        LockableType._USE_STRING = True
         firstGrammar = ChomskyGrammar.load_from_text_lines( wrap_text(
         """
             S -> F G H
@@ -611,7 +613,6 @@ class TestGrammarFertileSymbols(TestingUtilities):
         """, dictionary_to_string( simple_non_terminals ) )
 
     def test_grammarGetNonTerminalSimpleSymbolsChapter4Item5Example2(self):
-        LockableType._USE_STRING = True
         firstGrammar = ChomskyGrammar.load_from_text_lines( wrap_text(
         """
             S -> a B c D e
@@ -632,7 +633,6 @@ class TestGrammarFertileSymbols(TestingUtilities):
         """, dictionary_to_string( simple_non_terminals ) )
 
     def test_grammarEliminateNonTerminalSimpleSymbolsChapter4Item5Example1(self):
-        LockableType._USE_STRING = True
         firstGrammar = ChomskyGrammar.load_from_text_lines( wrap_text(
         """
             S -> F G H
@@ -651,7 +651,6 @@ class TestGrammarFertileSymbols(TestingUtilities):
         """, firstGrammar )
 
     def test_grammarEliminateNonTerminalSimpleSymbolsChapter4Item5Example2(self):
-        LockableType._USE_STRING = True
         firstGrammar = ChomskyGrammar.load_from_text_lines( wrap_text(
         """
             S -> a B c D e
@@ -671,33 +670,103 @@ class TestGrammarFertileSymbols(TestingUtilities):
             + F -> f | f F
         """, firstGrammar )
 
-    # def test_grammarGenerateSentencesOfnAsSize5(self):
-    #     firstGrammar = Grammar.load_from_text_lines(
-    #     """
-    #         A -> aA | a
-    #     """ )
-    #     generate_sentences = []
-    #     firstGrammar.generate_sentences_of_size_n( 5, generate_sentences )
+    def test_grammarHasLeftRecursionCalculationOfChapter5Item5Example1(self):
+        firstGrammar = ChomskyGrammar.load_from_text_lines( wrap_text(
+        """
+            S -> Sa | b
+        """ ) )
 
-    #     self.assertTextEqual(
-    #     """
-    #         + ['a', 'aa', 'aaa', 'aaaa', 'aaaaa']
-    #     """, str( generate_sentences ) )
+        self.assertTextEqual(
+        """
+            + (S, 'direct')
+        """, convert_to_text_lines( firstGrammar.left_recursion() ) )
 
-    # def test_grammarHasLeftRecursionCalculationOfChapter5Example1First(self):
-    #     firstGrammar = ChomskyGrammar.load_from_text_lines( wrap_text(
-    #     """
-    #         S -> Ab | A Bc
-    #         A -> aA | &
-    #         B -> bB | Ad | &
-    #     """ ) )
+        self.assertTrue( firstGrammar.has_left_recursion() )
 
-    #     self.assertTextEqual(
-    #     """
-    #         not implemented yet
-    #     """, dictionary_to_string( firstGrammar.left_recursion() ) )
+    def test_grammarHasLeftRecursionCalculationOfChapter5Item5Example1Mutated(self):
+        firstGrammar = ChomskyGrammar.load_from_text_lines( wrap_text(
+        """
+            S -> aSa | b
+        """ ) )
 
-    #     self.assertFalse( firstGrammar.has_left_recursion() )
+        self.assertFalse( firstGrammar.has_left_recursion() )
+
+    def test_grammarHasLeftRecursionCalculationOfChapter5Item5Example2(self):
+        firstGrammar = ChomskyGrammar.load_from_text_lines( wrap_text(
+        """
+            E -> E + T | T
+            T -> T * T | F
+            F -> ( E ) | id
+        """ ) )
+
+        self.assertTextEqual(
+        """
+            + (E, 'direct')
+            + (T, 'direct')
+        """, convert_to_text_lines( firstGrammar.left_recursion() ) )
+
+        self.assertTrue( firstGrammar.has_left_recursion() )
+
+    def test_grammarHasLeftRecursionCalculationOfChapter5Item5Example2Mutated(self):
+        firstGrammar = ChomskyGrammar.load_from_text_lines( wrap_text(
+        """
+            E -> a E + T | T
+            T -> b T * T | F
+            F -> ( E ) | id
+        """ ) )
+
+        self.assertFalse( firstGrammar.has_left_recursion() )
+
+    def test_grammarHasLeftRecursionCalculationOfChapter5Item6Example1(self):
+        firstGrammar = ChomskyGrammar.load_from_text_lines( wrap_text(
+        """
+            S -> Aa | Sb
+            A -> Sc | d
+        """ ) )
+
+        self.assertTextEqual(
+        """
+            + (A, 'indirect')
+            + (S, 'direct')
+        """, convert_to_text_lines( firstGrammar.left_recursion() ) )
+
+        self.assertTrue( firstGrammar.has_left_recursion() )
+
+    def test_grammarHasLeftRecursionCalculationOfChapter5Item6Example1Mutated(self):
+        firstGrammar = ChomskyGrammar.load_from_text_lines( wrap_text(
+        """
+            S -> aAa | bSb
+            A -> Sc | d
+        """ ) )
+
+        self.assertFalse( firstGrammar.has_left_recursion() )
+
+    def test_grammarHasLeftRecursionCalculationOfChapter5Item6Example2(self):
+        firstGrammar = ChomskyGrammar.load_from_text_lines( wrap_text(
+        """
+            S -> aS | Ab
+            A -> Ab | Bc | a
+            B -> Bd | Sa | e
+        """ ) )
+
+        self.assertTextEqual(
+        """
+            + (A, 'direct')
+            + (B, 'direct')
+            + (S, 'indirect')
+        """, convert_to_text_lines( firstGrammar.left_recursion() ) )
+
+        self.assertTrue( firstGrammar.has_left_recursion() )
+
+    def test_grammarHasLeftRecursionCalculationOfChapter5Item6Example2Mutated(self):
+        firstGrammar = ChomskyGrammar.load_from_text_lines( wrap_text(
+        """
+            S -> aS | aAb
+            A -> aAb | bBc | a
+            B -> bBd | aSa | e
+        """ ) )
+
+        self.assertFalse( firstGrammar.has_left_recursion() )
 
     # def test_grammarIsFactoredCalculationOfChapter5Example1First(self):
     #     firstGrammar = ChomskyGrammar.load_from_text_lines( wrap_text(

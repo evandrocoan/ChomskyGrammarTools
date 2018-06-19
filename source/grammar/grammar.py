@@ -532,10 +532,31 @@ class ChomskyGrammar():
 
     def left_recursion(self):
         """
-            Determines whether this grammar has left recursion on any of its start non terminal's
-            symbols.
+            Returns a set with a tuple (non terminal, recursion_type) where `non terminal` is a
+            grammar recursive non terminal's and `recursion_type` the type of the recursion which
+            can be 'direct' or 'indirect'.
         """
-        left_recursion = {}
+        left_recursion = set()
+        self.convert_to_proper()
+        first_non_terminal = self.first_non_terminal()
+
+        for first in first_non_terminal.keys():
+
+            if first in first_non_terminal[first]:
+                is_direct = False
+
+                for production in self.productions[first]:
+
+                    if production[0] == first:
+                        is_direct = True
+                        break
+
+                if is_direct:
+                    left_recursion.add( ( first, 'direct' ) )
+
+                else:
+                    left_recursion.add( ( first, 'indirect' ) )
+
         return left_recursion
 
     def has_left_recursion(self):
@@ -543,7 +564,7 @@ class ChomskyGrammar():
             Determines whether this grammar has left recursion on any of its start non terminal's
             symbols.
         """
-        return bool( not self.left_recursion() )
+        return bool( self.left_recursion() )
 
     def factors(self):
         """
@@ -557,7 +578,7 @@ class ChomskyGrammar():
         """
             Determines whether this grammar is factored, i.e., deterministic or nondeterministic.
         """
-        return bool( not self.factors() )
+        return not self.factors()
 
     def fertile(self):
         """
