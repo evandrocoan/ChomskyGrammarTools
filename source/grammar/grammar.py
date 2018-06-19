@@ -536,11 +536,11 @@ class ChomskyGrammar():
             can be 'direct' or 'indirect'.
         """
         left_recursion = set()
-        first_non_terminal = self.first_non_terminal()
+        first_non_terminals = self.first_non_terminals()
 
-        for first in first_non_terminal.keys():
+        for first in first_non_terminals.keys():
 
-            if first in first_non_terminal[first]:
+            if first in first_non_terminals[first]:
                 is_direct = False
 
                 for production in self.productions[first]:
@@ -649,8 +649,34 @@ class ChomskyGrammar():
             Returns a dictionary with this grammar nondeterministic factors set for each non
             deterministic non terminal start symbol.
         """
-        factors = {}
+        factors = set()
+        first_terminals = self.first_terminals()
+
+        for first in first_terminals.keys():
+
+            if first in first_terminals[first]:
+                is_direct = False
+
+                for production in self.productions[first]:
+
+                    if production[0] == first:
+                        is_direct = True
+                        break
+
+                if is_direct:
+                    factors.add( ( first, 'direct' ) )
+
+                else:
+                    factors.add( ( first, 'indirect' ) )
+
         return factors
+
+    def factor_it(self, maximum_steps=10):
+        """
+            Try to factor the this grammar in the `maximum_steps` given. Return True is the
+            factorization was successful, False otherwise.
+        """
+        return False
 
     def is_factored(self):
         """
@@ -944,7 +970,7 @@ class ChomskyGrammar():
 
         return False
 
-    def first_non_terminal(self):
+    def first_non_terminals(self):
         """
             Calculates the start production symbols non terminal's FIRST set.
         """
@@ -990,7 +1016,7 @@ class ChomskyGrammar():
 
         return first
 
-    def first(self):
+    def first_terminals(self):
         """
             Calculate this grammar terminal's FIRST's set for each non terminal.
 
@@ -999,7 +1025,7 @@ class ChomskyGrammar():
 
             @return a dictionary with the first for each non terminal start symbol
         """
-        first = {}
+        first_terminals = {}
         production_keys = self.productions.keys()
 
         old_counter = -1
@@ -1007,7 +1033,7 @@ class ChomskyGrammar():
 
         # Create the initial FIRST's sets
         for symbol in production_keys:
-            first[symbol] = set()
+            first_terminals[symbol] = set()
 
         while old_counter != current_counter:
             old_counter = current_counter
@@ -1024,39 +1050,39 @@ class ChomskyGrammar():
                         # If there is a production X → ε then add ε to first(X)
                         if type( symbol ) is Terminal:
 
-                            if symbol not in first[start_symbol]:
-                                first[start_symbol].add( symbol )
+                            if symbol not in first_terminals[start_symbol]:
+                                first_terminals[start_symbol].add( symbol )
                                 current_counter += 1
                             break
 
                         if type( symbol ) is NonTerminal:
 
-                            if Production.copy_productions_except_epsilon( first[symbol], first[start_symbol] ):
+                            if Production.copy_productions_except_epsilon( first_terminals[symbol], first_terminals[start_symbol] ):
                                 current_counter += 1
 
-                            # log( 1, "symbol: %s, production: %-6s, first: %s", symbol, production, first[symbol] )
-                            if epsilon_production in first[symbol]:
+                            # log( 1, "symbol: %s, production: %-6s, first: %s", symbol, production, first_terminals[symbol] )
+                            if epsilon_production in first_terminals[symbol]:
 
                                 # If First(Y1) First(Y2)..First(Yk) all contain ε, then add ε to First(Y1Y2..Yk) as well
                                 if production.is_last( symbol ):
 
-                                    if epsilon_production not in first[start_symbol]:
-                                        first[start_symbol].add( epsilon_production )
+                                    if epsilon_production not in first_terminals[start_symbol]:
+                                        first_terminals[start_symbol].add( epsilon_production )
                                         current_counter += 1
 
                             else:
                                 break
 
-        return first
+        return first_terminals
 
-    def get_first_from(self, symbols, first=None ):
+    def get_first_from(self, symbols, first_terminals=None ):
         """
             Given a list of `symbols` get their FIRST symbols set.
         """
         following_first = set()
 
-        if not first:
-            first = self.first()
+        if not first_terminals:
+            first_terminals = self.first_terminals()
 
         for symbol in symbols:
 
@@ -1065,32 +1091,32 @@ class ChomskyGrammar():
                 break
 
             if type( symbol ) is NonTerminal:
-                following_first.update( first[symbol] )
+                following_first.update( first_terminals[symbol] )
                 break
 
         return following_first
 
-    def follow(self, first=None):
+    def follow_terminals(self, first_terminals=None):
         """
             Calculate this grammar FOLLOW's set for each non terminal.
 
-            @return a dictionary with the first for each non terminal start symbol
+            @return a dictionary with the follow for each non terminal start symbol
         """
-        follow = {}
+        follow_terminals = {}
         production_keys = self.productions.keys()
 
         old_counter = -1
         current_counter = 0
 
-        if not first:
-            first = self.first()
+        if not first_terminals:
+            first_terminals = self.first_terminals()
 
         # Create the initial FOLLOW's sets
         for symbol in production_keys:
-            follow[symbol] = set()
+            follow_terminals[symbol] = set()
 
         # First put $ (the end of input marker) in Follow(S) (S is the start symbol)
-        follow[self.initial_symbol].add( end_of_string_terminal )
+        follow_terminals[self.initial_symbol].add( end_of_string_terminal )
 
         while old_counter != current_counter:
             old_counter = current_counter
@@ -1108,23 +1134,23 @@ class ChomskyGrammar():
                             next_symbol = production.peek_next()
 
                             if next_symbol:
-                                following_first = self.get_first_from( production.following_symbols(), first )
+                                following_first = self.get_first_from( production.following_symbols(), first_terminals )
 
-                                if Production.copy_productions_except_epsilon( following_first, follow[current_symbol] ):
+                                if Production.copy_productions_except_epsilon( following_first, follow_terminals[current_symbol] ):
                                     # log( 1, "1. start_symbol: %s, current_symbol: %s, next_symbol: %-4s, Adding: %s", start_symbol, current_symbol, next_symbol, following_first )
                                     current_counter += 1
 
                                 if epsilon_production in following_first:
 
-                                    if Production.copy_productions_except_epsilon( follow[start_symbol], follow[current_symbol] ):
-                                        # log( 1, "2. start_symbol: %s, current_symbol: %s, next_symbol: %-4s, Adding: %s", start_symbol, current_symbol, next_symbol, follow[start_symbol] )
+                                    if Production.copy_productions_except_epsilon( follow_terminals[start_symbol], follow_terminals[current_symbol] ):
+                                        # log( 1, "2. start_symbol: %s, current_symbol: %s, next_symbol: %-4s, Adding: %s", start_symbol, current_symbol, next_symbol, follow_terminals[start_symbol] )
                                         current_counter += 1
 
                             else:
 
-                                if Production.copy_productions_except_epsilon( follow[start_symbol], follow[current_symbol] ):
-                                    # log( 1, "3. start_symbol: %s, current_symbol: %s, next_symbol: %-4s, Adding: %s", start_symbol, current_symbol, next_symbol, follow[start_symbol] )
+                                if Production.copy_productions_except_epsilon( follow_terminals[start_symbol], follow_terminals[current_symbol] ):
+                                    # log( 1, "3. start_symbol: %s, current_symbol: %s, next_symbol: %-4s, Adding: %s", start_symbol, current_symbol, next_symbol, follow_terminals[start_symbol] )
                                     current_counter += 1
 
-        return follow
+        return follow_terminals
 

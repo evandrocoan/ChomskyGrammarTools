@@ -892,20 +892,19 @@ class TestGrammarFactoringAndRecursionSymbols(TestingUtilities):
             + B -> e | a S a | b B d
         """, firstGrammar )
 
-    # def test_grammarIsFactoredCalculationOfChapter5Example1First(self):
-    #     firstGrammar = ChomskyGrammar.load_from_text_lines( wrap_text(
-    #     """
-    #         S -> Ab | A Bc
-    #         A -> aA | &
-    #         B -> bB | Ad | &
-    #     """ ) )
+    def test_grammarIsFactoredCalculationOfChapter5Example1First(self):
+        firstGrammar = ChomskyGrammar.load_from_text_lines( wrap_text(
+        """
+            S -> Ab | A Bc
+            A -> aA | &
+            B -> bB | Ad | &
+        """ ) )
 
-    #     self.assertTextEqual(
-    #     """
-    #         not implemented yet
-    #     """, dictionary_to_string( firstGrammar.factors() ) )
+        self.assertTextEqual(
+        """
+        """, convert_to_text_lines( firstGrammar.factors() ) )
 
-    #     self.assertFalse( firstGrammar.is_factored() )
+        self.assertFalse( firstGrammar.is_factored() )
 
 
 class TestGrammarTreeParsing(TestingUtilities):
@@ -1436,14 +1435,14 @@ class TestGrammarFirstAndFollow(TestingUtilities):
             A -> aA | &
             B -> bB | Ad | &
         """ ) )
-        first_non_terminal = firstGrammar.first_non_terminal()
+        first_non_terminals = firstGrammar.first_non_terminals()
 
         self.assertTextEqual(
         """
             + S: A B
             + A:
             + B: A
-        """, dictionary_to_string( first_non_terminal ) )
+        """, dictionary_to_string( first_non_terminals ) )
 
     def test_grammarFirstCalculationOfChapter5Example1First(self):
         firstGrammar = ChomskyGrammar.load_from_text_lines( wrap_text(
@@ -1452,7 +1451,7 @@ class TestGrammarFirstAndFollow(TestingUtilities):
             A -> aA | &
             B -> bB | Ad | &
         """ ) )
-        first = firstGrammar.first()
+        first = firstGrammar.first_terminals()
 
         self.assertTextEqual(
         """
@@ -1468,7 +1467,7 @@ class TestGrammarFirstAndFollow(TestingUtilities):
             A -> aA | &
             B -> bB | Ad | &
         """ ) )
-        follow = firstGrammar.follow()
+        follow = firstGrammar.follow_terminals()
 
         self.assertTextEqual(
         """
@@ -1485,7 +1484,7 @@ class TestGrammarFirstAndFollow(TestingUtilities):
             B -> bB | A Cd
             C -> cC | &
         """ ) )
-        first_non_terminal = firstGrammar.first_non_terminal()
+        first_non_terminals = firstGrammar.first_non_terminals()
 
         self.assertTextEqual(
         """
@@ -1493,7 +1492,7 @@ class TestGrammarFirstAndFollow(TestingUtilities):
             + A:
             + B: A C
             + C:
-        """, dictionary_to_string( first_non_terminal ) )
+        """, dictionary_to_string( first_non_terminals ) )
 
     def test_grammarFirstCalculationOfChapter5Example1Follow(self):
         firstGrammar = ChomskyGrammar.load_from_text_lines( wrap_text(
@@ -1503,7 +1502,7 @@ class TestGrammarFirstAndFollow(TestingUtilities):
             B -> bB | A Cd
             C -> cC | &
         """ ) )
-        first = firstGrammar.first()
+        first = firstGrammar.first_terminals()
 
         self.assertTextEqual(
         """
@@ -1521,7 +1520,7 @@ class TestGrammarFirstAndFollow(TestingUtilities):
             B -> bB | A Cd
             C -> cC | &
         """ ) )
-        follow = firstGrammar.follow()
+        follow = firstGrammar.follow_terminals()
 
         self.assertTextEqual(
         """
@@ -1540,7 +1539,7 @@ class TestGrammarFirstAndFollow(TestingUtilities):
             T' -> * F T' | &
             F  -> ( E ) | id
         """ ) )
-        first = firstGrammar.first()
+        first = firstGrammar.first_terminals()
 
         self.assertTextEqual(
         """
@@ -1560,7 +1559,7 @@ class TestGrammarFirstAndFollow(TestingUtilities):
             T' -> * F T' | &
             F  -> ( E ) | id
         """ ) )
-        first_non_terminal = firstGrammar.first_non_terminal()
+        first_non_terminals = firstGrammar.first_non_terminals()
 
         self.assertTextEqual(
         """
@@ -1569,7 +1568,7 @@ class TestGrammarFirstAndFollow(TestingUtilities):
             +  T: F
             + T':
             +  F:
-        """, dictionary_to_string( first_non_terminal ) )
+        """, dictionary_to_string( first_non_terminals ) )
 
     def test_grammarFollowCalculationOfChapter5FollowExample2(self):
         firstGrammar = ChomskyGrammar.load_from_text_lines( wrap_text(
@@ -1580,7 +1579,7 @@ class TestGrammarFirstAndFollow(TestingUtilities):
             T' -> * F T' | &
             F  -> ( E ) | id
         """ ) )
-        follow = firstGrammar.follow()
+        follow = firstGrammar.follow_terminals()
 
         self.assertTextEqual(
         """
@@ -1601,7 +1600,7 @@ class TestGrammarFirstAndFollow(TestingUtilities):
             E -> eE | &
             F -> F S | fF | g
         """ ) )
-        first = firstGrammar.first()
+        first = firstGrammar.first_terminals()
 
         self.assertTextEqual(
         """
@@ -1623,7 +1622,7 @@ class TestGrammarFirstAndFollow(TestingUtilities):
             E -> eE | &
             F -> F S | fF | g
         """ ) )
-        first_non_terminal = firstGrammar.first_non_terminal()
+        first_non_terminals = firstGrammar.first_non_terminals()
 
         self.assertTextEqual(
         """
@@ -1633,7 +1632,7 @@ class TestGrammarFirstAndFollow(TestingUtilities):
             + D: C E
             + E:
             + F: F
-        """, dictionary_to_string( first_non_terminal ) )
+        """, dictionary_to_string( first_non_terminals ) )
 
     def test_grammarFollowCalculationOfChapter5FollowExample3(self):
         firstGrammar = ChomskyGrammar.load_from_text_lines( wrap_text(
@@ -1645,7 +1644,7 @@ class TestGrammarFirstAndFollow(TestingUtilities):
             E -> eE | &
             F -> F S | fF | g
         """ ) )
-        follow = firstGrammar.follow()
+        follow = firstGrammar.follow_terminals()
 
         self.assertTextEqual(
         """
@@ -1666,7 +1665,7 @@ class TestGrammarFirstAndFollow(TestingUtilities):
             C -> c C | &
         """ ) )
         # sys.setrecursionlimit( 2000 )
-        first = firstGrammar.first()
+        first = firstGrammar.first_terminals()
 
         self.assertTextEqual(
         """
@@ -1685,7 +1684,7 @@ class TestGrammarFirstAndFollow(TestingUtilities):
             C -> c C | &
         """ ) )
         # sys.setrecursionlimit( 2000 )
-        first_non_terminal = firstGrammar.first_non_terminal()
+        first_non_terminals = firstGrammar.first_non_terminals()
 
         self.assertTextEqual(
         """
@@ -1693,7 +1692,7 @@ class TestGrammarFirstAndFollow(TestingUtilities):
             + A: A B C
             + B: A B C
             + C:
-        """, dictionary_to_string( first_non_terminal ) )
+        """, dictionary_to_string( first_non_terminals ) )
 
     def test_grammarFollowCalculationOfChapter5FollowExample4(self):
         firstGrammar = ChomskyGrammar.load_from_text_lines( wrap_text(
@@ -1704,7 +1703,7 @@ class TestGrammarFirstAndFollow(TestingUtilities):
             C -> c C | &
         """ ) )
         # sys.setrecursionlimit( 2000 )
-        follow = firstGrammar.follow()
+        follow = firstGrammar.follow_terminals()
 
         self.assertTextEqual(
         """
