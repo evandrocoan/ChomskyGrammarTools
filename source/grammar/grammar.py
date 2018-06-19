@@ -620,8 +620,8 @@ class ChomskyGrammar():
                         if outter_production[0] == inner_start_symbol:
 
                             for inner_production in inner_productions:
-                                new_production = outter_production.replace( 0, inner_production )
                                 remove_outter_production = True
+                                new_production = outter_production.replace( 0, inner_production )
                                 self.add_production( outter_start_symbol, new_production )
 
                     if remove_outter_production:
@@ -663,25 +663,29 @@ class ChomskyGrammar():
 
     def factors(self):
         """
-            Returns a dictionary with this grammar nondeterministic factors set for each non
-            deterministic non terminal start symbol.
+            Returns a list with tuple on the format (NonTerminal, Terminal) representing this
+            grammar nondeterministic factors for each non deterministic non terminal start symbol.
+
+            If the list contains duplicated entries, it means this grammar is non factored, i.e.,
+            non deterministic.
         """
-        log( 1, "self: \n%s", self )
+        # log( 1, "self: \n%s", self )
         self.remove_indirect_factors()
 
-        factors = set()
+        factors = []
         production_keys = self.productions.keys()
 
         for start_symbol in production_keys:
             productions = self.productions[start_symbol]
 
             for production in productions:
+                first_symbol = production[0]
 
-                if is_direct:
-                    factors.add( ( first, 'direct' ) )
+                if type( first_symbol ) is Terminal:
+                    factors.append( ( start_symbol, first_symbol ) )
 
                 else:
-                    factors.add( ( first, 'indirect' ) )
+                    raise RuntimeError( "The program cold not remove all indirect factors or left recursions! \n%s" % self )
 
         return factors
 
@@ -689,28 +693,31 @@ class ChomskyGrammar():
         """
             Converts all indirect factors from this grammar to direct factors.
         """
-        recursive_terminals = DynamicIterationSet([non_terminal_to_check])
+        old_counter = -1
+        current_counter = 0
+        production_keys = self.productions.keys()
 
-        for non_terminal in recursive_terminals:
-            productions = self.productions[non_terminal]
+        while old_counter != current_counter:
+            old_counter = current_counter
 
-            for production in productions:
-                # log( 1, "production: %s", production )
+            for start_symbol in production_keys:
+                start_productions = set( self.productions[start_symbol] )
 
-                for symbol in production:
-                    # log( 1, "symbol: %s", symbol )
+                for start_production in start_productions:
+                    first_symbol = start_production[0]
 
-                    if type( symbol ) is NonTerminal:
+                    if type( first_symbol ) is NonTerminal:
+                        remove_production = False
+                        first_symbol_productions = self.productions[first_symbol]
 
-                        if symbol == non_terminal_to_check:
-                            # log( 1, "recursive_terminals: %s", recursive_terminals )
-                            return True
+                        for first_symbol_production in first_symbol_productions:
+                            remove_production = True
+                            new_production = start_production.replace( 0, first_symbol_production )
+                            self.add_production( start_symbol, new_production )
 
-                        if symbol not in recursive_terminals:
-                            recursive_terminals.add( symbol )
-
-        # log( 1, "recursive_terminals: %s", recursive_terminals )
-        return False
+                        if remove_production:
+                            current_counter += 1
+                            self.remove_production_from_non_terminal( start_symbol, start_production )
 
     def factor_it(self, maximum_steps=10):
         """
@@ -722,8 +729,12 @@ class ChomskyGrammar():
     def is_factored(self):
         """
             Determines whether this grammar is factored, i.e., deterministic or nondeterministic.
+
+            How do I check if there are duplicates in a flat list?
+            https://stackoverflow.com/questions/1541797/how-do-i-check-if-there-are-duplicates-in-a-flat-list
         """
-        return not self.has_left_recursion() and not self.factors()
+        factors = self.factors()
+        return not self.has_left_recursion() and len( factors ) == len( set( factors ) )
 
     def fertile(self):
         """

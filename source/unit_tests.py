@@ -942,6 +942,19 @@ class TestGrammarFactoringAndRecursionSymbols(TestingUtilities):
 
         self.assertTextEqual(
         """
+            + (A, a)
+            + (B, a)
+            + (B, b)
+            + (B, d)
+            + (S, a)
+            + (S, a)
+            + (S, a)
+            + (S, b)
+            + (S, b)
+            + (S, c)
+            + (S, dc)
+            + (A, &)
+            + (B, &)
         """, convert_to_text_lines( firstGrammar.factors() ) )
 
         self.assertFalse( firstGrammar.is_factored() )
