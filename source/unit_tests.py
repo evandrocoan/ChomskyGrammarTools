@@ -1,15 +1,16 @@
 #! /usr/bin/env python
 # -*- coding: utf-8 -*-
 
+import os
 import sys
 import lark
-
 import unittest
+
 from natsort import natsorted
 from collections import OrderedDict
+from debug_tools import getLogger
 
 from grammar.grammar import ChomskyGrammar
-
 from grammar.utilities import wrap_text
 from grammar.utilities import getCleanSpaces
 from grammar.utilities import dictionary_to_string
@@ -22,10 +23,13 @@ from grammar.symbols import NonTerminal
 from grammar.production import Production
 from grammar.production import epsilon_production
 from grammar.production import epsilon_terminal
+
 from grammar.lockable_type import LockableType
 from grammar.tree_transformer import ChomskyGrammarTreeTransformer
-
 from grammar.testing_utilities import TestingUtilities
+
+log = getLogger( 127, os.path.basename( os.path.dirname( os.path.abspath ( __file__ ) ) ) )
+log( 1, "Importing " + __name__ )
 
 
 class TestChomskyGrammar(TestingUtilities):
@@ -830,7 +834,7 @@ class TestGrammarFactoringAndRecursionSymbols(TestingUtilities):
         self.assertTextEqual(
         """
             + S -> a A a | b S b
-            + A -> d | a A ac | b S bc
+            + A -> d | S c
         """, firstGrammar )
 
     def test_grammarHasLeftRecursionCalculationOfChapter5Item6Example2(self):
@@ -849,6 +853,26 @@ class TestGrammarFactoringAndRecursionSymbols(TestingUtilities):
         """, convert_to_text_lines( firstGrammar.left_recursion() ) )
 
         self.assertTrue( firstGrammar.has_left_recursion() )
+
+    def test_grammarEliminateLeftRecursionCalculationOfChapter5Item6Example2(self):
+        firstGrammar = ChomskyGrammar.load_from_text_lines( wrap_text(
+        """
+            S -> aS | Ab
+            A -> Ab | Bc | a
+            B -> Bd | Sa | e
+        """ ) )
+        firstGrammar.eliminate_left_recursion()
+
+        self.assertTextEqual(
+        """
+            +  S -> A b | a S
+            +  A -> a A' | B c A'
+            + A' -> & | b A'
+            +  B -> e B' | a S a B' | a A' ba B'
+            + B' -> & | d B' | c A' ba B'
+        """, firstGrammar )
+
+        self.assertFalse( firstGrammar.has_left_recursion() )
 
     def test_grammarHasLeftRecursionCalculationOfChapter5Item6Example2Mutated(self):
         firstGrammar = ChomskyGrammar.load_from_text_lines( wrap_text(

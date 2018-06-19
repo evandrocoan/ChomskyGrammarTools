@@ -23,7 +23,8 @@ from .utilities import sort_alphabetically_and_by_length
 from .tree_transformer import ChomskyGrammarTreeTransformer
 
 # level 4 - Abstract Syntax Tree Parsing
-log = getLogger( 127-4, __name__ )
+# level 8 - Log addition and removal of productions
+log = getLogger( 127-4-8, __name__ )
 log( 1, "Importing " + __name__ )
 
 
@@ -245,7 +246,7 @@ class ChomskyGrammar():
         if start_symbol not in self.productions:
             self.productions[start_symbol] = set()
 
-        # log( 1, "Adding production: %s -> %s", start_symbol, production )
+        log( 8, "%s -> %s", start_symbol, production )
         self.productions[start_symbol].add( production )
 
     def has_production(self, start_symbol, production):
@@ -448,6 +449,7 @@ class ChomskyGrammar():
             If was the last production, then the `start_symbol` symbol is also removed from the
             grammar `productions` and everywhere it is mentioned.
         """
+        log( 8, "%s -> %s", start_symbol, production )
         self.productions[start_symbol].discard( production )
 
         if not self.productions[start_symbol]:
@@ -533,8 +535,6 @@ class ChomskyGrammar():
             grammar recursive non terminal and `recursion_type` the type of the recursion which
             can be 'direct' or 'indirect'.
         """
-        self.convert_to_proper()
-
         left_recursion = set()
         first_non_terminal = self.first_non_terminal()
 
@@ -557,28 +557,46 @@ class ChomskyGrammar():
 
         return left_recursion
 
+    def has_left_recursion(self):
+        """
+            Determines whether this grammar has left recursion on any of its start non terminal's
+            symbols.
+        """
+        return bool( self.left_recursion() )
+
     def eliminate_left_recursion(self):
         """
             Eliminates direct or indirect left recursion from this grammar.
         """
-        self.convert_to_proper()
         # log( 1, "self: \n%s", self )
 
+        if self.has_left_recursion():
+            self.convert_to_proper()
+
+        else:
+            return
+
         production_keys = list( self.productions.keys() )
-        non_terminals_count = len( self.productions )
+        non_terminals_count = len( production_keys )
 
         for maximum_index in range( 0, non_terminals_count ):
             outter_start_symbol = production_keys[maximum_index]
             outter_productions = set( self.productions[outter_start_symbol] )
-            # log( 1, "outter_start_symbol: %s", outter_start_symbol )
-            # log( 1, "outter_productions: %s", outter_productions )
+            # log( 1, "1. outter_start_symbol: %s", outter_start_symbol )
+            # log( 1, "1. outter_productions: %s", outter_productions )
 
             # Eliminate indirect left recursion
             for index in range( 0, maximum_index ):
                 inner_start_symbol = production_keys[index]
                 inner_productions = set( self.productions[inner_start_symbol] )
+                outter_productions = set( self.productions[outter_start_symbol] )
+                # log( 1, "1.2 inner_start_symbol: %s", inner_start_symbol )
+                # log( 1, "1.2 inner_productions: %s", inner_productions )
+                # log( 1, "1.2 outter_productions: %s", outter_productions )
 
                 for outter_production in outter_productions:
+                    # log( 1, "1.2.3 outter_production: %s", outter_production )
+                    remove_outter_production = False
 
                     if type( outter_production[0] ) is NonTerminal:
 
@@ -586,14 +604,19 @@ class ChomskyGrammar():
 
                             for inner_production in inner_productions:
                                 new_production = outter_production.replace( 0, inner_production )
+                                remove_outter_production = True
                                 self.add_production( outter_start_symbol, new_production )
-                                self.remove_production_from_non_terminal( outter_start_symbol, outter_production )
+
+                    if remove_outter_production:
+                        self.remove_production_from_non_terminal( outter_start_symbol, outter_production )
 
             # Eliminate direct left recursion
             outter_productions = set( self.productions[outter_start_symbol] )
             new_outter_start_symbol = self.get_new_symbol( outter_start_symbol )
             outter_productions_recursive = set()
 
+            # log( 1, "2. new_outter_start_symbol: %s", new_outter_start_symbol )
+            # log( 1, "2. outter_productions: %s", outter_productions )
             for outter_production in outter_productions:
 
                 if type( outter_production[0] ) is NonTerminal:
@@ -601,8 +624,7 @@ class ChomskyGrammar():
                     if outter_production[0] == outter_start_symbol:
                         outter_productions_recursive.add( outter_production )
 
-            # log( 1, "outter_productions: %s", outter_productions )
-            # log( 1, "outter_productions_recursive: %s", outter_productions_recursive )
+            # log( 1, "2. outter_productions_recursive: %s", outter_productions_recursive )
             if outter_productions_recursive:
 
                 for outter_production in outter_productions:
@@ -621,13 +643,6 @@ class ChomskyGrammar():
                     self.remove_production_from_non_terminal( outter_start_symbol, outter_production )
 
                 self.add_production( new_outter_start_symbol, epsilon_production.new() )
-
-    def has_left_recursion(self):
-        """
-            Determines whether this grammar has left recursion on any of its start non terminal's
-            symbols.
-        """
-        return bool( self.left_recursion() )
 
     def factors(self):
         """
@@ -882,7 +897,9 @@ class ChomskyGrammar():
             2. Call `eliminate_simple_non_terminals()` because it can create unuseful (infertile and unreachable) symbols.
             3. Call `eliminate_unuseful()` to finally clear the grammar.
         """
-        self.convert_to_epsilon_free()
+
+        if not self.is_epsilon_free():
+            self.convert_to_epsilon_free()
 
         if self.has_simple_cycle():
             self.eliminate_simple_non_terminals()
