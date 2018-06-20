@@ -990,6 +990,37 @@ class TestGrammarFactoringAndRecursionSymbols(TestingUtilities):
         """, convert_to_text_lines( get_duplicated_elements( firstGrammar.factors() ) ) )
 
         self.assertFalse( factor_it )
+        self.assertFalse( firstGrammar.is_factored() )
+
+    def test_grammarFactoringOfList3Exercice7ItemA(self):
+        firstGrammar = ChomskyGrammar.load_from_text_lines( wrap_text(
+        """
+            P -> D L | &
+            C -> V=exp | id (E)
+            D -> d D | &
+            E -> exp, E | exp
+            L -> L; C | C
+            V -> id[E] | id
+        """ ) )
+
+        self.assertTextEqual(
+        """
+            + P -> & | D L
+            + C -> V =exp | id( E )
+            + D -> & | d D
+            + E -> exp | exp, E
+            + L -> C | L ; C
+            + V -> id | id[ E ]
+        """, firstGrammar )
+        factor_it = firstGrammar.factor_it()
+
+        self.assertTextEqual(
+        """
+        """, firstGrammar )
+
+        self.assertTrue( factor_it )
+        self.assertTrue( firstGrammar.is_factored() )
+        self.assertTextEqual( "", convert_to_text_lines( get_duplicated_elements( firstGrammar.factors() ) ) )
 
 
 class TestGrammarTreeParsing(TestingUtilities):

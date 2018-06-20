@@ -50,16 +50,31 @@ class ChomskyGrammar():
         // Forces them to appear in the tree as branches
         epsilon         : [] | "&"+
         end_symbol      : ";"* space* new_line ( new_line | space )*
-        terminal        : ( DIGIT | LCASE_LETTER | dash_phi_hyphen | star | plus | open_paren | close_paren )+
+        terminal        : ( DIGIT | LCASE_LETTER | signs | parens )+
         non_terminal    : UCASE_LETTER+ ( UCASE_LETTER | DIGIT | quote )*
         new_line        : NEWLINE
         quote           : "'"
-        dash_phi_hyphen : "-"
         space           : " "
-        star            : "*"
-        plus            : "+"
-        open_paren      : "("
-        close_paren     : ")"
+
+        // Tells the tree-builder to inline this branch if it has only one member
+        ?signs    : minus |  plus | star | comma | colon | equals | semicolon | slash | backslash
+        semicolon : ";"
+        comma     : ","
+        colon     : "."
+        equals    : "="
+        minus     : "-"
+        star      : "*"
+        plus      : "+"
+        slash     : "/"
+        backslash : "\\"
+
+        ?parens       : open_paren | close_paren | open_bracket | close_bracket | open_brace | close_brace
+        open_bracket  : "["
+        close_bracket : "]"
+        open_brace    : "{"
+        close_brace   : "}"
+        open_paren    : "("
+        close_paren   : ")"
 
         // Rename the start symbol, so when parsing the tree it is simple to find it
         non_terminal_start : non_terminal
