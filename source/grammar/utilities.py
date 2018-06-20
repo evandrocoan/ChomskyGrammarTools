@@ -30,6 +30,31 @@ def get_unique_hash():
     return initial_hash
 
 
+def get_duplicated_elements(elements_list):
+    """
+        Given an `elements_list` with duplicated elements, return a set only with the duplicated
+        elements in the list. If there are not duplicated elements, an empty set is returned.
+
+        How do I find the duplicates in a list and create another list with them?
+        https://stackoverflow.com/questions/9835762/how-do-i-find-the-duplicates-in-a-list-and-create-another-list-with-them
+    """
+    visited_elements = set()
+    visited_and_duplicated = set()
+
+    add_item_to_visited_elements = visited_elements.add
+    add_item_to_visited_and_duplicated = visited_and_duplicated.add
+
+    for item in elements_list:
+
+        if item in visited_elements:
+            add_item_to_visited_and_duplicated(item)
+
+        else:
+            add_item_to_visited_elements(item)
+
+    return visited_and_duplicated
+
+
 def trimMessage(message):
     """
         Cuts a message maximum width and length and add an ellipsis (...) when it exceeds 30 lines
@@ -143,13 +168,18 @@ def dictionary_to_string(dictionary):
     return "\n".join( strings )
 
 
-def convert_to_text_lines(iterable, use_repr=True, new_line=True):
+def convert_to_text_lines(iterable, use_repr=True, new_line=True, sort=None):
     """
         Given a dictionary with a list for each string key, call `sort_dictionary_lists()` and
         return a string representation by line of its entries.
     """
     strings = []
-    iterable = sort_correctly( iterable )
+
+    if sort:
+        iterable = sort( iterable )
+
+    else:
+        iterable = sort_alphabetically_and_by_length( iterable )
 
     for item in iterable:
         strings.append( "{}".format( repr( item ) ) )

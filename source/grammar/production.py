@@ -195,18 +195,37 @@ class Production(LockableType):
         self.lock()
         # log( 1, "self: \n%s", self )
 
+    def remove_everything(self, index):
+        """
+            Given an index starting from 0, removes all the symbols after it.
+        """
+        self.trim_epsilons()
+        self.symbols = self.symbols[:index+1]
+
+    def remove_terminal(self, index):
+        """
+            Given an index starting from 0, removes the nth terminal's.
+        """
+        self._remove_nth_symbol( index, Terminal )
+
     def remove_non_terminal(self, index):
         """
             Given an index starting from 0, removes the nth non terminal's.
         """
-        terminal_index = -1
+        self._remove_nth_symbol( index, NonTerminal )
+
+    def _remove_nth_symbol(self, index, symbol_type):
+        """
+            Given an index starting from 0, removes the nth symbol with type `symbol_type`.
+        """
+        symbol_index = -1
 
         for symbol in self.symbols:
 
-            if type( symbol ) is NonTerminal:
-                terminal_index += 1
+            if type( symbol ) is symbol_type:
+                symbol_index += 1
 
-                if terminal_index == index:
+                if symbol_index == index:
                     self.symbols[symbol.sequence - 1] = epsilon_terminal
                     break
 
@@ -378,12 +397,12 @@ class Production(LockableType):
         """
         return self._get_symbols( NonTerminal, index )
 
-    def _get_symbols(self, symbolType, index=-1):
+    def _get_symbols(self, symbol_type, index=-1):
         symbols = []
 
         for symbol in self.symbols:
 
-            if type( symbol ) is symbolType:
+            if type( symbol ) is symbol_type:
                 symbols.append( symbol )
 
         if index > -1:

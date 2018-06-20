@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*-
 
 import os
+import re
 
 from threading import Lock
 from debug_tools import getLogger
@@ -20,13 +21,14 @@ from .utilities import getCleanSpaces
 from .utilities import DynamicIterationSet
 from .utilities import dictionary_to_string
 from .utilities import convert_to_text_lines
+from .utilities import get_duplicated_elements
 from .utilities import sort_alphabetically_and_by_length
 
 from .tree_transformer import ChomskyGrammarTreeTransformer
 
 # level 4 - Abstract Syntax Tree Parsing
 # level 8 - Log addition and removal of productions
-log = getLogger( 127-4-8, __name__ )
+log = getLogger( 127-4-8-16, __name__ )
 log( 1, "Importing " + __name__ )
 
 
@@ -167,13 +169,26 @@ class ChomskyGrammar():
         """
             Set the initial symbol assuring it has the minimum requirements.
         """
+        self.assure_correct_start_symbol( value )
+        self._initial_symbol = value
 
-        if isinstance( value, Production ) and len( value ) == 1:
-            value.lock()
-            self._initial_symbol = value
+    def assure_correct_start_symbol(self, start_symbol):
+        """
+            Checks whether a given `start_symbol` has the required properties to be a valid start symbol.
 
-        else:
-            raise ValueError( "Error: The initial must be an Production with length 1! %s" % repr( value ) )
+            If it is an invalid start symbol Production, an RuntimeError will be threw.
+        """
+
+        if type( start_symbol ) is not Production:
+            raise RuntimeError( "Your start symbol is not an instance of Production! %s (%s)" % ( start_symbol, repr( start_symbol ) ) )
+
+        if len( start_symbol ) != 1:
+            raise ValueError( "The start symbol be a Production with length 1! %s (%s)" % ( start_symbol, repr( value ) ) )
+
+        if type( start_symbol[0] ) is not NonTerminal:
+            raise ValueError( "The start symbol production first symbol must be a NonTerminal! %s (%s)" % ( start_symbol, repr( value ) ) )
+
+        start_symbol.lock()
 
     def __len__(self):
         """
@@ -243,23 +258,17 @@ class ChomskyGrammar():
 
             The production object is a composition of several Terminal's and NonTerminal's symbols.
         """
-
-        if type( start_symbol ) is not Production:
-            raise RuntimeError( "Your start_symbol is not an instance of Production! %s, %s" % ( start_symbol, production ) )
+        self.assure_correct_start_symbol( start_symbol )
 
         if type( production ) is not Production:
-            raise RuntimeError( "Your production is not an instance of Production! %s, %s" % ( start_symbol, production ) )
-
-        if not len( start_symbol ):
-            raise RuntimeError( "Grammar start non terminal cannot be Epsilon! %s -> %s", start_symbol, production )
+            raise RuntimeError( "Your production is not an instance of Production! %s -> %s" % ( start_symbol, production ) )
 
         production.lock()
-        start_symbol.lock()
 
         if start_symbol not in self.productions:
             self.productions[start_symbol] = set()
 
-        log( 8, "%s -> %s", start_symbol, production )
+        log( 24, "   %s -> %s", start_symbol, production )
         self.productions[start_symbol].add( production )
 
     def has_production(self, start_symbol, production):
@@ -444,7 +453,7 @@ class ChomskyGrammar():
                     # log( 1, "combination: %s", combination )
                     self.add_production( start_symbol, combination )
 
-            self.remove_production_from_non_terminal( start_symbol, epsilon_production )
+            self.remove_production( start_symbol, epsilon_production )
 
         if self.initial_symbol in non_terminal_epsilon:
 
@@ -455,14 +464,14 @@ class ChomskyGrammar():
 
             self.add_production( self.initial_symbol, epsilon_production )
 
-    def remove_production_from_non_terminal(self, start_symbol, production):
+    def remove_production(self, start_symbol, production):
         """
             Given a `start_symbol` remove its `production`.
 
             If was the last production, then the `start_symbol` symbol is also removed from the
             grammar `productions` and everywhere it is mentioned.
         """
-        log( 8, "%s -> %s", start_symbol, production )
+        log( 24, "%s -> %s", start_symbol, production )
         self.productions[start_symbol].discard( production )
 
         if not self.productions[start_symbol]:
@@ -484,7 +493,7 @@ class ChomskyGrammar():
                 for symbol in production:
 
                     if symbol == start_non_terminal:
-                        self.remove_production_from_non_terminal( start_symbol, production )
+                        self.remove_production( start_symbol, production )
                         break
 
         del self.productions[start_non_terminal]
@@ -521,7 +530,7 @@ class ChomskyGrammar():
         for production in secondGrammarProductions:
             self.add_production( non_terminal_destine, production )
 
-    def get_new_symbol(self, new_symbol='S'):
+    def get_new_symbol(self, new_symbol='S', use_digits=False):
         """
             Given a `new_symbol` initial name, search for a new symbol name until find one in the
             form S'''... and returns it.
@@ -531,13 +540,37 @@ class ChomskyGrammar():
         if not new_symbol:
             raise RuntimeError( "The new_symbol `%s` has not length! (%s)\n%s" % ( new_symbol, repr( new_symbol ), self ) )
 
+        clean_symbol = new_symbol
         current_symbols = set()
 
         for non_terminal in self.productions.keys():
             current_symbols.add( str( non_terminal ) )
 
+        if use_digits:
+            current_counter = 0
+            search_result = re.findall( r'\d+', new_symbol )
+
+            if search_result:
+                current_counter = int( search_result[-1] )
+                search_result = re.findall( r'[^\d]+', new_symbol )
+
+                if search_result:
+                    clean_symbol = search_result[-1]
+
+            def push_next_symbol():
+                nonlocal current_counter
+                current_counter += 1
+
+        else:
+            current_counter = ""
+
+            def push_next_symbol():
+                nonlocal current_counter
+                current_counter += "'"
+
         while True:
-            new_symbol += "'"
+            push_next_symbol()
+            new_symbol = clean_symbol + str( current_counter )
 
             if new_symbol not in current_symbols:
                 return Production( symbols=[NonTerminal( new_symbol )], lock=True )
@@ -614,10 +647,11 @@ class ChomskyGrammar():
                 for outter_production in outter_productions:
                     # log( 1, "1.2.3 outter_production: %s", outter_production )
                     remove_outter_production = False
+                    outter_production_first_symbol = outter_production[0]
 
-                    if type( outter_production[0] ) is NonTerminal:
+                    if type( outter_production_first_symbol ) is NonTerminal:
 
-                        if outter_production[0] == inner_start_symbol:
+                        if outter_production_first_symbol == inner_start_symbol:
 
                             for inner_production in inner_productions:
                                 remove_outter_production = True
@@ -625,7 +659,7 @@ class ChomskyGrammar():
                                 self.add_production( outter_start_symbol, new_production )
 
                     if remove_outter_production:
-                        self.remove_production_from_non_terminal( outter_start_symbol, outter_production )
+                        self.remove_production( outter_start_symbol, outter_production )
 
             # Eliminate direct left recursion
             outter_productions = set( self.productions[outter_start_symbol] )
@@ -657,20 +691,21 @@ class ChomskyGrammar():
                         new_production.add( new_outter_start_symbol[0].new() )
                         self.add_production( outter_start_symbol, new_production )
 
-                    self.remove_production_from_non_terminal( outter_start_symbol, outter_production )
+                    self.remove_production( outter_start_symbol, outter_production )
 
                 self.add_production( new_outter_start_symbol, epsilon_production.new() )
 
     def factors(self):
         """
-            Returns a list with tuple on the format (NonTerminal, Terminal) representing this
-            grammar nondeterministic factors for each non deterministic non terminal start symbol.
+            Call `eliminate_indirect_factors()` then returns a list with tuple on the format
+            (NonTerminal, Terminal) representing this grammar nondeterministic factors for each non
+            deterministic non terminal start symbol.
 
             If the list contains duplicated entries, it means this grammar is non factored, i.e.,
             non deterministic.
         """
-        # log( 1, "self: \n%s", self )
-        self.remove_indirect_factors()
+        if self.has_indirect_factors():
+            self.eliminate_indirect_factors()
 
         factors = []
         production_keys = self.productions.keys()
@@ -689,19 +724,76 @@ class ChomskyGrammar():
 
         return factors
 
-    def remove_indirect_factors(self):
+    def has_duplicated_factors(self):
         """
-            Converts all indirect factors from this grammar to direct factors.
+            Call `factors()` and check whether there are duplicated entries in the factors list.
+
+            How do I check if there are duplicates in a flat list?
+            https://stackoverflow.com/questions/1541797/how-do-i-check-if-there-are-duplicates-in-a-flat-list
+        """
+        factors = self.factors()
+        factors_length = len( factors )
+        return factors_length and factors_length != len( set( factors ) )
+
+    def is_factored(self):
+        """
+            Determines whether this grammar is factored, i.e., deterministic or nondeterministic.
+        """
+        return not self.has_left_recursion() and not self.has_duplicated_factors()
+
+    def factor_it(self, maximum_steps=3):
+        """
+            Try to factor the this grammar in the `maximum_steps` given. Return True is the
+            factorization was successful, False otherwise.
+        """
+        log( 16, "self: \n%s", self )
+        current_step = 0
+
+        if self.has_left_recursion():
+            self.eliminate_left_recursion()
+
+        while True:
+            current_step += 1
+            is_factored = not self.has_duplicated_factors()
+
+            if is_factored:
+                return True
+
+            if current_step > maximum_steps:
+                return False
+
+            self.eliminate_direct_factors()
+
+    def has_indirect_factors(self):
+        """
+            Checks whether there are indirect factors on this grammar.
+        """
+        production_keys = self.productions.keys()
+
+        for start_symbol in production_keys:
+            start_productions = self.productions[start_symbol]
+
+            for start_production in start_productions:
+                first_symbol = start_production[0]
+
+                if type( first_symbol ) is NonTerminal:
+                    return True
+
+        return False
+
+    def eliminate_indirect_factors(self):
+        """
+            Converts all indirect factors on this grammar to direct factors.
         """
         old_counter = -1
         current_counter = 0
-        production_keys = self.productions.keys()
+        production_keys = self.initial_symbol_as_first()
 
         while old_counter != current_counter:
             old_counter = current_counter
 
             for start_symbol in production_keys:
-                start_productions = set( self.productions[start_symbol] )
+                start_productions = sorted( self.productions[start_symbol] )
 
                 for start_production in start_productions:
                     first_symbol = start_production[0]
@@ -717,24 +809,73 @@ class ChomskyGrammar():
 
                         if remove_production:
                             current_counter += 1
-                            self.remove_production_from_non_terminal( start_symbol, start_production )
+                            self.remove_production( start_symbol, start_production )
 
-    def factor_it(self, maximum_steps=10):
-        """
-            Try to factor the this grammar in the `maximum_steps` given. Return True is the
-            factorization was successful, False otherwise.
-        """
-        return False
+        log( 16, "self out: \n%s", self )
 
-    def is_factored(self):
+    def eliminate_direct_factors(self):
         """
-            Determines whether this grammar is factored, i.e., deterministic or nondeterministic.
+            Converts all direct factors on this grammar to deterministic factors.
+        """
+        production_keys = self.initial_symbol_as_first()
+        duplicated_factors_list = sorted( get_duplicated_elements( self.factors() ) )
+        duplicated_factors_dictionary = {}
 
-            How do I check if there are duplicates in a flat list?
-            https://stackoverflow.com/questions/1541797/how-do-i-check-if-there-are-duplicates-in-a-flat-list
-        """
-        factors = self.factors()
-        return not self.has_left_recursion() and len( factors ) == len( set( factors ) )
+        for factor_symbol, factor_terminal in duplicated_factors_list:
+
+            if factor_symbol not in duplicated_factors_dictionary:
+                duplicated_factors_dictionary[factor_symbol]  = []
+
+            duplicated_factors_dictionary[factor_symbol].append( factor_terminal )
+
+        for start_symbol in production_keys:
+            start_productions = sorted( self.productions[start_symbol] )
+            log( 16, "start_symbol: %s", start_symbol )
+            log( 16, "start_productions: %s", start_productions )
+
+            while True:
+
+                # Picks up a random nondeterministic symbol to factoring
+                if start_symbol in duplicated_factors_dictionary and duplicated_factors_dictionary[start_symbol]:
+                    start_symbol_non_deterministic_factor = duplicated_factors_dictionary[start_symbol].pop( 0 )
+
+                else:
+                    break
+
+                new_factor_start_symbol = self.get_new_symbol( start_symbol, True )
+                direct_factors_productions = []
+                log( 16, "start_symbol_non_deterministic_factor: %s", start_symbol_non_deterministic_factor )
+                log( 16, "new_factor_start_symbol: %s", new_factor_start_symbol )
+                log( 16, "start_productions: %s", start_productions )
+
+                for start_production in start_productions:
+                    start_production_first_symbol = start_production[0]
+
+                    if type( start_production_first_symbol ) is Terminal:
+
+                        if start_production_first_symbol == start_symbol_non_deterministic_factor:
+                            direct_factors_productions.append( start_production )
+
+                direct_factors_productions = sorted( direct_factors_productions )
+                log( 16, "direct_factors_productions: %s", direct_factors_productions )
+                if direct_factors_productions:
+
+                    for start_production in start_productions:
+
+                        if start_production in direct_factors_productions:
+                            last_factor = start_production
+                            new_factor_production = start_production.new()
+                            new_factor_production.remove_terminal( 0 )
+
+                            self.add_production( new_factor_start_symbol, new_factor_production )
+                            self.remove_production( start_symbol, start_production )
+
+                    new_start_production = last_factor.new()
+                    new_start_production.remove_everything( 0 )
+                    new_start_production.add( new_factor_start_symbol[0].new() )
+                    self.add_production( start_symbol, new_start_production )
+
+        log( 16, "self out: \n%s", self )
 
     def fertile(self):
         """
@@ -815,7 +956,7 @@ class ChomskyGrammar():
                             break
 
                 if not all_fertile:
-                    self.remove_production_from_non_terminal( start_symbol, production )
+                    self.remove_production( start_symbol, production )
 
     def reachable(self):
         """
@@ -867,7 +1008,7 @@ class ChomskyGrammar():
                         break
 
                 if not all_reachable:
-                    self.remove_production_from_non_terminal( start_symbol, production )
+                    self.remove_production( start_symbol, production )
 
     def eliminate_unuseful(self):
         """
@@ -967,7 +1108,7 @@ class ChomskyGrammar():
             for production in start_productions:
 
                 if production in simple_non_terminals:
-                    self.remove_production_from_non_terminal( start_symbol, production )
+                    self.remove_production( start_symbol, production )
 
     def convert_to_proper(self):
         """

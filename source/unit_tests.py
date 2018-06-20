@@ -13,8 +13,10 @@ from debug_tools import getLogger
 from grammar.grammar import ChomskyGrammar
 from grammar.utilities import wrap_text
 from grammar.utilities import getCleanSpaces
+from grammar.utilities import sort_correctly
 from grammar.utilities import dictionary_to_string
 from grammar.utilities import convert_to_text_lines
+from grammar.utilities import get_duplicated_elements
 from grammar.utilities import sort_alphabetically_and_by_length
 
 from grammar.symbols import Terminal
@@ -106,7 +108,7 @@ class TestChomskyGrammar(TestingUtilities):
             A -> aA | &
             B -> bB | Ad | &
         """ ) )
-        firstGrammar.remove_production_from_non_terminal( firstGrammar.initial_symbol, firstGrammar.initial_symbol )
+        firstGrammar.remove_production( firstGrammar.initial_symbol, firstGrammar.initial_symbol )
 
         self.assertTextEqual(
         """
@@ -530,7 +532,7 @@ class TestGrammarFertileSymbols(TestingUtilities):
             + NonTerminal locked: True, str: B, sequence: 2, len: 1;
             + NonTerminal locked: True, str: D, sequence: 2, len: 1;
             + NonTerminal locked: True, str: S, sequence: 1, len: 1;
-        """, convert_to_text_lines( reachable ) )
+        """, convert_to_text_lines( reachable, sort=sort_correctly ) )
 
     def test_grammarEliminateUneachableSymbolsChapter4Item1Example2(self):
         firstGrammar = ChomskyGrammar.load_from_text_lines( wrap_text(
@@ -799,7 +801,7 @@ class TestGrammarFactoringAndRecursionSymbols(TestingUtilities):
         """
             + (A, 'indirect')
             + (S, 'direct')
-        """, convert_to_text_lines( firstGrammar.left_recursion() ) )
+        """, convert_to_text_lines( firstGrammar.left_recursion(), sort=sort_correctly ) )
 
         self.assertTrue( firstGrammar.has_left_recursion() )
 
@@ -955,9 +957,39 @@ class TestGrammarFactoringAndRecursionSymbols(TestingUtilities):
             + (S, dc)
             + (A, &)
             + (B, &)
-        """, convert_to_text_lines( firstGrammar.factors() ) )
+        """, convert_to_text_lines( firstGrammar.factors(), sort=sort_correctly ) )
 
         self.assertFalse( firstGrammar.is_factored() )
+
+    def test_grammarFactoringOfChapter5Example1First(self):
+        firstGrammar = ChomskyGrammar.load_from_text_lines( wrap_text(
+        """
+            S -> Ab | A Bc
+            A -> aA | &
+            B -> bB | Ad | &
+        """ ) )
+        factor_it = firstGrammar.factor_it()
+
+        self.assertTextEqual(
+        """
+            +  S -> c | dc | a S1 | b S2
+            +  A -> & | a A
+            +  B -> & | d | b B | a A d
+            + S1 -> c | dc | a S3 | b S4
+            + S2 -> & | c | dc | b B c | a A dc
+            + S3 -> c | dc | a S5 | b S6
+            + S4 -> & | c | dc | b B c | a A dc
+            + S5 -> b | c | dc | a A b | b B c | a A dc | a A B c
+            + S6 -> & | c | dc | b B c | a A dc
+        """, firstGrammar )
+
+        self.assertTextEqual(
+        """
+            + (S5, a)
+            + (S5, b)
+        """, convert_to_text_lines( get_duplicated_elements( firstGrammar.factors() ) ) )
+
+        self.assertFalse( factor_it )
 
 
 class TestGrammarTreeParsing(TestingUtilities):

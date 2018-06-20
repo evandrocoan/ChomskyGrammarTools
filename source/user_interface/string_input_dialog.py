@@ -26,7 +26,7 @@ from PyQt5.QtWidgets import QPushButton
 from debug_tools import getLogger
 
 # Enable debug messages: ( bitwise )
-log = getLogger( 127, 'string_output_dialog' )
+log = getLogger( 127, __name__ )
 log( 1, "Importing " + __name__ )
 
 from grammar.utilities import wrap_text
