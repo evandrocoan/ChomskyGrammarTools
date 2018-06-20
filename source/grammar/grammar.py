@@ -781,7 +781,12 @@ class ChomskyGrammar():
                 first_symbol = production[0]
 
                 if type( first_symbol ) is Terminal:
-                    factors.append( ( start_symbol, first_symbol ) )
+                    accumulated_symbols = []
+
+                    for symbol in first_symbol.str:
+                        accumulated_symbols.append( symbol )
+                        factors.append( ( start_symbol, Terminal( "".join( accumulated_symbols ), lock=True ) ) )
+                        break
 
                 else:
                     raise RuntimeError( "The program cold not remove all indirect factors or left recursions! \n%s" % self )
@@ -805,7 +810,7 @@ class ChomskyGrammar():
         """
         return not self.has_left_recursion() and not self.has_duplicated_factors()
 
-    def factor_it(self, maximum_steps=3):
+    def factor_it(self, maximum_steps=5):
         """
             Try to factor the this grammar in the `maximum_steps` given. Return True is the
             factorization was successful, False otherwise.
@@ -848,6 +853,9 @@ class ChomskyGrammar():
             log( 16, "start_symbol: %s", start_symbol )
             log( 16, "start_productions: %s", start_productions )
 
+            if start_symbol in duplicated_factors_dictionary:
+                log( 16, "non_deterministic_factors: %s", duplicated_factors_dictionary[start_symbol] )
+
             while True:
 
                 # Picks up a random nondeterministic symbol to factoring
@@ -858,37 +866,41 @@ class ChomskyGrammar():
                     break
 
                 new_factor_start_symbol = self.get_new_symbol( start_symbol, True )
-                direct_factors_productions = []
+                direct_factors_productions = {}
                 log( 16, "start_symbol_non_deterministic_factor: %s", start_symbol_non_deterministic_factor )
                 log( 16, "new_factor_start_symbol: %s", new_factor_start_symbol )
-                log( 16, "start_productions: %s", start_productions )
 
                 for start_production in start_productions:
                     start_production_first_symbol = start_production[0]
 
                     if type( start_production_first_symbol ) is Terminal:
+                        common_terminal_symbols = Terminal.get_common_symbols(
+                                start_production_first_symbol, start_symbol_non_deterministic_factor )
 
-                        if start_production_first_symbol == start_symbol_non_deterministic_factor:
-                            direct_factors_productions.append( start_production )
+                        if common_terminal_symbols:
+                            direct_factors_productions[start_production] = common_terminal_symbols
 
                 direct_factors_productions = direct_factors_productions
                 log( 16, "direct_factors_productions: %s", direct_factors_productions )
+
                 if direct_factors_productions:
+                    has_added_first_production = False
 
                     for start_production in start_productions:
 
                         if start_production in direct_factors_productions:
-                            last_factor = start_production
+
+                            if not has_added_first_production:
+                                has_added_first_production = True
+                                new_start_production = Production(symbols=[direct_factors_productions[start_production].new()])
+                                new_start_production.add( new_factor_start_symbol[0].new() )
+                                self.add_production( start_symbol, new_start_production )
+
                             new_factor_production = start_production.new()
-                            new_factor_production.remove_terminal( 0 )
+                            new_factor_production.remove_terminal_prefix( direct_factors_productions[start_production] )
 
                             self.add_production( new_factor_start_symbol, new_factor_production )
                             self.remove_production( start_symbol, start_production )
-
-                    new_start_production = last_factor.new()
-                    new_start_production.remove_everything( 0 )
-                    new_start_production.add( new_factor_start_symbol[0].new() )
-                    self.add_production( start_symbol, new_start_production )
 
         log( 16, "self out: \n%s", self )
 

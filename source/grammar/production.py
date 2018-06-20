@@ -11,6 +11,9 @@ from debug_tools import getLogger
 from .symbols import Terminal
 from .symbols import NonTerminal
 
+from .symbols import epsilon_terminal
+from .symbols import end_of_string_terminal
+
 from .lockable_type import LockableType
 
 # level 4 - Abstract Syntax Tree Parsing
@@ -112,6 +115,12 @@ class Production(LockableType):
         """
         return self.symbols[key]
 
+    def  __setitem__(self, key, element):
+        """
+            Called by Python automatically when indexing a production as in object[index].
+        """
+        self.symbols[key] = element
+
     def __iter__(self):
         """
             Called by Python automatically when iterating over this set and python wants to start
@@ -194,6 +203,27 @@ class Production(LockableType):
         self.trim_epsilons()
         self.lock()
         # log( 1, "self: \n%s", self )
+
+    def remove_terminal_prefix(self, prefix_terminal):
+        """
+            Given a `prefix_terminal`, removes it from the string.
+        """
+        self.trim_epsilons()
+        first_terminal = self[0].new()
+        maximum_index = min( len( first_terminal.str ), len( prefix_terminal.str ) )
+        first_terminal_string = list( first_terminal.str )
+
+        for index in range( 0, maximum_index ):
+
+            if first_terminal.str[index] == prefix_terminal.str[index]:
+                first_terminal_string[index] = "&"
+
+            else:
+                break
+
+        first_terminal.str = "".join( first_terminal_string )
+        first_terminal.lock()
+        self[0] = first_terminal
 
     def remove_everything(self, index):
         """
@@ -447,8 +477,5 @@ class Production(LockableType):
 
 
 # Standard/common symbols used
-epsilon_terminal = Terminal( '&' )
 epsilon_production = Production( symbols=[epsilon_terminal], lock=True )
-
-end_of_string_terminal = Terminal( '$', lock=True )
 

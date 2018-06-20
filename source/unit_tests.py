@@ -954,7 +954,7 @@ class TestGrammarFactoringAndRecursionSymbols(TestingUtilities):
             + (S, b)
             + (S, b)
             + (S, c)
-            + (S, dc)
+            + (S, d)
             + (A, &)
             + (B, &)
         """, convert_to_text_lines( firstGrammar.factors(), sort=sort_correctly ) )
@@ -968,7 +968,7 @@ class TestGrammarFactoringAndRecursionSymbols(TestingUtilities):
             A -> aA | &
             B -> bB | Ad | &
         """ ) )
-        factor_it = firstGrammar.factor_it()
+        factor_it = firstGrammar.factor_it(3)
 
         self.assertTextEqual(
         """
@@ -1012,10 +1012,42 @@ class TestGrammarFactoringAndRecursionSymbols(TestingUtilities):
             + L -> C | L ; C
             + V -> id | id[ E ]
         """, firstGrammar )
-        factor_it = firstGrammar.factor_it()
+        firstGrammar.eliminate_left_recursion()
 
         self.assertTextEqual(
         """
+            +  P -> & | L | D L
+            +  C -> V =exp | id( E )
+            +  D -> d | d D
+            +  E -> exp | exp, E
+            +  L -> V =exp L' | id( E ) L'
+            +  V -> id | id[ E ]
+            + L' -> & | ; C L'
+        """, firstGrammar )
+        factor_it = firstGrammar.factor_it(5)
+
+        self.assertTextEqual(
+        """
+            +  P -> & | d P1 | i P2
+            +  C -> i C1
+            +  D -> d D1
+            +  E -> e E1
+            +  L -> i L1
+            +  V -> i V1
+            + C1 -> d C2
+            + C2 -> =exp | ( E ) | [ E ]=exp
+            + D1 -> & | d D1
+            + E1 -> x E2
+            + E2 -> p E3
+            + E3 -> & | , E
+            + L1 -> d L2
+            + L2 -> =exp L' | ( E ) L' | [ E ]=exp L'
+            + L' -> & | ; C L'
+            + P1 -> i L1 | d D1 L
+            + P2 -> d P3
+            + P3 -> =exp L' | ( E ) L' | [ E ]=exp L'
+            + V1 -> d V2
+            + V2 -> & | [ E ]
         """, firstGrammar )
 
         self.assertTrue( factor_it )
