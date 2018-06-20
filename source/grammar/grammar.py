@@ -787,13 +787,13 @@ class ChomskyGrammar():
         """
         old_counter = -1
         current_counter = 0
-        production_keys = self.initial_symbol_as_first()
+        production_keys = self.productions.keys()
 
         while old_counter != current_counter:
             old_counter = current_counter
 
             for start_symbol in production_keys:
-                start_productions = sorted( self.productions[start_symbol] )
+                start_productions = list( self.productions[start_symbol] )
 
                 for start_production in start_productions:
                     first_symbol = start_production[0]
@@ -817,7 +817,7 @@ class ChomskyGrammar():
         """
             Converts all direct factors on this grammar to deterministic factors.
         """
-        production_keys = self.initial_symbol_as_first()
+        production_keys = list( self.productions.keys() )
         duplicated_factors_list = sorted( get_duplicated_elements( self.factors() ) )
         duplicated_factors_dictionary = {}
 
@@ -829,7 +829,7 @@ class ChomskyGrammar():
             duplicated_factors_dictionary[factor_symbol].append( factor_terminal )
 
         for start_symbol in production_keys:
-            start_productions = sorted( self.productions[start_symbol] )
+            start_productions = list( self.productions[start_symbol] )
             log( 16, "start_symbol: %s", start_symbol )
             log( 16, "start_productions: %s", start_productions )
 
@@ -856,7 +856,7 @@ class ChomskyGrammar():
                         if start_production_first_symbol == start_symbol_non_deterministic_factor:
                             direct_factors_productions.append( start_production )
 
-                direct_factors_productions = sorted( direct_factors_productions )
+                direct_factors_productions = direct_factors_productions
                 log( 16, "direct_factors_productions: %s", direct_factors_productions )
                 if direct_factors_productions:
 
