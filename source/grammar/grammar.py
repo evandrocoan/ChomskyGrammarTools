@@ -710,6 +710,55 @@ class ChomskyGrammar():
 
                 self.add_production( new_outter_start_symbol, epsilon_production.new() )
 
+    def has_indirect_factors(self):
+        """
+            Checks whether there are indirect factors on this grammar.
+        """
+        production_keys = self.productions.keys()
+
+        for start_symbol in production_keys:
+            start_productions = self.productions[start_symbol]
+
+            for start_production in start_productions:
+                first_symbol = start_production[0]
+
+                if type( first_symbol ) is NonTerminal:
+                    return True
+
+        return False
+
+    def eliminate_indirect_factors(self):
+        """
+            Converts all indirect factors on this grammar to direct factors.
+        """
+        old_counter = -1
+        current_counter = 0
+        production_keys = self.productions.keys()
+
+        while old_counter != current_counter:
+            old_counter = current_counter
+
+            for start_symbol in production_keys:
+                start_productions = list( self.productions[start_symbol] )
+
+                for start_production in start_productions:
+                    first_symbol = start_production[0]
+
+                    if type( first_symbol ) is NonTerminal:
+                        remove_production = False
+                        first_symbol_productions = self.productions[first_symbol]
+
+                        for first_symbol_production in first_symbol_productions:
+                            remove_production = True
+                            new_production = start_production.replace( 0, first_symbol_production )
+                            self.add_production( start_symbol, new_production )
+
+                        if remove_production:
+                            current_counter += 1
+                            self.remove_production( start_symbol, start_production )
+
+        log( 16, "self out: \n%s", self )
+
     def factors(self):
         """
             Call `eliminate_indirect_factors()` then returns a list with tuple on the format
@@ -778,55 +827,6 @@ class ChomskyGrammar():
                 return False
 
             self.eliminate_direct_factors()
-
-    def has_indirect_factors(self):
-        """
-            Checks whether there are indirect factors on this grammar.
-        """
-        production_keys = self.productions.keys()
-
-        for start_symbol in production_keys:
-            start_productions = self.productions[start_symbol]
-
-            for start_production in start_productions:
-                first_symbol = start_production[0]
-
-                if type( first_symbol ) is NonTerminal:
-                    return True
-
-        return False
-
-    def eliminate_indirect_factors(self):
-        """
-            Converts all indirect factors on this grammar to direct factors.
-        """
-        old_counter = -1
-        current_counter = 0
-        production_keys = self.productions.keys()
-
-        while old_counter != current_counter:
-            old_counter = current_counter
-
-            for start_symbol in production_keys:
-                start_productions = list( self.productions[start_symbol] )
-
-                for start_production in start_productions:
-                    first_symbol = start_production[0]
-
-                    if type( first_symbol ) is NonTerminal:
-                        remove_production = False
-                        first_symbol_productions = self.productions[first_symbol]
-
-                        for first_symbol_production in first_symbol_productions:
-                            remove_production = True
-                            new_production = start_production.replace( 0, first_symbol_production )
-                            self.add_production( start_symbol, new_production )
-
-                        if remove_production:
-                            current_counter += 1
-                            self.remove_production( start_symbol, start_production )
-
-        log( 16, "self out: \n%s", self )
 
     def eliminate_direct_factors(self):
         """
