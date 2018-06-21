@@ -1082,7 +1082,7 @@ class TestGrammarFactoringAndRecursionSymbols(TestingUtilities):
 
         self.assertTrue( factor_it )
         self.assertTrue( firstGrammar.is_factored() )
-        self.assertTextEqual( "", convert_to_text_lines( get_duplicated_elements( firstGrammar.factors() ) ) )
+        self.assertTextEqual( " No elements found.", convert_to_text_lines( get_duplicated_elements( firstGrammar.factors() ) ) )
 
 
 class TestGrammarTreeParsing(TestingUtilities):

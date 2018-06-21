@@ -127,7 +127,7 @@ class ChomskyGrammar():
             log( 4, "productions:        %s", productions )
             log( 4, "productions_string: %s", productions_string )
 
-            return "{:>{biggest}} -> {}".format( str( start_symbol ),
+            return " {:>{biggest}} -> {}".format( str( start_symbol ),
                     " | ".join( sort_alphabetically_and_by_length( productions_string ) ), biggest=biggest )
 
         if self.initial_symbol in self.productions:

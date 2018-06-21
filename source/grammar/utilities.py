@@ -152,6 +152,10 @@ def dictionary_to_string(dictionary):
         Given a dictionary with a list for each string key, call `sort_dictionary_lists()` and
         return a string representation by line of its entries.
     """
+
+    if not len( dictionary ):
+        return " No elements found."
+
     strings = []
     elements_strings = []
 
@@ -175,6 +179,10 @@ def convert_to_text_lines(iterable, use_repr=True, new_line=True, sort=None):
         Given a dictionary with a list for each string key, call `sort_dictionary_lists()` and
         return a string representation by line of its entries.
     """
+
+    if not len( iterable ):
+        return " No elements found."
+
     strings = []
 
     if sort:
@@ -184,7 +192,7 @@ def convert_to_text_lines(iterable, use_repr=True, new_line=True, sort=None):
         iterable = sort_alphabetically_and_by_length( iterable )
 
     for item in iterable:
-        strings.append( "{}".format( repr( item ) ) )
+        strings.append( " {}".format( repr( item ) ) )
 
     return ( "\n" if new_line else "" ).join( strings )
 

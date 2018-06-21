@@ -38,6 +38,7 @@ from grammar.run_function_async import run_function_async
 
 from grammar.utilities import wrap_text
 from grammar.utilities import ignore_exceptions
+from grammar.utilities import convert_to_text_lines
 from grammar.utilities import setTextWithoutCleaningHistory
 from grammar.utilities import trimMessage
 from grammar.utilities import getCleanSpaces
@@ -147,11 +148,12 @@ class ProgramWindow(QtWidgets.QMainWindow):
 
         self.redoGrammarButton        = QPushButton( "Redo Operations" )
         self.undoGrammarButton        = QPushButton( "Undo Operations" )
+        self.calculateFirstAndFollow  = QPushButton( "Compute First and Follow" )
+        self.convertToProperGrammar   = QPushButton( "Convert to Proper" )
         self.isGrammarEmpty           = QPushButton( "Is Empty" )
         self.isGrammarFinite          = QPushButton( "Is Finite" )
         self.isGrammarInfinite        = QPushButton( "Is Infinite" )
         self.isGrammarEmptyOrInFinite = QPushButton( "Is Empty Or (In)Finite" )
-        self.calculateFirstAndFollow  = QPushButton( "Compute First and Follow" )
         self.openGrammar              = QPushButton( "Open File" )
         self.saveGrammar              = QPushButton( "Save File" )
         self.grammarBeautifing        = QPushButton( "Beautify" )
@@ -159,10 +161,11 @@ class ProgramWindow(QtWidgets.QMainWindow):
         self.undoGrammarButton.clicked.connect( self.handleUndoGrammarTextEdit )
         self.redoGrammarButton.clicked.connect( self.handleRedoGrammarTextEdit )
         self.calculateFirstAndFollow.clicked.connect( self.handleCalculateFirstAndFollow )
-        self.isGrammarEmptyOrInFinite.clicked.connect( self.handleGrammarIsFiniteInfiniteOrEmpty )
+        self.convertToProperGrammar.clicked.connect( self.handleConvertToProperGrammar )
         self.isGrammarEmpty.clicked.connect( self.handleIsGrammarEmpty )
         self.isGrammarFinite.clicked.connect( self.handleIsGrammarFinite )
         self.isGrammarInfinite.clicked.connect( self.handleIsGrammarInfinite )
+        self.isGrammarEmptyOrInFinite.clicked.connect( self.handleGrammarIsFiniteInfiniteOrEmpty )
         self.openGrammar.clicked.connect( self.handleOpenGrammar )
         self.saveGrammar.clicked.connect( self.handleSaveGrammar )
         self.grammarBeautifing.clicked.connect( self.handleGrammarBeautifing)
@@ -170,18 +173,20 @@ class ProgramWindow(QtWidgets.QMainWindow):
         # The distances between the QPushButton in QGridLayout
         # https://stackoverflow.com/questions/13578187/the-distances-between-the-qpushbutton-in-qgridlayout
         self.grammarVerticalGridLayout = QGridLayout()
-        self.grammarVerticalGridLayout.addWidget( self.undoGrammarButton,        0,  0)
-        self.grammarVerticalGridLayout.addWidget( self.redoGrammarButton,        1,  0)
-        self.grammarVerticalGridLayout.addWidget( self.get_vertical_separator(), 2,  0)
-        self.grammarVerticalGridLayout.addWidget( self.calculateFirstAndFollow,  3,  0)
-        self.grammarVerticalGridLayout.addWidget( self.isGrammarEmptyOrInFinite, 4,  0)
-        self.grammarVerticalGridLayout.addWidget( self.isGrammarEmpty,           5,  0)
-        self.grammarVerticalGridLayout.addWidget( self.isGrammarFinite,          6,  0)
-        self.grammarVerticalGridLayout.addWidget( self.isGrammarInfinite,        7,  0)
-        self.grammarVerticalGridLayout.addWidget( self.get_vertical_separator(), 8,  0)
-        self.grammarVerticalGridLayout.addWidget( self.openGrammar,              9,  0)
-        self.grammarVerticalGridLayout.addWidget( self.saveGrammar,              10, 0)
-        self.grammarVerticalGridLayout.addWidget( self.grammarBeautifing,        11, 0)
+        self.grammarVerticalGridLayout.addWidget( self.undoGrammarButton,        0, 0)
+        self.grammarVerticalGridLayout.addWidget( self.redoGrammarButton,        1, 0)
+        self.grammarVerticalGridLayout.addWidget( self.get_vertical_separator(), 2, 0)
+        self.grammarVerticalGridLayout.addWidget( self.calculateFirstAndFollow,  3, 0)
+        self.grammarVerticalGridLayout.addWidget( self.convertToProperGrammar,   4, 0)
+        self.grammarVerticalGridLayout.addWidget( self.get_vertical_separator(), 5, 0)
+        self.grammarVerticalGridLayout.addWidget( self.isGrammarEmpty,           6, 0)
+        self.grammarVerticalGridLayout.addWidget( self.isGrammarFinite,          7, 0)
+        self.grammarVerticalGridLayout.addWidget( self.isGrammarInfinite,        8, 0)
+        self.grammarVerticalGridLayout.addWidget( self.isGrammarEmptyOrInFinite, 9, 0)
+        self.grammarVerticalGridLayout.addWidget( self.get_vertical_separator(), 10, 0)
+        self.grammarVerticalGridLayout.addWidget( self.openGrammar,              11, 0)
+        self.grammarVerticalGridLayout.addWidget( self.saveGrammar,              12, 0)
+        self.grammarVerticalGridLayout.addWidget( self.grammarBeautifing,        13, 0)
         self.grammarVerticalGridLayout.setSpacing( 0 )
         self.grammarVerticalGridLayout.setAlignment(Qt.AlignTop)
 
@@ -295,7 +300,7 @@ class ProgramWindow(QtWidgets.QMainWindow):
         isToStop = [False]
 
         results_dialog = StringOutputDialog( self, self.getMainFontOptions(), self._getFileDialogOptions(), isToStop )
-        results_dialog.appendText( initial_message + '\n' )
+        results_dialog.appendText( initial_message )
 
         target_function.results = ""
         target_function.isToStop = isToStop
@@ -314,14 +319,17 @@ class ProgramWindow(QtWidgets.QMainWindow):
 
             results.append( "Terminal's FIRST\n" )
             results.append( dictionary_to_string( first_terminals ) )
+
             results.append( "\n\nNon Terminal's FIRST\n" )
             results.append( dictionary_to_string( first_non_terminals ) )
+
             results.append( "\n\nTerminal's FOLLOW\n" )
             results.append( dictionary_to_string( follow_terminals ) )
+
             results.append( "\n\nComputation completed successfully!" )
             function.results = "".join( results )
 
-        self._handleFunctionAsync( function, "The computed FIRST and FOLLOW for the given grammar are:" )
+        self._handleFunctionAsync( function, "The computed FIRST and FOLLOW for the given grammar are:\n" )
 
     @ignore_exceptions
     def _handleGrammarIsSomething(self, function_to_check, property_name):
@@ -340,7 +348,7 @@ class ProgramWindow(QtWidgets.QMainWindow):
             results.append( "\n\nIs %s%s.\n" % ( "" if is_empty else "NOT ", property_name ) )
             function.results = "".join( results )
 
-        self._handleFunctionAsync( function, "The following grammar:" )
+        self._handleFunctionAsync( function, "The following grammar:\n" )
 
     @ignore_exceptions
     def handleGrammarIsFiniteInfiniteOrEmpty(self, qt_decorator_bug):
@@ -369,7 +377,7 @@ class ProgramWindow(QtWidgets.QMainWindow):
             results.append( "\n\nIs %s.\n" % ( property_name ) )
             function.results = "".join( results )
 
-        self._handleFunctionAsync( function, "The following grammar:" )
+        self._handleFunctionAsync( function, "The following grammar:\n" )
 
     @ignore_exceptions
     def handleIsGrammarEmpty(self, function_to_check):
@@ -382,6 +390,41 @@ class ProgramWindow(QtWidgets.QMainWindow):
     @ignore_exceptions
     def handleIsGrammarInfinite(self, function_to_check):
         self._handleGrammarIsSomething( ChomskyGrammar.is_infinite, "infinite" )
+
+    @ignore_exceptions
+    def handleConvertToProperGrammar(self, qt_decorator_bug):
+
+        @ignore_exceptions
+        def function():
+            results = []
+            firstGrammar = ChomskyGrammar.load_from_text_lines( self.grammarTextEditWidget.toPlainText() )
+            results.append( str( firstGrammar ) )
+
+            non_terminal_epsilon = firstGrammar.get_non_terminal_epsilon()
+            fertile = firstGrammar.fertile()
+            reachable = firstGrammar.reachable()
+            simple_non_terminals = firstGrammar.get_simple_non_terminals()
+            firstGrammar.convert_to_proper()
+
+            results.append( "\n\nHas the following Proper version:\n" )
+            results.append( str( firstGrammar ) )
+
+            results.append( "\n\nIt has the following Non Terminal Epsilon set (Ne):\n" )
+            results.append( convert_to_text_lines( non_terminal_epsilon ) )
+
+            results.append( "\n\nIt has the following Fertile Non Terminal's set (Nf):\n" )
+            results.append( convert_to_text_lines( fertile ) )
+
+            results.append( "\n\nIt has the following Reachable Non Terminal's set (Vi):\n" )
+            results.append( convert_to_text_lines( reachable ) )
+
+            results.append( "\n\nIt has the following Simple Non Terminal's set (Na):\n" )
+            results.append( dictionary_to_string( simple_non_terminals ) )
+
+            results.append( "\n\nComputation completed successfully!" )
+            function.results = "".join( results )
+
+        self._handleFunctionAsync( function, "The following grammar:" )
 
 
 if __name__ == "__main__":
