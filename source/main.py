@@ -196,7 +196,7 @@ class ProgramWindow(QtWidgets.QMainWindow):
         self.grammarVerticalGridLayout.addWidget( self.get_vertical_separator(), 13, 0)
         self.grammarVerticalGridLayout.addWidget( self.openGrammar,              14, 0)
         self.grammarVerticalGridLayout.addWidget( self.saveGrammar,              15, 0)
-        self.grammarVerticalGridLayout.addWidget( self.grammarBeautifing,        16, 0)
+        # self.grammarVerticalGridLayout.addWidget( self.grammarBeautifing,        16, 0)
         self.grammarVerticalGridLayout.setSpacing( 0 )
         self.grammarVerticalGridLayout.setAlignment(Qt.AlignTop)
 
