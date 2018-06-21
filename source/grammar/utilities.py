@@ -201,24 +201,7 @@ def ignore_exceptions(function_to_decorate):
 
         except Exception as error:
             log.exception( "" )
-
-            parent = None
-
-            if args and isinstance( args[0], QtWidgets.QMainWindow ) :
-                parent = args[0]
-
-            msgBox = PyQt5.QtWidgets.QMessageBox( parent )
-            msgBox.setIcon( PyQt5.QtWidgets.QMessageBox.Information )
-            msgBox.setText( "<font size=10 color=green></font>Your operation can not be completed because you entered "
-                    "with a invalid language! The program issued the following error message: "
-                    "<pre>`<br>%s<br>`</pre>" % trimMessage( str( error ) ) )
-
-            msgBox.addButton( PyQt5.QtWidgets.QMessageBox.Ok )
-            msgBox.setDefaultButton( PyQt5.QtWidgets.QMessageBox.No )
-            buttonClickResult = msgBox.exec_()
-
-            if buttonClickResult == PyQt5.QtWidgets.QMessageBox.Ok:
-                return
+            ignore_exceptions.send_string_signal.emit( str( error ) )
 
     return wrapper
 

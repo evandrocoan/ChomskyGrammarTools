@@ -64,9 +64,42 @@ def main():
 
 class ProgramWindow(QtWidgets.QMainWindow):
 
+    send_string_signal = QtCore.pyqtSignal( [str] )
+
+    def show_error_message_box(self, error_message):
+        parent = self
+        msgBox = PyQt5.QtWidgets.QMessageBox( parent )
+
+        msgBox.setIcon( PyQt5.QtWidgets.QMessageBox.Information )
+        msgBox.setText( "<font size=10 color=green></font>Your operation can not be completed because you entered "
+                "with a invalid language! The program issued the following error message: "
+                "<pre>`<br>%s<br>`</pre>" % trimMessage( error_message ) )
+
+        msgBox.addButton( PyQt5.QtWidgets.QMessageBox.Ok )
+        msgBox.setDefaultButton( PyQt5.QtWidgets.QMessageBox.No )
+        buttonClickResult = msgBox.exec_()
+
+        if buttonClickResult == PyQt5.QtWidgets.QMessageBox.Ok:
+            return
+
+    def setup_main_excpetion_handler(self):
+        """
+            PyQt4.QtCore.pyqtSignal object has no attribute 'connect'
+            https://stackoverflow.com/questions/2970312/pyqt4-qtcore-pyqtsignal-object-has-no-attribute-connect
+
+            Python decorators in classes
+            https://stackoverflow.com/questions/1263451/python-decorators-in-classes
+
+            Updating GUI elements in MultiThreaded PyQT
+            https://stackoverflow.com/questions/9957195/updating-gui-elements-in-multithreaded-pyqt
+        """
+        self.send_string_signal.connect( self.show_error_message_box )
+        ignore_exceptions.send_string_signal = self.send_string_signal
+
     def __init__(self):
         QtWidgets.QMainWindow.__init__( self )
         self.setup_main_window()
+        self.setup_main_excpetion_handler()
 
         # self.verticalSpacer = QtWidgets.QSpacerItem( 0, 0, QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Expanding )
         self.create_grammar_input_text()
