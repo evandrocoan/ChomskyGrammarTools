@@ -36,7 +36,7 @@ from grammar.utilities import getCleanSpaces
 from grammar.utilities import setTextWithoutCleaningHistory
 
 
-class InputIntegerDialog(QMainWindow):
+class IntegerInputDialog(QMainWindow):
     """
         How can I show a PyQt modal dialog and get data out of its controls once its closed?
         https://stackoverflow.com/questions/18196799/how-can-i-show-a-pyqt-modal-dialog-and-get-data-out-of-its-controls-once-its-clo
@@ -155,7 +155,7 @@ class InputIntegerDialog(QMainWindow):
         integer = 5
 
         while result:
-            dialog = InputIntegerDialog( parent, fontOptions )
+            dialog = IntegerInputDialog( parent, fontOptions )
             result = dialog.exec_()
 
             if result:

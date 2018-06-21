@@ -10,9 +10,9 @@ import PyQt5
 # from PyQt5.QtCore import *
 # from PyQt5.QtWidgets import *
 
-from user_interface.string_input_dialog import InputStringDialog
+from user_interface.string_input_dialog import StringInputDialog
 from user_interface.string_output_dialog import StringOutputDialog
-from user_interface.integer_input_dialog import InputIntegerDialog
+from user_interface.integer_input_dialog import IntegerInputDialog
 
 from PyQt5 import QtGui
 from PyQt5 import QtCore
@@ -151,7 +151,8 @@ class ProgramWindow(QtWidgets.QMainWindow):
         self.undoGrammarButton        = QPushButton( "Undo Operations" )
         self.calculateFirstAndFollow  = QPushButton( "Compute First and Follow" )
         self.convertToProperGrammar   = QPushButton( "Convert to Proper" )
-        self.isGrammarFactorable      = QPushButton( "Is Factored" )
+        self.isGrammarFactored        = QPushButton( "Is Factored" )
+        self.tryToFactorGrammar       = QPushButton( "Try to Factor it" )
         self.grammarHasLeftRecursion  = QPushButton( "Has Left Recursion" )
         self.isGrammarEmpty           = QPushButton( "Is Empty" )
         self.isGrammarFinite          = QPushButton( "Is Finite" )
@@ -164,7 +165,8 @@ class ProgramWindow(QtWidgets.QMainWindow):
         self.undoGrammarButton.clicked.connect( self.handleUndoGrammarTextEdit )
         self.redoGrammarButton.clicked.connect( self.handleRedoGrammarTextEdit )
         self.calculateFirstAndFollow.clicked.connect( self.handleCalculateFirstAndFollow )
-        self.isGrammarFactorable.clicked.connect( self.handleIsGrammarFactorable )
+        self.isGrammarFactored.clicked.connect( self.handleIsGrammarFactored )
+        self.tryToFactorGrammar.clicked.connect( self.handleTryToFactorGrammar )
         self.grammarHasLeftRecursion.clicked.connect( self.handleGrammarHasLeftRecursion )
         self.convertToProperGrammar.clicked.connect( self.handleConvertToProperGrammar )
         self.isGrammarEmpty.clicked.connect( self.handleIsGrammarEmpty )
@@ -183,17 +185,18 @@ class ProgramWindow(QtWidgets.QMainWindow):
         self.grammarVerticalGridLayout.addWidget( self.get_vertical_separator(), 2, 0)
         self.grammarVerticalGridLayout.addWidget( self.calculateFirstAndFollow,  3, 0)
         self.grammarVerticalGridLayout.addWidget( self.convertToProperGrammar,   4, 0)
-        self.grammarVerticalGridLayout.addWidget( self.isGrammarFactorable,      5, 0)
-        self.grammarVerticalGridLayout.addWidget( self.grammarHasLeftRecursion,  6, 0)
-        self.grammarVerticalGridLayout.addWidget( self.get_vertical_separator(), 7, 0)
-        self.grammarVerticalGridLayout.addWidget( self.isGrammarEmpty,           8, 0)
-        self.grammarVerticalGridLayout.addWidget( self.isGrammarFinite,          9, 0)
-        self.grammarVerticalGridLayout.addWidget( self.isGrammarInfinite,        10, 0)
-        self.grammarVerticalGridLayout.addWidget( self.isGrammarEmptyOrInFinite, 11, 0)
-        self.grammarVerticalGridLayout.addWidget( self.get_vertical_separator(), 12, 0)
-        self.grammarVerticalGridLayout.addWidget( self.openGrammar,              13, 0)
-        self.grammarVerticalGridLayout.addWidget( self.saveGrammar,              14, 0)
-        self.grammarVerticalGridLayout.addWidget( self.grammarBeautifing,        15, 0)
+        self.grammarVerticalGridLayout.addWidget( self.isGrammarFactored,        5, 0)
+        self.grammarVerticalGridLayout.addWidget( self.tryToFactorGrammar,       6, 0)
+        self.grammarVerticalGridLayout.addWidget( self.grammarHasLeftRecursion,  7, 0)
+        self.grammarVerticalGridLayout.addWidget( self.get_vertical_separator(), 8, 0)
+        self.grammarVerticalGridLayout.addWidget( self.isGrammarEmpty,           9, 0)
+        self.grammarVerticalGridLayout.addWidget( self.isGrammarFinite,          10, 0)
+        self.grammarVerticalGridLayout.addWidget( self.isGrammarInfinite,        11, 0)
+        self.grammarVerticalGridLayout.addWidget( self.isGrammarEmptyOrInFinite, 12, 0)
+        self.grammarVerticalGridLayout.addWidget( self.get_vertical_separator(), 13, 0)
+        self.grammarVerticalGridLayout.addWidget( self.openGrammar,              14, 0)
+        self.grammarVerticalGridLayout.addWidget( self.saveGrammar,              15, 0)
+        self.grammarVerticalGridLayout.addWidget( self.grammarBeautifing,        16, 0)
         self.grammarVerticalGridLayout.setSpacing( 0 )
         self.grammarVerticalGridLayout.setAlignment(Qt.AlignTop)
 
@@ -335,14 +338,46 @@ class ProgramWindow(QtWidgets.QMainWindow):
             results.append( "\n\nAnd Terminal's FOLLOW\n" )
             results.append( dictionary_to_string( follow_terminals ) )
 
-            results.append( "\n\nComputation completed successfully!" )
             function.results = "".join( results )
 
         self._handleFunctionAsync( function, "The following grammar:" )
 
     @ignore_exceptions
-    def handleIsGrammarFactorable(self, qt_decorator_bug):
+    def handleIsGrammarFactored(self, qt_decorator_bug):
         self._handleGrammarIsSomething( ChomskyGrammar.is_factored, "Factored" )
+
+    @ignore_exceptions
+    def handleTryToFactorGrammar(self, qt_decorator_bug):
+        fontOptions = self.getMainFontOptions()
+        ( maximumSteps, isAccepted ) = IntegerInputDialog.getNewUserInput( self, fontOptions )
+
+        if not isAccepted:
+            return
+
+        @ignore_exceptions
+        def function():
+            results = []
+            firstGrammar = ChomskyGrammar.load_from_text_lines( self.grammarTextEditWidget.toPlainText() )
+            results.append( str( firstGrammar ) )
+
+            was_factored = firstGrammar.factor_it( maximumSteps )
+
+            if was_factored:
+                results.append( "\n\nCould be successfully factored in `%s` steps!" % firstGrammar.last_factoring_step )
+                results.append( "\n\nThe new factored grammar is:" )
+
+            else:
+                factors = firstGrammar.factors()
+                results.append( "\n\nCould not be successfully factored in `%s` steps!\n\n" % maximumSteps )
+                results.append( "\n\nDoes still has the following factor/nondeterminism(s)\n" )
+                results.append( convert_to_text_lines( factors, sort=sort_correctly ) )
+                results.append( "\n\nThe last non factored grammar produced was:" )
+
+            results.append( "\n" )
+            results.append( str( firstGrammar ) )
+            function.results = "".join( results )
+
+        self._handleFunctionAsync( function, "Trying to factor the following grammar in `%s` steps:" % maximumSteps )
 
     @ignore_exceptions
     def handleGrammarHasLeftRecursion(self, qt_decorator_bug):
@@ -367,7 +402,6 @@ class ProgramWindow(QtWidgets.QMainWindow):
             else:
                 results.append( "\n\nHas NO Left Recursion." )
 
-            results.append( "\n\nComputation completed successfully!" )
             function.results = "".join( results )
 
         self._handleFunctionAsync( function, "The following grammar:" )
@@ -462,7 +496,6 @@ class ProgramWindow(QtWidgets.QMainWindow):
             results.append( "\n\nIt has the following Simple Non Terminal's set (Na):\n" )
             results.append( dictionary_to_string( simple_non_terminals ) )
 
-            results.append( "\n\nComputation completed successfully!" )
             function.results = "".join( results )
 
         self._handleFunctionAsync( function, "The following grammar:" )

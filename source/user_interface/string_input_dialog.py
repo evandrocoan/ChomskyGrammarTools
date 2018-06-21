@@ -34,7 +34,7 @@ from grammar.utilities import ignore_exceptions
 from grammar.utilities import setTextWithoutCleaningHistory
 
 
-class InputStringDialog(QMainWindow):
+class StringInputDialog(QMainWindow):
     """
         How can I show a PyQt modal dialog and get data out of its controls once its closed?
         https://stackoverflow.com/questions/18196799/how-can-i-show-a-pyqt-modal-dialog-and-get-data-out-of-its-controls-once-its-clo
@@ -140,7 +140,7 @@ class InputStringDialog(QMainWindow):
     # static method to create the dialog and return ( date, time, accepted )
     @staticmethod
     def getNewUserInput(parent, fontOptions, _openFileCall, dialogTypeName, dialogTitleMessage):
-        dialog = InputStringDialog( parent, fontOptions, _openFileCall, dialogTypeName, dialogTitleMessage )
+        dialog = StringInputDialog( parent, fontOptions, _openFileCall, dialogTypeName, dialogTitleMessage )
         result = dialog.exec_()
 
         # dialog.deleteLater()

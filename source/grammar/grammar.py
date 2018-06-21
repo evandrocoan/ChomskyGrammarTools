@@ -170,6 +170,10 @@ class ChomskyGrammar():
         """
         ## A dictionary with productions this grammar can generates
         self.productions = {}
+
+        ## Saves the last step count used to factoring a grammar by the `factor_it()` method
+        self.last_factoring_step = 0
+
         self._initial_symbol = ""
 
     @property
@@ -844,19 +848,19 @@ class ChomskyGrammar():
             factorization was successful, False otherwise.
         """
         log( 16, "self: \n%s", self )
-        current_step = 0
+        self.last_factoring_step = 0
 
         if self.has_left_recursion():
             self.eliminate_left_recursion()
 
         while True:
-            current_step += 1
+            self.last_factoring_step += 1
             is_factored = not self.has_duplicated_factors()
 
             if is_factored:
                 return True
 
-            if current_step > maximum_steps:
+            if self.last_factoring_step > maximum_steps:
                 return False
 
             self.eliminate_direct_factors()
