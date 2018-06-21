@@ -778,15 +778,43 @@ class ChomskyGrammar():
             productions = self.productions[start_symbol]
 
             for production in productions:
-                first_symbol = production[0]
 
-                if type( first_symbol ) is Terminal:
-                    accumulated_symbols = []
+                if type( production[0] ) is Terminal:
 
-                    for symbol in first_symbol.str:
-                        accumulated_symbols.append( symbol )
-                        factors.append( ( start_symbol, Terminal( "".join( accumulated_symbols ), lock=True ) ) )
-                        break
+                    if len( production[0] ):
+                        accumulated_symbols = ""
+
+                        for symbol in production[0].str:
+                            accumulated_symbols += symbol
+                            is_minimum_symbol_start = False
+
+                            for another_production in productions:
+
+                                if another_production != production:
+
+                                    if another_production[0].str[0] == production[0].str[0]:
+                                        minimum_symbol_counter = 0
+
+                                        for another_symbol in another_production[0].str:
+
+                                            if another_symbol != accumulated_symbols[minimum_symbol_counter]:
+                                                is_minimum_symbol_start = True
+                                                accumulated_symbols = accumulated_symbols[:-1]
+                                                break
+
+                                            minimum_symbol_counter += 1
+
+                                            if len( another_production[0].str ) - 1 < minimum_symbol_counter:
+                                                is_minimum_symbol_start = True
+                                                break
+
+                                            if minimum_symbol_counter >= len( accumulated_symbols ):
+                                                break
+
+                            if is_minimum_symbol_start:
+                                break
+
+                        factors.append( ( start_symbol, Terminal( accumulated_symbols, lock=True ) ) )
 
                 else:
                     raise RuntimeError( "The program cold not remove all indirect factors or left recursions! \n%s" % self )

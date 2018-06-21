@@ -954,9 +954,7 @@ class TestGrammarFactoringAndRecursionSymbols(TestingUtilities):
             + (S, b)
             + (S, b)
             + (S, c)
-            + (S, d)
-            + (A, &)
-            + (B, &)
+            + (S, dc)
         """, convert_to_text_lines( firstGrammar.factors(), sort=sort_correctly ) )
 
         self.assertFalse( firstGrammar.is_factored() )
@@ -1024,30 +1022,46 @@ class TestGrammarFactoringAndRecursionSymbols(TestingUtilities):
             +  V -> id | id[ E ]
             + L' -> & | ; C L'
         """, firstGrammar )
-        factor_it = firstGrammar.factor_it(5)
 
         self.assertTextEqual(
         """
-            +  P -> & | d P1 | i P2
-            +  C -> i C1
+            + (C, id)
+            + (C, id)
+            + (C, id)
+            + (D, d)
+            + (D, d)
+            + (E, exp)
+            + (E, exp)
+            + (L, id)
+            + (L, id)
+            + (L, id)
+            + (P, d)
+            + (P, d)
+            + (P, id)
+            + (P, id)
+            + (P, id)
+            + (V, id)
+            + (V, id)
+            + (L', ;)
+        """, convert_to_text_lines( firstGrammar.factors(), sort=sort_correctly ) )
+
+        factor_it = firstGrammar.factor_it(5)
+        self.assertTextEqual(
+        """
+            +  P -> & | d P1 | id P2
+            +  C -> id C1
             +  D -> d D1
-            +  E -> e E1
-            +  L -> i L1
-            +  V -> i V1
-            + C1 -> d C2
-            + C2 -> =exp | ( E ) | [ E ]=exp
+            +  E -> exp E1
+            +  L -> id L1
+            +  V -> id V1
+            + C1 -> =exp | ( E ) | [ E ]=exp
             + D1 -> & | d D1
-            + E1 -> x E2
-            + E2 -> p E3
-            + E3 -> & | , E
-            + L1 -> d L2
-            + L2 -> =exp L' | ( E ) L' | [ E ]=exp L'
+            + E1 -> & | , E
+            + L1 -> =exp L' | ( E ) L' | [ E ]=exp L'
             + L' -> & | ; C L'
-            + P1 -> i L1 | d D1 L
-            + P2 -> d P3
-            + P3 -> =exp L' | ( E ) L' | [ E ]=exp L'
-            + V1 -> d V2
-            + V2 -> & | [ E ]
+            + P1 -> id L1 | d D1 L
+            + P2 -> =exp L' | ( E ) L' | [ E ]=exp L'
+            + V1 -> & | [ E ]
         """, firstGrammar )
 
         self.assertTrue( factor_it )
