@@ -9,6 +9,8 @@ from PyQt5 import QtCore
 from PyQt5.QtCore import Qt
 from debug_tools import getLogger
 
+from .utilities import ignore_exceptions
+
 # level 4 - Abstract Syntax Tree Parsing
 log = getLogger( 127-4, __name__ )
 
@@ -54,12 +56,13 @@ class RunFunctionAsyncThread(QtCore.QThread):
 
         else:
 
-            def default():
+            def default(self):
                 self.send_string_signal.emit( "Computing... No results available yet... " )
                 self.sleep( 1 )
 
             self.waiting = default
 
+    @ignore_exceptions
     def run(self):
         """
             Process asynchronously in background the given function.
@@ -102,6 +105,7 @@ class RunFunctionAsyncThread(QtCore.QThread):
             set_scroll_to_maximum( self.results_dialog.textEditWidget )
 
 
+@ignore_exceptions
 def run_function_async(function, results_dialog):
     """
         Create the updating thread and connect
@@ -122,6 +126,7 @@ def run_function_async(function, results_dialog):
     return qtUpdateThread
 
 
+@ignore_exceptions
 def set_scroll_to_maximum(textEdit):
     """
         Given a text edit area, set its scrolling completely to the bottom.

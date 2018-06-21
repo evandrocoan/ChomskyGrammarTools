@@ -9,6 +9,8 @@ import random
 import PyQt5
 import textwrap
 
+from PyQt5 import QtWidgets
+
 from natsort import natsorted
 from debug_tools import getLogger
 
@@ -200,8 +202,12 @@ def ignore_exceptions(function_to_decorate):
         except Exception as error:
             log.exception( "" )
 
+            parent = None
 
-            msgBox = PyQt5.QtWidgets.QMessageBox( args[0] )
+            if args and isinstance( args[0], QtWidgets.QMainWindow ) :
+                parent = args[0]
+
+            msgBox = PyQt5.QtWidgets.QMessageBox( parent )
             msgBox.setIcon( PyQt5.QtWidgets.QMessageBox.Information )
             msgBox.setText( "<font size=10 color=green></font>Your operation can not be completed because you entered "
                     "with a invalid language! The program issued the following error message: "

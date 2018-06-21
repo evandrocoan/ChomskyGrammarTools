@@ -34,7 +34,7 @@ from PyQt5.QtWidgets import QFileDialog
 from grammar.grammar import ChomskyGrammar
 from grammar.symbols import HISTORY_KEY_LINE
 
-from grammar.sentences_generation import run_function_async
+from grammar.run_function_async import run_function_async
 
 from grammar.utilities import wrap_text
 from grammar.utilities import ignore_exceptions
@@ -191,6 +191,7 @@ class ProgramWindow(QtWidgets.QMainWindow):
             }
         """
 
+    @ignore_exceptions
     def handleSaveGrammar(self):
         options = self._getFileDialogOptions()
         fileName, _ = QFileDialog.getSaveFileName( self, "Choose a name for your grammar", "","Grammar Files (*.grammar)", options=options )
@@ -200,10 +201,12 @@ class ProgramWindow(QtWidgets.QMainWindow):
             with open( fileName + '.grammar', 'w', encoding='utf-8' ) as file:
                 file.write( self.grammarTextEditWidget.toPlainText() )
 
+    @ignore_exceptions
     def handleOpenGrammar(self):
         inputGrammar = self._openGrammar()
         setTextWithoutCleaningHistory( self.grammarTextEditWidget, inputGrammar )
 
+    @ignore_exceptions
     def _openGrammar(self):
         options = self._getFileDialogOptions()
         fileName, _ = QFileDialog.getOpenFileName( self, "Choose a grammar", "","Grammar Files (*.grammar)", options=options )
@@ -230,18 +233,24 @@ class ProgramWindow(QtWidgets.QMainWindow):
             The computed FIRST and FOLLOW for the given grammar are:
         """ ) + '\n' )
 
+        @ignore_exceptions
         def function():
             results = []
             firstGrammar = ChomskyGrammar.load_from_text_lines( self.grammarTextEditWidget.toPlainText() )
-            first = firstGrammar.first()
-            follow = firstGrammar.follow( first )
+            first_terminals = firstGrammar.first_terminals()
+            first_non_terminals = firstGrammar.first_non_terminals()
+            follow_terminals = firstGrammar.follow_terminals( first_terminals )
 
-            results.append( dictionary_to_string( first ) )
-            results.append( "\n\n" )
-            results.append( dictionary_to_string( follow ) )
+            results.append( "Terminal's FIRST\n" )
+            results.append( dictionary_to_string( first_terminals ) )
+            results.append( "\n\nNon Terminal's FIRST\n" )
+            results.append( dictionary_to_string( first_non_terminals ) )
+            results.append( "\n\nTerminal's FOLLOW\n" )
+            results.append( dictionary_to_string( follow_terminals ) )
             results.append( "\n\nComputation completed successfully!" )
             function.results = "".join( results )
 
+        function.results = ""
         function.isToStop = isToStop
         run_function_async( function, results_dialog )
 
