@@ -320,23 +320,25 @@ class ProgramWindow(QtWidgets.QMainWindow):
         def function():
             results = []
             firstGrammar = ChomskyGrammar.load_from_text_lines( self.grammarTextEditWidget.toPlainText() )
+            results.append( str( firstGrammar ) )
+
             first_terminals = firstGrammar.first_terminals()
             first_non_terminals = firstGrammar.first_non_terminals()
             follow_terminals = firstGrammar.follow_terminals( first_terminals )
 
-            results.append( "Terminal's FIRST\n" )
+            results.append( "\n\nHas the following Terminal's FIRST\n" )
             results.append( dictionary_to_string( first_terminals ) )
 
-            results.append( "\n\nNon Terminal's FIRST\n" )
+            results.append( "\n\nAnd Non Terminal's FIRST\n" )
             results.append( dictionary_to_string( first_non_terminals ) )
 
-            results.append( "\n\nTerminal's FOLLOW\n" )
+            results.append( "\n\nAnd Terminal's FOLLOW\n" )
             results.append( dictionary_to_string( follow_terminals ) )
 
             results.append( "\n\nComputation completed successfully!" )
             function.results = "".join( results )
 
-        self._handleFunctionAsync( function, "The computed FIRST and FOLLOW for the given grammar are:\n" )
+        self._handleFunctionAsync( function, "The following grammar:" )
 
     @ignore_exceptions
     def handleIsGrammarFactorable(self, qt_decorator_bug):
@@ -353,18 +355,22 @@ class ProgramWindow(QtWidgets.QMainWindow):
 
             left_recursion = firstGrammar.left_recursion()
             has_left_recursion = firstGrammar.has_left_recursion()
+            firstGrammar.eliminate_left_recursion()
 
             if has_left_recursion:
                 results.append( "\n\nHas the following Left Recursion(s)\n" )
                 results.append( convert_to_text_lines( left_recursion, sort=sort_correctly ) )
 
+                results.append( "\n\nAnd has the following Left Recursion Free Grammar:\n" )
+                results.append( str( firstGrammar ) )
+
             else:
-                results.append( "\n\nHas NO Left Recursion" )
+                results.append( "\n\nHas NO Left Recursion." )
 
             results.append( "\n\nComputation completed successfully!" )
             function.results = "".join( results )
 
-        self._handleFunctionAsync( function, "The following grammar:\n" )
+        self._handleFunctionAsync( function, "The following grammar:" )
 
     @ignore_exceptions
     def _handleGrammarIsSomething(self, function_to_check, property_name, inverse_boolean=False):
@@ -383,7 +389,7 @@ class ProgramWindow(QtWidgets.QMainWindow):
             results.append( "\n\nIs %s%s.\n" % ( "" if (not is_empty if inverse_boolean else is_empty) else "NOT ", property_name ) )
             function.results = "".join( results )
 
-        self._handleFunctionAsync( function, "The following grammar:\n" )
+        self._handleFunctionAsync( function, "The following grammar:" )
 
     @ignore_exceptions
     def handleGrammarIsFiniteInfiniteOrEmpty(self, qt_decorator_bug):
@@ -412,7 +418,7 @@ class ProgramWindow(QtWidgets.QMainWindow):
             results.append( "\n\nIs %s.\n" % ( property_name ) )
             function.results = "".join( results )
 
-        self._handleFunctionAsync( function, "The following grammar:\n" )
+        self._handleFunctionAsync( function, "The following grammar:" )
 
     @ignore_exceptions
     def handleIsGrammarEmpty(self, function_to_check):
