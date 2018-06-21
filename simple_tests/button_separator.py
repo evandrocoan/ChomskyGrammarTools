@@ -24,6 +24,10 @@ def main():
     sys.exit( app.exec_() )
 
 class ProgramWindow(QtWidgets.QMainWindow):
+    """
+        How to increase QFrame.HLine line separator width and distance with the other buttons?
+        https://stackoverflow.com/questions/50825126/how-to-increase-qframe-hline-line-separator-width-and-distance-with-the-other-bu
+    """
 
     def __init__(self):
         QtWidgets.QMainWindow.__init__( self )

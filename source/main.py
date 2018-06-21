@@ -146,6 +146,15 @@ class ProgramWindow(QtWidgets.QMainWindow):
         self.separatorLine.setFrameShape( QFrame.HLine )
         self.separatorLine.setFrameShadow( QFrame.Plain )
 
+        # How to increase QFrame.HLine line separator width and distance with the other buttons?
+        # https://stackoverflow.com/questions/50825126/how-to-increase-qframe-hline-line-separator-width-and-distance-with-the-other-bu
+        sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Preferred)
+        sizePolicy.setHeightForWidth(self.separatorLine.sizePolicy().hasHeightForWidth())
+        self.separatorLine.setSizePolicy(sizePolicy)
+        self.separatorLine.setStyleSheet("font: 9pt; color: #000088;")
+        self.separatorLine.setLineWidth(2.5)
+        self.separatorLine.setMidLineWidth(10)
+
         self.redoGrammarButton        = QPushButton( "Redo Operations" )
         self.undoGrammarButton        = QPushButton( "Undo Operations" )
         self.calculateFirstAndFollow  = QPushButton( "Compute First and Follow" )
@@ -171,6 +180,7 @@ class ProgramWindow(QtWidgets.QMainWindow):
         self.grammarVerticalGridLayout.addWidget( self.saveGrammar,             5, 0)
         self.grammarVerticalGridLayout.addWidget( self.grammarBeautifing,       6, 0)
         self.grammarVerticalGridLayout.setSpacing( 0 )
+        self.grammarVerticalGridLayout.setRowMinimumHeight(3, 10)
         self.grammarVerticalGridLayout.setAlignment(Qt.AlignTop)
 
         # How to align the layouts QHBoxLayout and QVBoxLayout on pyqt4?
