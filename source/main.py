@@ -147,6 +147,10 @@ class ProgramWindow(QtWidgets.QMainWindow):
 
         self.redoGrammarButton        = QPushButton( "Redo Operations" )
         self.undoGrammarButton        = QPushButton( "Undo Operations" )
+        self.isGrammarEmpty           = QPushButton( "Is Empty" )
+        self.isGrammarFinite          = QPushButton( "Is Finite" )
+        self.isGrammarInfinite        = QPushButton( "Is Infinite" )
+        self.isGrammarEmptyOrInFinite = QPushButton( "Is Empty Or (In)Finite" )
         self.calculateFirstAndFollow  = QPushButton( "Compute First and Follow" )
         self.openGrammar              = QPushButton( "Open File" )
         self.saveGrammar              = QPushButton( "Save File" )
@@ -155,6 +159,10 @@ class ProgramWindow(QtWidgets.QMainWindow):
         self.undoGrammarButton.clicked.connect( self.handleUndoGrammarTextEdit )
         self.redoGrammarButton.clicked.connect( self.handleRedoGrammarTextEdit )
         self.calculateFirstAndFollow.clicked.connect( self.handleCalculateFirstAndFollow )
+        self.isGrammarEmptyOrInFinite.clicked.connect( self.handleGrammarIsFiniteInfiniteOrEmpty )
+        self.isGrammarEmpty.clicked.connect( self.handleIsGrammarEmpty )
+        self.isGrammarFinite.clicked.connect( self.handleIsGrammarFinite )
+        self.isGrammarInfinite.clicked.connect( self.handleIsGrammarInfinite )
         self.openGrammar.clicked.connect( self.handleOpenGrammar )
         self.saveGrammar.clicked.connect( self.handleSaveGrammar )
         self.grammarBeautifing.clicked.connect( self.handleGrammarBeautifing)
@@ -162,14 +170,18 @@ class ProgramWindow(QtWidgets.QMainWindow):
         # The distances between the QPushButton in QGridLayout
         # https://stackoverflow.com/questions/13578187/the-distances-between-the-qpushbutton-in-qgridlayout
         self.grammarVerticalGridLayout = QGridLayout()
-        self.grammarVerticalGridLayout.addWidget( self.undoGrammarButton,        0, 0)
-        self.grammarVerticalGridLayout.addWidget( self.redoGrammarButton,        1, 0)
-        self.grammarVerticalGridLayout.addWidget( self.get_vertical_separator(), 2, 0)
-        self.grammarVerticalGridLayout.addWidget( self.calculateFirstAndFollow,  3, 0)
-        self.grammarVerticalGridLayout.addWidget( self.get_vertical_separator(), 4, 0)
-        self.grammarVerticalGridLayout.addWidget( self.openGrammar,              5, 0)
-        self.grammarVerticalGridLayout.addWidget( self.saveGrammar,              6, 0)
-        self.grammarVerticalGridLayout.addWidget( self.grammarBeautifing,        7, 0)
+        self.grammarVerticalGridLayout.addWidget( self.undoGrammarButton,        0,  0)
+        self.grammarVerticalGridLayout.addWidget( self.redoGrammarButton,        1,  0)
+        self.grammarVerticalGridLayout.addWidget( self.get_vertical_separator(), 2,  0)
+        self.grammarVerticalGridLayout.addWidget( self.calculateFirstAndFollow,  3,  0)
+        self.grammarVerticalGridLayout.addWidget( self.isGrammarEmptyOrInFinite, 4,  0)
+        self.grammarVerticalGridLayout.addWidget( self.isGrammarEmpty,           5,  0)
+        self.grammarVerticalGridLayout.addWidget( self.isGrammarFinite,          6,  0)
+        self.grammarVerticalGridLayout.addWidget( self.isGrammarInfinite,        7,  0)
+        self.grammarVerticalGridLayout.addWidget( self.get_vertical_separator(), 8,  0)
+        self.grammarVerticalGridLayout.addWidget( self.openGrammar,              9,  0)
+        self.grammarVerticalGridLayout.addWidget( self.saveGrammar,              10, 0)
+        self.grammarVerticalGridLayout.addWidget( self.grammarBeautifing,        11, 0)
         self.grammarVerticalGridLayout.setSpacing( 0 )
         self.grammarVerticalGridLayout.setAlignment(Qt.AlignTop)
 
@@ -279,13 +291,18 @@ class ProgramWindow(QtWidgets.QMainWindow):
         setTextWithoutCleaningHistory( self.grammarTextEditWidget, str( firstGrammar ) )
 
     @ignore_exceptions
-    def handleCalculateFirstAndFollow(self, qt_decorator_bug):
+    def _handleFunctionAsync(self, target_function, initial_message):
         isToStop = [False]
 
         results_dialog = StringOutputDialog( self, self.getMainFontOptions(), self._getFileDialogOptions(), isToStop )
-        results_dialog.appendText( wrap_text( """
-            The computed FIRST and FOLLOW for the given grammar are:
-        """ ) + '\n' )
+        results_dialog.appendText( initial_message + '\n' )
+
+        target_function.results = ""
+        target_function.isToStop = isToStop
+        run_function_async( target_function, results_dialog )
+
+    @ignore_exceptions
+    def handleCalculateFirstAndFollow(self, qt_decorator_bug):
 
         @ignore_exceptions
         def function():
@@ -304,9 +321,67 @@ class ProgramWindow(QtWidgets.QMainWindow):
             results.append( "\n\nComputation completed successfully!" )
             function.results = "".join( results )
 
-        function.results = ""
-        function.isToStop = isToStop
-        run_function_async( function, results_dialog )
+        self._handleFunctionAsync( function, "The computed FIRST and FOLLOW for the given grammar are:" )
+
+    @ignore_exceptions
+    def _handleGrammarIsSomething(self, function_to_check, property_name):
+        """
+            How to pass member function as argument in python?
+            https://stackoverflow.com/questions/10181450/how-to-pass-member-function-as-argument-in-python
+        """
+
+        @ignore_exceptions
+        def function():
+            results = []
+            firstGrammar = ChomskyGrammar.load_from_text_lines( self.grammarTextEditWidget.toPlainText() )
+            is_empty = function_to_check( firstGrammar )
+
+            results.append( str( firstGrammar ) )
+            results.append( "\n\nIs %s%s.\n" % ( "" if is_empty else "NOT ", property_name ) )
+            function.results = "".join( results )
+
+        self._handleFunctionAsync( function, "The following grammar:" )
+
+    @ignore_exceptions
+    def handleGrammarIsFiniteInfiniteOrEmpty(self, qt_decorator_bug):
+
+        @ignore_exceptions
+        def function():
+            results = []
+            firstGrammar = ChomskyGrammar.load_from_text_lines( self.grammarTextEditWidget.toPlainText() )
+            is_empty = firstGrammar.is_empty()
+            is_finite = firstGrammar.is_finite()
+            is_infinite = firstGrammar.is_infinite()
+
+            if is_empty:
+                property_name = "Empty"
+
+            elif is_finite:
+                property_name = "Finite"
+
+            elif is_infinite:
+                property_name = "Infinite"
+
+            else:
+                property_name = "Unknown"
+
+            results.append( str( firstGrammar ) )
+            results.append( "\n\nIs %s.\n" % ( property_name ) )
+            function.results = "".join( results )
+
+        self._handleFunctionAsync( function, "The following grammar:" )
+
+    @ignore_exceptions
+    def handleIsGrammarEmpty(self, function_to_check):
+        self._handleGrammarIsSomething( ChomskyGrammar.is_empty, "empty" )
+
+    @ignore_exceptions
+    def handleIsGrammarFinite(self, function_to_check):
+        self._handleGrammarIsSomething( ChomskyGrammar.is_finite, "finite" )
+
+    @ignore_exceptions
+    def handleIsGrammarInfinite(self, function_to_check):
+        self._handleGrammarIsSomething( ChomskyGrammar.is_infinite, "infinite" )
 
 
 if __name__ == "__main__":
