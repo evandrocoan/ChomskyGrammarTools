@@ -58,8 +58,13 @@ def main():
     app = QtWidgets.QApplication( sys.argv )
     programWindow = ProgramWindow()
 
+    log( 1, "Opening main window..." )
     programWindow.show()
-    sys.exit( app.exec_() )
+    exit_code = app.exec_()
+
+    log( 1, "Closing main window..." )
+    log( 1, "exit_code: %s", exit_code )
+    sys.exit( exit_code )
 
 
 class ProgramWindow(QtWidgets.QMainWindow):
@@ -131,7 +136,7 @@ class ProgramWindow(QtWidgets.QMainWindow):
         self.grammarTextEditWidget.setLineWrapMode( QPlainTextEdit.NoWrap )
 
         # Change font, colour of text entry box
-        self.grammarTextEditWidget.setStyleSheet( self._getMainFontOptions() )
+        self.grammarTextEditWidget.setStyleSheet( self.getMainFontOptions() )
 
         # Set initial value of text
         self.grammarTextEditWidget.document().setPlainText( wrap_text( """
@@ -139,21 +144,6 @@ class ProgramWindow(QtWidgets.QMainWindow):
             S -> a A | a
             A -> b S | b
         """ ) )
-
-        # http://www.qtcentre.org/threads/24433-Separator-in-box-layout
-        # https://stackoverflow.com/questions/10082299/qvboxlayout-how-to-vertically-align-widgets-to-the-top-instead-of-the-center
-        self.separatorLine = QFrame()
-        self.separatorLine.setFrameShape( QFrame.HLine )
-        self.separatorLine.setFrameShadow( QFrame.Plain )
-
-        # How to increase QFrame.HLine line separator width and distance with the other buttons?
-        # https://stackoverflow.com/questions/50825126/how-to-increase-qframe-hline-line-separator-width-and-distance-with-the-other-bu
-        sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Preferred)
-        sizePolicy.setHeightForWidth(self.separatorLine.sizePolicy().hasHeightForWidth())
-        self.separatorLine.setSizePolicy(sizePolicy)
-        self.separatorLine.setStyleSheet("font: 9pt; color: #000088;")
-        self.separatorLine.setLineWidth(2.5)
-        self.separatorLine.setMidLineWidth(10)
 
         self.redoGrammarButton        = QPushButton( "Redo Operations" )
         self.undoGrammarButton        = QPushButton( "Undo Operations" )
@@ -172,15 +162,15 @@ class ProgramWindow(QtWidgets.QMainWindow):
         # The distances between the QPushButton in QGridLayout
         # https://stackoverflow.com/questions/13578187/the-distances-between-the-qpushbutton-in-qgridlayout
         self.grammarVerticalGridLayout = QGridLayout()
-        self.grammarVerticalGridLayout.addWidget( self.undoGrammarButton,       0, 0)
-        self.grammarVerticalGridLayout.addWidget( self.redoGrammarButton,       1, 0)
-        self.grammarVerticalGridLayout.addWidget( self.calculateFirstAndFollow, 2, 0)
-        self.grammarVerticalGridLayout.addWidget( self.separatorLine,           3, 0)
-        self.grammarVerticalGridLayout.addWidget( self.openGrammar,             4, 0)
-        self.grammarVerticalGridLayout.addWidget( self.saveGrammar,             5, 0)
-        self.grammarVerticalGridLayout.addWidget( self.grammarBeautifing,       6, 0)
+        self.grammarVerticalGridLayout.addWidget( self.undoGrammarButton,        0, 0)
+        self.grammarVerticalGridLayout.addWidget( self.redoGrammarButton,        1, 0)
+        self.grammarVerticalGridLayout.addWidget( self.get_vertical_separator(), 2, 0)
+        self.grammarVerticalGridLayout.addWidget( self.calculateFirstAndFollow,  3, 0)
+        self.grammarVerticalGridLayout.addWidget( self.get_vertical_separator(), 4, 0)
+        self.grammarVerticalGridLayout.addWidget( self.openGrammar,              5, 0)
+        self.grammarVerticalGridLayout.addWidget( self.saveGrammar,              6, 0)
+        self.grammarVerticalGridLayout.addWidget( self.grammarBeautifing,        7, 0)
         self.grammarVerticalGridLayout.setSpacing( 0 )
-        self.grammarVerticalGridLayout.setRowMinimumHeight(3, 10)
         self.grammarVerticalGridLayout.setAlignment(Qt.AlignTop)
 
         # How to align the layouts QHBoxLayout and QVBoxLayout on pyqt4?
@@ -188,6 +178,27 @@ class ProgramWindow(QtWidgets.QMainWindow):
         self.grammarInnerLayout = QHBoxLayout()
         self.grammarInnerLayout.addLayout( self.grammarVerticalGridLayout )
         self.grammarInnerLayout.addWidget( self.grammarTextEditWidget )
+
+    def get_vertical_separator(self):
+        """
+            http://www.qtcentre.org/threads/24433-Separator-in-box-layout
+            https://stackoverflow.com/questions/10082299/qvboxlayout-how-to-vertically-align-widgets-to-the-top-instead-of-the-center
+
+            How to increase QFrame.HLine line separator width and distance with the other buttons?
+            https://stackoverflow.com/questions/50825126/how-to-increase-qframe-hline-line-separator-width-and-distance-with-the-other-bu
+        """
+        separator_line = QFrame()
+        separator_line.setFrameShape( QFrame.HLine )
+        separator_line.setFrameShadow( QFrame.Plain )
+
+        sizePolicy = QtWidgets.QSizePolicy( QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Preferred )
+        sizePolicy.setHeightForWidth( separator_line.sizePolicy().hasHeightForWidth() )
+        separator_line.setSizePolicy( sizePolicy )
+        separator_line.setStyleSheet( "font: 9pt; color: #000088;" )
+        separator_line.setLineWidth( 2.5 )
+        separator_line.setMidLineWidth( 10 )
+        separator_line.setMinimumSize( 3, 10 )
+        return separator_line
 
     def set_window_layout(self):
         # Creates a box to align vertically the panels
@@ -220,7 +231,7 @@ class ProgramWindow(QtWidgets.QMainWindow):
         options |= QFileDialog.DontUseNativeDialog
         return options
 
-    def _getMainFontOptions(self):
+    def getMainFontOptions(self):
         """
             Qt Style Sheets Reference
             http://doc.qt.io/archives/qt-4.8/stylesheet-reference.html
@@ -271,7 +282,7 @@ class ProgramWindow(QtWidgets.QMainWindow):
     def handleCalculateFirstAndFollow(self, qt_decorator_bug):
         isToStop = [False]
 
-        results_dialog = StringOutputDialog( self, self._getMainFontOptions(), self._getFileDialogOptions(), isToStop )
+        results_dialog = StringOutputDialog( self, self.getMainFontOptions(), self._getFileDialogOptions(), isToStop )
         results_dialog.appendText( wrap_text( """
             The computed FIRST and FOLLOW for the given grammar are:
         """ ) + '\n' )
