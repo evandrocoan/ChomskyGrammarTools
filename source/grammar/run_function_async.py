@@ -42,6 +42,9 @@ class RunFunctionAsyncThread(QtCore.QThread):
         ## A `QWindow` object which will display the function results while it is computing and after if has finished
         self.results_dialog = results_dialog
 
+        ## Determines whether the waiting message was displayed one or not
+        self.has_showed_waiting = False
+
         if hasattr( function, 'force_first_run' ):
             ## Whether or not the to force the `waiting` function to run at least one time, as it
             ## can some time never be called
@@ -88,6 +91,7 @@ class RunFunctionAsyncThread(QtCore.QThread):
         while self.process_thread.isRunning() or force_first_run:
             force_first_run = False
             self.waiting( self )
+            self.has_showed_waiting = True
 
             if not self.function.isToStop[0]:
                 self.sleep( 1 )
@@ -100,6 +104,9 @@ class RunFunctionAsyncThread(QtCore.QThread):
 
         if not self.function.isToStop[0]:
             self.disable_stop_button_signal.emit()
+
+            if self.has_showed_waiting:
+                self.send_string_signal.emit("")
 
             self.send_string_signal.emit( self.function.results )
             set_scroll_to_maximum( self.results_dialog.textEditWidget )

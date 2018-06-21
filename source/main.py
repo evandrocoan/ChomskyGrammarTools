@@ -150,6 +150,7 @@ class ProgramWindow(QtWidgets.QMainWindow):
         self.undoGrammarButton        = QPushButton( "Undo Operations" )
         self.calculateFirstAndFollow  = QPushButton( "Compute First and Follow" )
         self.convertToProperGrammar   = QPushButton( "Convert to Proper" )
+        self.isGrammarFactorable      = QPushButton( "Is Factored" )
         self.isGrammarEmpty           = QPushButton( "Is Empty" )
         self.isGrammarFinite          = QPushButton( "Is Finite" )
         self.isGrammarInfinite        = QPushButton( "Is Infinite" )
@@ -161,6 +162,7 @@ class ProgramWindow(QtWidgets.QMainWindow):
         self.undoGrammarButton.clicked.connect( self.handleUndoGrammarTextEdit )
         self.redoGrammarButton.clicked.connect( self.handleRedoGrammarTextEdit )
         self.calculateFirstAndFollow.clicked.connect( self.handleCalculateFirstAndFollow )
+        self.isGrammarFactorable.clicked.connect( self.handleIsGrammarFactorable )
         self.convertToProperGrammar.clicked.connect( self.handleConvertToProperGrammar )
         self.isGrammarEmpty.clicked.connect( self.handleIsGrammarEmpty )
         self.isGrammarFinite.clicked.connect( self.handleIsGrammarFinite )
@@ -178,15 +180,16 @@ class ProgramWindow(QtWidgets.QMainWindow):
         self.grammarVerticalGridLayout.addWidget( self.get_vertical_separator(), 2, 0)
         self.grammarVerticalGridLayout.addWidget( self.calculateFirstAndFollow,  3, 0)
         self.grammarVerticalGridLayout.addWidget( self.convertToProperGrammar,   4, 0)
-        self.grammarVerticalGridLayout.addWidget( self.get_vertical_separator(), 5, 0)
-        self.grammarVerticalGridLayout.addWidget( self.isGrammarEmpty,           6, 0)
-        self.grammarVerticalGridLayout.addWidget( self.isGrammarFinite,          7, 0)
-        self.grammarVerticalGridLayout.addWidget( self.isGrammarInfinite,        8, 0)
-        self.grammarVerticalGridLayout.addWidget( self.isGrammarEmptyOrInFinite, 9, 0)
-        self.grammarVerticalGridLayout.addWidget( self.get_vertical_separator(), 10, 0)
-        self.grammarVerticalGridLayout.addWidget( self.openGrammar,              11, 0)
-        self.grammarVerticalGridLayout.addWidget( self.saveGrammar,              12, 0)
-        self.grammarVerticalGridLayout.addWidget( self.grammarBeautifing,        13, 0)
+        self.grammarVerticalGridLayout.addWidget( self.isGrammarFactorable,      5, 0)
+        self.grammarVerticalGridLayout.addWidget( self.get_vertical_separator(), 6, 0)
+        self.grammarVerticalGridLayout.addWidget( self.isGrammarEmpty,           7, 0)
+        self.grammarVerticalGridLayout.addWidget( self.isGrammarFinite,          8, 0)
+        self.grammarVerticalGridLayout.addWidget( self.isGrammarInfinite,        9, 0)
+        self.grammarVerticalGridLayout.addWidget( self.isGrammarEmptyOrInFinite, 10, 0)
+        self.grammarVerticalGridLayout.addWidget( self.get_vertical_separator(), 11, 0)
+        self.grammarVerticalGridLayout.addWidget( self.openGrammar,              12, 0)
+        self.grammarVerticalGridLayout.addWidget( self.saveGrammar,              13, 0)
+        self.grammarVerticalGridLayout.addWidget( self.grammarBeautifing,        14, 0)
         self.grammarVerticalGridLayout.setSpacing( 0 )
         self.grammarVerticalGridLayout.setAlignment(Qt.AlignTop)
 
@@ -330,6 +333,10 @@ class ProgramWindow(QtWidgets.QMainWindow):
             function.results = "".join( results )
 
         self._handleFunctionAsync( function, "The computed FIRST and FOLLOW for the given grammar are:\n" )
+
+    @ignore_exceptions
+    def handleIsGrammarFactorable(self, qt_decorator_bug):
+        self._handleGrammarIsSomething( ChomskyGrammar.is_factored, "Factored" )
 
     @ignore_exceptions
     def _handleGrammarIsSomething(self, function_to_check, property_name):
