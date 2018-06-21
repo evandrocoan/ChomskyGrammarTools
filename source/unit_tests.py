@@ -977,6 +977,71 @@ class TestAutomataOperationHistory(TestingUtilities):
 
         self.assertTextEqual(
         """
+            + # 1. Factoring, Beginning
+            +   P -> & | L | D L
+            +   C -> V =exp | id( E )
+            +   D -> d | d D
+            +   E -> exp | exp, E
+            +   L -> V =exp L' | id( E ) L'
+            +   V -> id | id[ E ]
+            +  L' -> & | ; C L'
+            +
+            + # 2. Eliminating Indirect Factors, End
+            +   P -> & | d L | d D L | id=exp L' | id( E ) L' | id[ E ]=exp L'
+            +   C -> id=exp | id( E ) | id[ E ]=exp
+            +   D -> d | d D
+            +   E -> exp | exp, E
+            +   L -> id=exp L' | id( E ) L' | id[ E ]=exp L'
+            +   V -> id | id[ E ]
+            +  L' -> & | ; C L'
+            +
+            + # 3. Eliminating Direct Factors, End
+            +   P -> & | d P1 | id P2
+            +   C -> id C1
+            +   D -> d D1
+            +   E -> exp E1
+            +   L -> id L1
+            +   V -> id V1
+            +  C1 -> =exp | ( E ) | [ E ]=exp
+            +  D1 -> & | D
+            +  E1 -> & | , E
+            +  L1 -> =exp L' | ( E ) L' | [ E ]=exp L'
+            +  L' -> & | ; C L'
+            +  P1 -> L | D L
+            +  P2 -> =exp L' | ( E ) L' | [ E ]=exp L'
+            +  V1 -> & | [ E ]
+            +
+            + # 4. Eliminating Indirect Factors, End
+            +   P -> & | d P1 | id P2
+            +   C -> id C1
+            +   D -> d D1
+            +   E -> exp E1
+            +   L -> id L1
+            +   V -> id V1
+            +  C1 -> =exp | ( E ) | [ E ]=exp
+            +  D1 -> & | d D1
+            +  E1 -> & | , E
+            +  L1 -> =exp L' | ( E ) L' | [ E ]=exp L'
+            +  L' -> & | ; C L'
+            +  P1 -> id L1 | d D1 L
+            +  P2 -> =exp L' | ( E ) L' | [ E ]=exp L'
+            +  V1 -> & | [ E ]
+            +
+            + # 5. Factoring, End
+            +   P -> & | d P1 | id P2
+            +   C -> id C1
+            +   D -> d D1
+            +   E -> exp E1
+            +   L -> id L1
+            +   V -> id V1
+            +  C1 -> =exp | ( E ) | [ E ]=exp
+            +  D1 -> & | d D1
+            +  E1 -> & | , E
+            +  L1 -> =exp L' | ( E ) L' | [ E ]=exp L'
+            +  L' -> & | ; C L'
+            +  P1 -> id L1 | d D1 L
+            +  P2 -> =exp L' | ( E ) L' | [ E ]=exp L'
+            +  V1 -> & | [ E ]
         """, firstGrammar.get_operation_history() )
 
 

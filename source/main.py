@@ -362,6 +362,7 @@ class ProgramWindow(QtWidgets.QMainWindow):
                 results.append( "\n\nDoes still has the following factor/nondeterminism(s)\n" )
                 results.append( convert_to_text_lines( factors, sort=sort_correctly ) )
 
+            results.append( self._get_history_string( firstGrammar ) )
             function.results = "".join( results )
 
         self._handleFunctionAsync( function, "The following grammar:" )
@@ -395,6 +396,8 @@ class ProgramWindow(QtWidgets.QMainWindow):
 
             results.append( "\n" )
             results.append( str( firstGrammar ) )
+
+            results.append( self._get_history_string( firstGrammar ) )
             function.results = "".join( results )
 
         self._handleFunctionAsync( function, "Trying to factor the following grammar in `%s` steps:" % maximumSteps )
@@ -422,6 +425,7 @@ class ProgramWindow(QtWidgets.QMainWindow):
             else:
                 results.append( "\n\nHas NO Left Recursion." )
 
+            results.append( self._get_history_string( firstGrammar ) )
             function.results = "".join( results )
 
         self._handleFunctionAsync( function, "The following grammar:" )
@@ -441,6 +445,8 @@ class ProgramWindow(QtWidgets.QMainWindow):
 
             results.append( str( firstGrammar ) )
             results.append( "\n\nIs %s%s.\n" % ( "" if (not is_empty if inverse_boolean else is_empty) else "NOT ", property_name ) )
+
+            results.append( self._get_history_string( firstGrammar ) )
             function.results = "".join( results )
 
         self._handleFunctionAsync( function, "The following grammar:" )
@@ -470,6 +476,8 @@ class ProgramWindow(QtWidgets.QMainWindow):
 
             results.append( str( firstGrammar ) )
             results.append( "\n\nIs %s.\n" % ( property_name ) )
+
+            results.append( self._get_history_string( firstGrammar ) )
             function.results = "".join( results )
 
         self._handleFunctionAsync( function, "The following grammar:" )
@@ -516,9 +524,13 @@ class ProgramWindow(QtWidgets.QMainWindow):
             results.append( "\n\nIt has the following Simple Non Terminal's set (Na):\n" )
             results.append( dictionary_to_string( simple_non_terminals ) )
 
+            results.append( self._get_history_string( firstGrammar ) )
             function.results = "".join( results )
 
         self._handleFunctionAsync( function, "The following grammar:" )
+
+    def _get_history_string(self, firstGrammar):
+        return "\n\n\n%s\n\n%s" % ( HISTORY_KEY_LINE, firstGrammar.get_operation_history() )
 
 
 if __name__ == "__main__":

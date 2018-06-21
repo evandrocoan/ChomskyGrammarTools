@@ -12,13 +12,14 @@ from typing import Dict, Set
 
 from .symbols import Terminal
 from .symbols import NonTerminal
+from .symbols import HISTORY_KEY_LINE
 
 from .production import Production
 from .production import epsilon_production
 from .production import end_of_string_terminal
 
-from .utilities import DynamicIterationSet
 from .utilities import IntermediateGrammar
+from .utilities import DynamicIterationSet
 
 from .utilities import getCleanSpaces
 from .utilities import dictionary_to_string
@@ -258,7 +259,7 @@ class ChomskyGrammar():
                 1 -> a | a2 | b | b2
                 2 -> a | a2 | b | b2
         """
-        AST = cls.parse( "\n".join( getCleanSpaces( input_text_form, keepSpaceSepators=True ) ) )
+        AST = cls.parse( "\n".join( getCleanSpaces( input_text_form, lineCutTrigger=HISTORY_KEY_LINE, keepSpaceSepators=True ) ) )
         grammar = ChomskyGrammar()
 
         # initial_symbol: 1
@@ -495,6 +496,7 @@ class ChomskyGrammar():
             Convert the current grammar to a epsilon free grammar.
         """
         # log( 1, "self: \n%s", self )
+        self._save_history( "Converting to Epsilon Free", IntermediateGrammar.BEGINNING )
         non_terminal_epsilon = self.non_terminal_epsilon()
 
         for start_symbol in set( self.productions.keys() ):
@@ -516,6 +518,8 @@ class ChomskyGrammar():
                 self.initial_symbol = new_initial_symbol
 
             self.add_production( self.initial_symbol, epsilon_production )
+
+        self._save_history( "Converting to Epsilon Free", IntermediateGrammar.END )
 
     def remove_production(self, start_symbol, production):
         """
@@ -587,6 +591,9 @@ class ChomskyGrammar():
         """
             Given a `new_symbol` initial name, search for a new symbol name until find one in the
             form S'''... and returns it.
+
+            If `use_digits` is passed as True, then use numbers to represent the new symbols instead
+            of single quotes `'`.
         """
         new_symbol = str( new_symbol )
 
@@ -671,6 +678,7 @@ class ChomskyGrammar():
             function. See that function documentation for the sorting order.
         """
         # log( 1, "self: \n%s", self )
+        self._save_history( "Eliminating Left Recursion", IntermediateGrammar.BEGINNING )
 
         if self.has_left_recursion():
             self.convert_to_proper()
@@ -748,6 +756,8 @@ class ChomskyGrammar():
 
                 self.add_production( new_outter_start_symbol, epsilon_production.new() )
 
+        self._save_history( "Eliminating Left Recursion", IntermediateGrammar.END )
+
     def has_indirect_factors(self):
         """
             Checks whether there are indirect factors on this grammar.
@@ -769,6 +779,7 @@ class ChomskyGrammar():
         """
             Converts all indirect factors on this grammar to direct factors.
         """
+        self._save_history( "Eliminating Indirect Factors", IntermediateGrammar.BEGINNING )
         old_counter = -1
         current_counter = 0
         production_keys = self.productions.keys()
@@ -795,6 +806,7 @@ class ChomskyGrammar():
                             current_counter += 1
                             self.remove_production( start_symbol, start_production )
 
+        self._save_history( "Eliminating Indirect Factors", IntermediateGrammar.END )
         log( 16, "self out: \n%s", self )
 
     def factors(self):
@@ -910,7 +922,9 @@ class ChomskyGrammar():
         """
             Converts all direct factors on this grammar to deterministic factors.
         """
+        self._save_history( "Eliminating Direct Factors", IntermediateGrammar.BEGINNING )
         production_keys = list( self.productions.keys() )
+
         duplicated_factors_list = sorted( get_duplicated_elements( self.factors() ) )
         duplicated_factors_dictionary = {}
 
@@ -975,6 +989,7 @@ class ChomskyGrammar():
                             self.add_production( new_factor_start_symbol, new_factor_production )
                             self.remove_production( start_symbol, start_production )
 
+        self._save_history( "Eliminating Direct Factors", IntermediateGrammar.END )
         log( 16, "self out: \n%s", self )
 
     def fertile(self):
@@ -1029,6 +1044,7 @@ class ChomskyGrammar():
         """
             Eliminates all non fertile non terminal's symbols with their productions.
         """
+        self._save_history( "Eliminating Infertile Symbols", IntermediateGrammar.BEGINNING )
         fertile = self.fertile()
         production_keys = set( self.productions.keys() )
 
@@ -1058,6 +1074,8 @@ class ChomskyGrammar():
                 if not all_fertile:
                     self.remove_production( start_symbol, production )
 
+        self._save_history( "Eliminating Infertile Symbols", IntermediateGrammar.END )
+
     def reachable(self):
         """
             Return a set with the reachable terminal's and non terminal's symbols.
@@ -1084,6 +1102,7 @@ class ChomskyGrammar():
         """
             Eliminates all unreachable terminal's and non terminal symbols with their productions.
         """
+        self._save_history( "Eliminating Unreachable Symbols", IntermediateGrammar.BEGINNING )
         reachable = self.reachable()
         production_keys = set( self.productions.keys() )
 
@@ -1110,20 +1129,24 @@ class ChomskyGrammar():
                 if not all_reachable:
                     self.remove_production( start_symbol, production )
 
+        self._save_history( "Eliminating Unreachable Symbols", IntermediateGrammar.END )
+
     def eliminate_unuseful(self):
         """
             Eliminates all infertile and unreachable terminal's and non terminal's symbols.
         """
+        self._save_history( "Eliminating Unuseful Symbols", IntermediateGrammar.BEGINNING )
         self.eliminate_infertile()
         self.eliminate_unreachable()
+        self._save_history( "Eliminating Unuseful Symbols", IntermediateGrammar.END )
 
     def simple_non_terminals(self):
         """
             For each non terminal start symbol, calculates the reachable terminal only by simple
             productions.
 
-            @return a dictionary with the non terminal's reachable by simple productions for each
-                non terminal start symbol
+            Return a dictionary with the non terminal's reachable by simple productions for each non
+            terminal start symbol
         """
         self.convert_to_epsilon_free()
         simple_non_terminals = {}
@@ -1189,6 +1212,7 @@ class ChomskyGrammar():
         """
             Eliminates all unreachable terminal's and non terminal symbols with their productions.
         """
+        self._save_history( "Eliminating Simple Productions", IntermediateGrammar.BEGINNING )
         simple_non_terminals = self.simple_non_terminals()
         production_keys = set( self.productions.keys() )
 
@@ -1210,12 +1234,15 @@ class ChomskyGrammar():
                 if production in simple_non_terminals:
                     self.remove_production( start_symbol, production )
 
+        self._save_history( "Eliminating Simple Productions", IntermediateGrammar.END )
+
     def convert_to_proper(self):
         """
             1. Call `convert_to_epsilon_free()` because it can create cycles
             2. Call `eliminate_simple_non_terminals()` because it can create unuseful (infertile and unreachable) symbols.
             3. Call `eliminate_unuseful()` to finally clear the grammar.
         """
+        self._save_history( "Converting to Proper", IntermediateGrammar.BEGINNING )
 
         if not self.is_epsilon_free():
             self.convert_to_epsilon_free()
@@ -1224,6 +1251,7 @@ class ChomskyGrammar():
             self.eliminate_simple_non_terminals()
 
         self.eliminate_unuseful()
+        self._save_history( "Converting to Proper", IntermediateGrammar.END )
 
     def is_empty(self):
         """
