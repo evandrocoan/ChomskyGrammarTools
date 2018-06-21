@@ -37,6 +37,7 @@ from grammar.symbols import HISTORY_KEY_LINE
 from grammar.run_function_async import run_function_async
 
 from grammar.utilities import wrap_text
+from grammar.utilities import sort_correctly
 from grammar.utilities import ignore_exceptions
 from grammar.utilities import convert_to_text_lines
 from grammar.utilities import setTextWithoutCleaningHistory
@@ -343,7 +344,27 @@ class ProgramWindow(QtWidgets.QMainWindow):
 
     @ignore_exceptions
     def handleGrammarHasLeftRecursion(self, qt_decorator_bug):
-        self._handleGrammarIsSomething( ChomskyGrammar.has_left_recursion, "Left Recursion Free", True )
+
+        @ignore_exceptions
+        def function():
+            results = []
+            firstGrammar = ChomskyGrammar.load_from_text_lines( self.grammarTextEditWidget.toPlainText() )
+            results.append( str( firstGrammar ) )
+
+            left_recursion = firstGrammar.left_recursion()
+            has_left_recursion = firstGrammar.has_left_recursion()
+
+            if has_left_recursion:
+                results.append( "\n\nHas the following Left Recursion(s)\n" )
+                results.append( convert_to_text_lines( left_recursion, sort=sort_correctly ) )
+
+            else:
+                results.append( "\n\nHas NO Left Recursion" )
+
+            results.append( "\n\nComputation completed successfully!" )
+            function.results = "".join( results )
+
+        self._handleFunctionAsync( function, "The following grammar:\n" )
 
     @ignore_exceptions
     def _handleGrammarIsSomething(self, function_to_check, property_name, inverse_boolean=False):
