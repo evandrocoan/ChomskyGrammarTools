@@ -400,10 +400,10 @@ class ProgramWindow(QtWidgets.QMainWindow):
             firstGrammar = ChomskyGrammar.load_from_text_lines( self.grammarTextEditWidget.toPlainText() )
             results.append( str( firstGrammar ) )
 
-            non_terminal_epsilon = firstGrammar.get_non_terminal_epsilon()
+            non_terminal_epsilon = firstGrammar.non_terminal_epsilon()
             fertile = firstGrammar.fertile()
             reachable = firstGrammar.reachable()
-            simple_non_terminals = firstGrammar.get_simple_non_terminals()
+            simple_non_terminals = firstGrammar.simple_non_terminals()
             firstGrammar.convert_to_proper()
 
             results.append( "\n\nHas the following Proper version:\n" )

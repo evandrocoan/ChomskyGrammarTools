@@ -121,7 +121,7 @@ class Terminal(ChomskyGrammarSymbol):
     """
 
     @staticmethod
-    def get_common_symbols(first_terminal, second_terminal):
+    def common_symbols(first_terminal, second_terminal):
         """
             Given two terminals `first_terminal` and `second_terminal`, return a new Terminal which
             is the common prefix for both terminal's. If the prefix is found, epsilon is returned.

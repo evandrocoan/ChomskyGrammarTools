@@ -330,7 +330,7 @@ class TestGrammarEpsilonConversion(TestingUtilities):
             + , Production locked: True, str: B, symbols: [NonTerminal locked: True, str: B, sequence: 1, len:
             + 1;], sequence: 1, len: 1;
             + ]
-        """, wrap_text( sort_alphabetically_and_by_length( firstGrammar.get_non_terminal_epsilon() ), wrap=100 ) )
+        """, wrap_text( sort_alphabetically_and_by_length( firstGrammar.non_terminal_epsilon() ), wrap=100 ) )
 
     def test_grammarGetNonTerminalEpsilonChapter5Example1FirstMutated(self):
         LockableType._USE_STRING = False
@@ -350,7 +350,7 @@ class TestGrammarEpsilonConversion(TestingUtilities):
             + , Production locked: True, str: S, symbols: [NonTerminal locked: True, str: S, sequence: 1, len:
             + 1;], sequence: 1, len: 1;
             + ]
-        """, wrap_text( sort_alphabetically_and_by_length( firstGrammar.get_non_terminal_epsilon() ), wrap=100 ) )
+        """, wrap_text( sort_alphabetically_and_by_length( firstGrammar.non_terminal_epsilon() ), wrap=100 ) )
 
     def test_grammarIsNotEpsilonFreeChapter5Example1First(self):
         firstGrammar = ChomskyGrammar.load_from_text_lines( wrap_text(
@@ -584,7 +584,7 @@ class TestGrammarFertileSymbols(TestingUtilities):
             F -> b F d | a C | A b | G A
             G -> B c | B C a
         """ ) )
-        simple_non_terminals = firstGrammar.get_simple_non_terminals()
+        simple_non_terminals = firstGrammar.simple_non_terminals()
 
         self.assertTextEqual(
         r"""
@@ -608,7 +608,7 @@ class TestGrammarFactoringAndRecursionSymbols(TestingUtilities):
             G -> dG | H | a
             H -> c
         """ ) )
-        simple_non_terminals = firstGrammar.get_simple_non_terminals()
+        simple_non_terminals = firstGrammar.simple_non_terminals()
 
         self.assertTextEqual(
         """
@@ -627,7 +627,7 @@ class TestGrammarFactoringAndRecursionSymbols(TestingUtilities):
             E -> e E | e
             F -> f F | f
         """ ) )
-        simple_non_terminals = firstGrammar.get_simple_non_terminals()
+        simple_non_terminals = firstGrammar.simple_non_terminals()
 
         self.assertTextEqual(
         """

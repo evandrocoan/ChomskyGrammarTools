@@ -155,7 +155,7 @@ class Production(LockableType):
         # log( 1, "self: %s", self )
         combinations = set()
 
-        non_terminals = self.get_non_terminals()
+        non_terminals = self.non_terminals()
         non_terminals_count = len( non_terminals )
 
         for permutation_size in range( 0, non_terminals_count ):
@@ -409,7 +409,7 @@ class Production(LockableType):
         if not self.symbols:
             raise RuntimeError( "Invalid production creation! Production with no length: `%s`" % self.symbols )
 
-    def get_terminals(self, index=-1):
+    def terminals(self, index=-1):
         """
             Get all Terminal's this symbol is composed by, on their respective sequence/ordering.
 
@@ -418,7 +418,7 @@ class Production(LockableType):
         """
         return self._get_symbols( Terminal, index )
 
-    def get_non_terminals(self, index=-1):
+    def non_terminals(self, index=-1):
         """
             Get all NonTerminal's this symbol is composed by, on their respective sequence/ordering.
 

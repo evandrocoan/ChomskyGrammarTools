@@ -314,22 +314,22 @@ class ChomskyGrammar():
 
         return reachable_terminals
 
-    def get_non_terminals(self, start_symbol):
+    def non_terminals(self, start_symbol):
         """
             Given a `start_symbol` as S, return all its non terminal's reachable from it, with or
             without terminal's together.
         """
-        return self.get_symbols_composition( self.productions[start_symbol], NonTerminal )
+        return self.symbols_composition( self.productions[start_symbol], NonTerminal )
 
-    def get_terminals(self, symbol):
+    def terminals(self, symbol):
         """
             Given a `start_symbol` as S, return all its terminal's reachable from it, with or
             without non terminal's together.
         """
-        return self.get_symbols_composition( self.productions[symbol], Terminal )
+        return self.symbols_composition( self.productions[symbol], Terminal )
 
     @staticmethod
-    def get_symbols_composition(productions, symbolType):
+    def symbols_composition(productions, symbolType):
         """
             For each production in `productions`, get all symbol of type `symbolType` they are composed.
         """
@@ -347,10 +347,10 @@ class ChomskyGrammar():
             there is a empty start symbol `S ->`.
         """
         production_keys = self.productions.keys()
-        start_non_terminals = self.get_symbols_composition( production_keys, NonTerminal )
+        start_non_terminals = self.symbols_composition( production_keys, NonTerminal )
 
         for start_symbol in production_keys:
-            non_terminals = self.get_non_terminals( start_symbol )
+            non_terminals = self.non_terminals( start_symbol )
 
             for non_terminal in non_terminals:
 
@@ -407,7 +407,7 @@ class ChomskyGrammar():
         # log( 1, "recursive_terminals: %s", recursive_terminals )
         return False
 
-    def get_non_terminal_epsilon(self):
+    def non_terminal_epsilon(self):
         """
             Creates the non terminal's epsilon set, within all non terminal's which lead to epsilon
             with 0 or more transitions.
@@ -457,7 +457,7 @@ class ChomskyGrammar():
             Convert the current grammar to a epsilon free grammar.
         """
         # log( 1, "self: \n%s", self )
-        non_terminal_epsilon = self.get_non_terminal_epsilon()
+        non_terminal_epsilon = self.non_terminal_epsilon()
 
         for start_symbol in set( self.productions.keys() ):
             non_terminal_productions = set( self.productions[start_symbol] )
@@ -473,7 +473,7 @@ class ChomskyGrammar():
         if self.initial_symbol in non_terminal_epsilon:
 
             if self.has_recursion_on_the_non_terminal( self.initial_symbol ):
-                new_initial_symbol = self.get_new_symbol()
+                new_initial_symbol = self.new_symbol()
                 self.copy_productions_for_one_non_terminal( self.initial_symbol, new_initial_symbol )
                 self.initial_symbol = new_initial_symbol
 
@@ -517,12 +517,12 @@ class ChomskyGrammar():
     def clean_initial_symbol(self, start_symbol):
         """
             Replace the current initial symbol creating a new empty initial symbol such `S -> S` by
-            querying `get_new_symbol()` for a new initial symbol.
+            querying `new_symbol()` for a new initial symbol.
         """
 
         if self.initial_symbol == start_symbol:
             # log( 1, "WARNING: Removing the gramar initial symbol!" )
-            new_initial_symbol = self.get_new_symbol()
+            new_initial_symbol = self.new_symbol()
 
             self.add_production( new_initial_symbol, new_initial_symbol )
             self.initial_symbol = new_initial_symbol
@@ -545,7 +545,7 @@ class ChomskyGrammar():
         for production in secondGrammarProductions:
             self.add_production( non_terminal_destine, production )
 
-    def get_new_symbol(self, new_symbol='S', use_digits=False):
+    def new_symbol(self, new_symbol='S', use_digits=False):
         """
             Given a `new_symbol` initial name, search for a new symbol name until find one in the
             form S'''... and returns it.
@@ -678,7 +678,7 @@ class ChomskyGrammar():
 
             # Eliminate direct left recursion
             outter_productions = set( self.productions[outter_start_symbol] )
-            new_outter_start_symbol = self.get_new_symbol( outter_start_symbol )
+            new_outter_start_symbol = self.new_symbol( outter_start_symbol )
             outter_productions_recursive = set()
 
             # log( 1, "2. new_outter_start_symbol: %s", new_outter_start_symbol )
@@ -893,7 +893,7 @@ class ChomskyGrammar():
                 else:
                     break
 
-                new_factor_start_symbol = self.get_new_symbol( start_symbol, True )
+                new_factor_start_symbol = self.new_symbol( start_symbol, True )
                 direct_factors_productions = {}
                 log( 16, "start_symbol_non_deterministic_factor: %s", start_symbol_non_deterministic_factor )
                 log( 16, "new_factor_start_symbol: %s", new_factor_start_symbol )
@@ -902,7 +902,7 @@ class ChomskyGrammar():
                     start_production_first_symbol = start_production[0]
 
                     if type( start_production_first_symbol ) is Terminal:
-                        common_terminal_symbols = Terminal.get_common_symbols(
+                        common_terminal_symbols = Terminal.common_symbols(
                                 start_production_first_symbol, start_symbol_non_deterministic_factor )
 
                         if common_terminal_symbols:
@@ -1018,7 +1018,7 @@ class ChomskyGrammar():
             Return a set with the reachable terminal's and non terminal's symbols.
         """
         reachable_terminals = set()
-        reachable_non_terminals = DynamicIterationSet( [self.initial_symbol.get_non_terminals(0)] )
+        reachable_non_terminals = DynamicIterationSet( [self.initial_symbol.non_terminals(0)] )
 
         for start_symbol in reachable_non_terminals:
             start_productions = self.productions[start_symbol]
@@ -1072,7 +1072,7 @@ class ChomskyGrammar():
         self.eliminate_infertile()
         self.eliminate_unreachable()
 
-    def get_simple_non_terminals(self):
+    def simple_non_terminals(self):
         """
             For each non terminal start symbol, calculates the reachable terminal only by simple
             productions.
@@ -1100,7 +1100,7 @@ class ChomskyGrammar():
                 for production in start_productions:
 
                     if len( production ) == 1:
-                        non_terminal = production.get_non_terminals( 0 )
+                        non_terminal = production.non_terminals( 0 )
 
                         if non_terminal:
 
@@ -1144,7 +1144,7 @@ class ChomskyGrammar():
         """
             Eliminates all unreachable terminal's and non terminal symbols with their productions.
         """
-        simple_non_terminals = self.get_simple_non_terminals()
+        simple_non_terminals = self.simple_non_terminals()
         production_keys = set( self.productions.keys() )
 
         for start_symbol in production_keys:
@@ -1323,7 +1323,7 @@ class ChomskyGrammar():
 
         return first_terminals
 
-    def get_first_from(self, symbols, first_terminals=None ):
+    def first_from(self, symbols, first_terminals=None ):
         """
             Given a list of `symbols` get their FIRST symbols set.
         """
@@ -1382,7 +1382,7 @@ class ChomskyGrammar():
                             next_symbol = production.peek_next()
 
                             if next_symbol:
-                                following_first = self.get_first_from( production.following_symbols(), first_terminals )
+                                following_first = self.first_from( production.following_symbols(), first_terminals )
 
                                 if Production.copy_productions_except_epsilon( following_first, follow_terminals[current_symbol] ):
                                     # log( 1, "1. start_symbol: %s, current_symbol: %s, next_symbol: %-4s, Adding: %s", start_symbol, current_symbol, next_symbol, following_first )
