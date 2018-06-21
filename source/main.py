@@ -344,7 +344,27 @@ class ProgramWindow(QtWidgets.QMainWindow):
 
     @ignore_exceptions
     def handleIsGrammarFactored(self, qt_decorator_bug):
-        self._handleGrammarIsSomething( ChomskyGrammar.is_factored, "Factored" )
+
+        @ignore_exceptions
+        def function():
+            results = []
+            firstGrammar = ChomskyGrammar.load_from_text_lines( self.grammarTextEditWidget.toPlainText() )
+            results.append( str( firstGrammar ) )
+
+            factors = firstGrammar.factors()
+            is_factored = firstGrammar.is_factored()
+
+            if is_factored:
+                results.append( "\n\nIs Factored!" )
+
+            else:
+                results.append( "\n\nIs NOT Factored!" )
+                results.append( "\n\nDoes still has the following factor/nondeterminism(s)\n" )
+                results.append( convert_to_text_lines( factors, sort=sort_correctly ) )
+
+            function.results = "".join( results )
+
+        self._handleFunctionAsync( function, "The following grammar:" )
 
     @ignore_exceptions
     def handleTryToFactorGrammar(self, qt_decorator_bug):
