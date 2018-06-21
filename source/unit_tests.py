@@ -915,6 +915,31 @@ class TestGrammarFactoringAndRecursionSymbols(TestingUtilities):
 
         self.assertFalse( firstGrammar.has_left_recursion() )
 
+    def test_grammarEliminateLeftRecursionOfList3Exercice7ItemA(self):
+        firstGrammar = ChomskyGrammar.load_from_text_lines( wrap_text(
+        """
+            P -> D L | &
+            C -> V=exp | id (E)
+            D -> d D | &
+            E -> exp, E | exp
+            L -> L; C | C
+            V -> id[E] | id
+        """ ) )
+        firstGrammar.eliminate_left_recursion()
+
+        self.assertTextEqual(
+        """
+            +  P -> & | L | D L
+            +  C -> V =exp | id( E )
+            +  D -> d | d D
+            +  E -> exp | exp, E
+            +  L -> V =exp L' | id( E ) L'
+            +  V -> id | id[ E ]
+            + L' -> & | ; C L'
+        """, firstGrammar )
+
+        self.assertFalse( firstGrammar.has_left_recursion() )
+
     def test_grammarConvertToProperCalculationOfExercise6List3ItemC(self):
         firstGrammar = ChomskyGrammar.load_from_text_lines( wrap_text(
         """
@@ -959,6 +984,40 @@ class TestGrammarFactoringAndRecursionSymbols(TestingUtilities):
 
         self.assertFalse( firstGrammar.is_factored() )
 
+    def test_grammarIsFactoredOfList3Exercice7ItemA(self):
+        firstGrammar = ChomskyGrammar.load_from_text_lines( wrap_text(
+        """
+            P  -> & | L | D L
+            C  -> V =exp | id( E )
+            D  -> d | d D
+            E  -> exp | exp, E
+            L  -> V =exp L' | id( E ) L'
+            V  -> id | id[ E ]
+            L' -> & | ; C L'
+        """ ) )
+
+        self.assertTextEqual(
+        """
+            + (C, id)
+            + (C, id)
+            + (C, id)
+            + (D, d)
+            + (D, d)
+            + (E, exp)
+            + (E, exp)
+            + (L, id)
+            + (L, id)
+            + (L, id)
+            + (P, d)
+            + (P, d)
+            + (P, id)
+            + (P, id)
+            + (P, id)
+            + (V, id)
+            + (V, id)
+            + (L', ;)
+        """, convert_to_text_lines( firstGrammar.factors(), sort=sort_correctly ) )
+
     def test_grammarFactoringOfChapter5Example1First(self):
         firstGrammar = ChomskyGrammar.load_from_text_lines( wrap_text(
         """
@@ -993,57 +1052,14 @@ class TestGrammarFactoringAndRecursionSymbols(TestingUtilities):
     def test_grammarFactoringOfList3Exercice7ItemA(self):
         firstGrammar = ChomskyGrammar.load_from_text_lines( wrap_text(
         """
-            P -> D L | &
-            C -> V=exp | id (E)
-            D -> d D | &
-            E -> exp, E | exp
-            L -> L; C | C
-            V -> id[E] | id
+            P  -> & | L | D L
+            C  -> V =exp | id( E )
+            D  -> d | d D
+            E  -> exp | exp, E
+            L  -> V =exp L' | id( E ) L'
+            V  -> id | id[ E ]
+            L' -> & | ; C L'
         """ ) )
-
-        self.assertTextEqual(
-        """
-            + P -> & | D L
-            + C -> V =exp | id( E )
-            + D -> & | d D
-            + E -> exp | exp, E
-            + L -> C | L ; C
-            + V -> id | id[ E ]
-        """, firstGrammar )
-        firstGrammar.eliminate_left_recursion()
-
-        self.assertTextEqual(
-        """
-            +  P -> & | L | D L
-            +  C -> V =exp | id( E )
-            +  D -> d | d D
-            +  E -> exp | exp, E
-            +  L -> V =exp L' | id( E ) L'
-            +  V -> id | id[ E ]
-            + L' -> & | ; C L'
-        """, firstGrammar )
-
-        self.assertTextEqual(
-        """
-            + (C, id)
-            + (C, id)
-            + (C, id)
-            + (D, d)
-            + (D, d)
-            + (E, exp)
-            + (E, exp)
-            + (L, id)
-            + (L, id)
-            + (L, id)
-            + (P, d)
-            + (P, d)
-            + (P, id)
-            + (P, id)
-            + (P, id)
-            + (V, id)
-            + (V, id)
-            + (L', ;)
-        """, convert_to_text_lines( firstGrammar.factors(), sort=sort_correctly ) )
 
         factor_it = firstGrammar.factor_it(5)
         self.assertTextEqual(
@@ -1317,6 +1333,141 @@ class TestGrammarTreeParsing(TestingUtilities):
             +     production
             +       space
             +       epsilon
+        """, firstGrammar.pretty() )
+
+    def test_grammarSpecialSymbolsList3Exercice7ItemA(self):
+        firstGrammar = ChomskyGrammar.parse( wrap_text(
+        """
+            P -> D L | &
+            C -> V=exp | id (E)
+            D -> d D | &
+            E -> exp, E | exp
+            L -> L; C | C
+            V -> id[E] | id
+        """ ) )
+
+        self.assertTextEqual(
+        """
+            + productions
+            +   non_terminal_start
+            +     non_terminal  P
+            +   space
+            +   non_terminals
+            +     production
+            +       space
+            +       non_terminal  D
+            +       space
+            +       non_terminal  L
+            +       space
+            +     production
+            +       space
+            +       epsilon
+            +   end_symbol
+            +     new_line
+            +
+            +   non_terminal_start
+            +     non_terminal  C
+            +   space
+            +   non_terminals
+            +     production
+            +       space
+            +       non_terminal  V
+            +       terminal
+            +         equals
+            +         e
+            +         x
+            +         p
+            +       space
+            +     production
+            +       space
+            +       terminal
+            +         i
+            +         d
+            +       space
+            +       terminal
+            +         open_paren
+            +       non_terminal  E
+            +       terminal
+            +         close_paren
+            +   end_symbol
+            +     new_line
+            +
+            +   non_terminal_start
+            +     non_terminal  D
+            +   space
+            +   non_terminals
+            +     production
+            +       space
+            +       terminal  d
+            +       space
+            +       non_terminal  D
+            +       space
+            +     production
+            +       space
+            +       epsilon
+            +   end_symbol
+            +     new_line
+            +
+            +   non_terminal_start
+            +     non_terminal  E
+            +   space
+            +   non_terminals
+            +     production
+            +       space
+            +       terminal
+            +         e
+            +         x
+            +         p
+            +         comma
+            +       space
+            +       non_terminal  E
+            +       space
+            +     production
+            +       space
+            +       terminal
+            +         e
+            +         x
+            +         p
+            +   end_symbol
+            +     new_line
+            +
+            +   non_terminal_start
+            +     non_terminal  L
+            +   space
+            +   non_terminals
+            +     production
+            +       space
+            +       non_terminal  L
+            +       terminal
+            +         semicolon
+            +       space
+            +       non_terminal  C
+            +       space
+            +     production
+            +       space
+            +       non_terminal  C
+            +   end_symbol
+            +     new_line
+            +
+            +   non_terminal_start
+            +     non_terminal  V
+            +   space
+            +   non_terminals
+            +     production
+            +       space
+            +       terminal
+            +         i
+            +         d
+            +         open_bracket
+            +       non_terminal  E
+            +       terminal
+            +         close_bracket
+            +       space
+            +     production
+            +       space
+            +       terminal
+            +         i
+            +         d
         """, firstGrammar.pretty() )
 
 
