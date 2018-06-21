@@ -215,7 +215,7 @@ def ignore_exceptions(function_to_decorate):
     return wrapper
 
 
-def setTextWithoutCleaningHistory(textWidget, textToSet):
+def setTextWithoutCleaningHistory(editTextWidget, textToSet):
     """
         Making changes to a QTextEdit without adding an undo command to the undo stack
         https://stackoverflow.com/questions/27113262/making-changes-to-a-qtextedit-without-adding-an-undo-command-to-the-undo-stack
@@ -224,12 +224,12 @@ def setTextWithoutCleaningHistory(textWidget, textToSet):
         http://doc.qt.io/qt-5/qtextdocument.html#clearUndoRedoStacks
         http://www.qtcentre.org/threads/43268-Setting-Text-in-QPlainTextEdit-without-Clearing-Undo-Redo-History
     """
-    textCursor = textWidget.textCursor()
+    textCursor = editTextWidget.textCursor()
 
     # Autoscroll PyQT QTextWidget
     # https://stackoverflow.com/questions/7778726/autoscroll-pyqt-qtextwidget
-    verticalScrollBar = textWidget.verticalScrollBar()
-    horizontalScrollBar = textWidget.horizontalScrollBar()
+    verticalScrollBar = editTextWidget.verticalScrollBar()
+    horizontalScrollBar = editTextWidget.horizontalScrollBar()
 
     textCursor.beginEditBlock()
     textCursor.select( PyQt5.QtGui.QTextCursor.Document );
@@ -239,6 +239,11 @@ def setTextWithoutCleaningHistory(textWidget, textToSet):
 
     verticalScrollBar.setValue( horizontalScrollBar.maximum() )
     horizontalScrollBar.setValue( horizontalScrollBar.minimum() )
+
+    # PyQT force update textEdit before calling other function
+    # https://stackoverflow.com/questions/47654327/pyqt-force-update-textedit-before-calling-other-function
+    editTextWidget.repaint()
+    QCoreApplication.processEvents()
 
 
 def getCleanSpaces(inputText, minimumLength=0, lineCutTrigger="", keepSpaceSepators=False):
