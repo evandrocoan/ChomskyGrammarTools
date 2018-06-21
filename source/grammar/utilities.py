@@ -11,6 +11,7 @@ import PyQt5
 import textwrap
 
 from PyQt5 import QtWidgets
+from PyQt5.QtCore import QCoreApplication
 
 from natsort import natsorted
 from debug_tools import getLogger
