@@ -116,7 +116,7 @@ class ProgramWindow(QtWidgets.QMainWindow):
         self.largestFirstCollumn = 0
 
         self.resize( 800, 600  )
-        self.setWindowTitle( "Trabalho 2 de Formais - Evandro Coan" )
+        self.setWindowTitle( "Chomsky Grammar Tools for Context Free Grammars (CFG) by Evandro Coan" )
 
         # https://github.com/GNOME/adwaita-icon-theme
         # https://code.google.com/archive/p/faenza-icon-theme/
