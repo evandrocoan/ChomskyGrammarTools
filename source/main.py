@@ -329,18 +329,18 @@ class ProgramWindow(QtWidgets.QMainWindow):
             first_non_terminals = firstGrammar.first_non_terminals()
             follow_terminals = firstGrammar.follow_terminals( first_terminals )
 
-            results.append( "\n\nHas the following Terminal's FIRST\n" )
+            results.append( "\n\n# Has the following Terminal's FIRST\n" )
             results.append( dictionary_to_string( first_terminals ) )
 
-            results.append( "\n\nAnd Non Terminal's FIRST\n" )
+            results.append( "\n\n# And Non Terminal's FIRST\n" )
             results.append( dictionary_to_string( first_non_terminals ) )
 
-            results.append( "\n\nAnd Terminal's FOLLOW\n" )
+            results.append( "\n\n# And Terminal's FOLLOW\n" )
             results.append( dictionary_to_string( follow_terminals ) )
 
             function.results = "".join( results )
 
-        self._handleFunctionAsync( function, "The following grammar:" )
+        self._handleFunctionAsync( function, "# The following grammar:" )
 
     @ignore_exceptions
     def handleIsGrammarFactored(self, qt_decorator_bug):
@@ -355,17 +355,17 @@ class ProgramWindow(QtWidgets.QMainWindow):
             is_factored = firstGrammar.is_factored()
 
             if is_factored:
-                results.append( "\n\nIs Factored!" )
+                results.append( "\n\n# Is Factored!" )
 
             else:
-                results.append( "\n\nIs NOT Factored!" )
-                results.append( "\n\nDoes still has the following factor/nondeterminism(s)\n" )
+                results.append( "\n\n# Is NOT Factored!" )
+                results.append( "\n\n# Does still has the following factor/nondeterminism(s)\n" )
                 results.append( convert_to_text_lines( factors, sort=sort_correctly ) )
 
             results.append( self._get_history_string( firstGrammar ) )
             function.results = "".join( results )
 
-        self._handleFunctionAsync( function, "The following grammar:" )
+        self._handleFunctionAsync( function, "# The following grammar:" )
 
     @ignore_exceptions
     def handleTryToFactorGrammar(self, qt_decorator_bug):
@@ -384,15 +384,16 @@ class ProgramWindow(QtWidgets.QMainWindow):
             was_factored = firstGrammar.factor_it( maximumSteps )
 
             if was_factored:
-                results.append( "\n\nCould be successfully factored in `%s` steps!" % firstGrammar.last_factoring_step )
-                results.append( "\n\nThe new factored grammar is:" )
+                results.append( "\n\n# Could be successfully factored in `%s` steps!" % firstGrammar.last_factoring_step )
+                results.append( "\n\n# The new factored grammar is:" )
 
             else:
                 factors = firstGrammar.factors()
-                results.append( "\n\nCould not be successfully factored in `%s` steps!\n\n" % maximumSteps )
-                results.append( "\n\nDoes still has the following factor/nondeterminism(s)\n" )
+                results.append( "\n\n# Could not be successfully factored in `%s` steps!\n\n" % maximumSteps )
+                results.append( "\n\n# Does still has the following factor/nondeterminism(s)\n" )
+
                 results.append( convert_to_text_lines( factors, sort=sort_correctly ) )
-                results.append( "\n\nThe last non factored grammar produced was:" )
+                results.append( "\n\n# The last non factored grammar produced was:" )
 
             results.append( "\n" )
             results.append( str( firstGrammar ) )
@@ -400,7 +401,7 @@ class ProgramWindow(QtWidgets.QMainWindow):
             results.append( self._get_history_string( firstGrammar ) )
             function.results = "".join( results )
 
-        self._handleFunctionAsync( function, "Trying to factor the following grammar in `%s` steps:" % maximumSteps )
+        self._handleFunctionAsync( function, "# Trying to factor the following grammar in `%s` steps:" % maximumSteps )
 
     @ignore_exceptions
     def handleGrammarHasLeftRecursion(self, qt_decorator_bug):
@@ -416,19 +417,19 @@ class ProgramWindow(QtWidgets.QMainWindow):
             firstGrammar.eliminate_left_recursion()
 
             if has_left_recursion:
-                results.append( "\n\nHas the following Left Recursion(s)\n" )
+                results.append( "\n\n# Has the following Left Recursion(s)\n" )
                 results.append( convert_to_text_lines( left_recursion, sort=sort_correctly ) )
 
-                results.append( "\n\nAnd has the following Left Recursion Free Grammar:\n" )
+                results.append( "\n\n# And has the following Left Recursion Free Grammar:\n" )
                 results.append( str( firstGrammar ) )
 
             else:
-                results.append( "\n\nHas NO Left Recursion." )
+                results.append( "\n\n# Has NO Left Recursion." )
 
             results.append( self._get_history_string( firstGrammar ) )
             function.results = "".join( results )
 
-        self._handleFunctionAsync( function, "The following grammar:" )
+        self._handleFunctionAsync( function, "# The following grammar:" )
 
     @ignore_exceptions
     def _handleGrammarIsSomething(self, function_to_check, property_name, inverse_boolean=False):
@@ -444,12 +445,12 @@ class ProgramWindow(QtWidgets.QMainWindow):
             is_empty = function_to_check( firstGrammar )
 
             results.append( str( firstGrammar ) )
-            results.append( "\n\nIs %s%s.\n" % ( "" if (not is_empty if inverse_boolean else is_empty) else "NOT ", property_name ) )
+            results.append( "\n\n# Is %s%s.\n" % ( "" if (not is_empty if inverse_boolean else is_empty) else "NOT ", property_name ) )
 
-            results.append( self._get_history_string( firstGrammar ) )
+            results.append( self._get_history_string( firstGrammar, "\n\n" ) )
             function.results = "".join( results )
 
-        self._handleFunctionAsync( function, "The following grammar:" )
+        self._handleFunctionAsync( function, "# The following grammar:" )
 
     @ignore_exceptions
     def handleGrammarIsFiniteInfiniteOrEmpty(self, qt_decorator_bug):
@@ -475,12 +476,12 @@ class ProgramWindow(QtWidgets.QMainWindow):
                 property_name = "Unknown"
 
             results.append( str( firstGrammar ) )
-            results.append( "\n\nIs %s.\n" % ( property_name ) )
+            results.append( "\n\n# Is %s.\n" % ( property_name ) )
 
             results.append( self._get_history_string( firstGrammar ) )
             function.results = "".join( results )
 
-        self._handleFunctionAsync( function, "The following grammar:" )
+        self._handleFunctionAsync( function, "# The following grammar:" )
 
     @ignore_exceptions
     def handleIsGrammarEmpty(self, function_to_check):
@@ -509,28 +510,28 @@ class ProgramWindow(QtWidgets.QMainWindow):
             simple_non_terminals = firstGrammar.simple_non_terminals()
             firstGrammar.convert_to_proper()
 
-            results.append( "\n\nHas the following Proper version:\n" )
+            results.append( "\n\n# Has the following Proper version:\n" )
             results.append( str( firstGrammar ) )
 
-            results.append( "\n\nIt has the following Non Terminal Epsilon set (Ne):\n" )
+            results.append( "\n\n# It has the following Non Terminal Epsilon set (Ne):\n" )
             results.append( convert_to_text_lines( non_terminal_epsilon ) )
 
-            results.append( "\n\nIt has the following Fertile Non Terminal's set (Nf):\n" )
+            results.append( "\n\n# It has the following Fertile Non Terminal's set (Nf):\n" )
             results.append( convert_to_text_lines( fertile ) )
 
-            results.append( "\n\nIt has the following Reachable Non Terminal's set (Vi):\n" )
+            results.append( "\n\n# It has the following Reachable Non Terminal's set (Vi):\n" )
             results.append( convert_to_text_lines( reachable ) )
 
-            results.append( "\n\nIt has the following Simple Non Terminal's set (Na):\n" )
+            results.append( "\n\n# It has the following Simple Non Terminal's set (Na):\n" )
             results.append( dictionary_to_string( simple_non_terminals ) )
 
             results.append( self._get_history_string( firstGrammar ) )
             function.results = "".join( results )
 
-        self._handleFunctionAsync( function, "The following grammar:" )
+        self._handleFunctionAsync( function, "# The following grammar:" )
 
-    def _get_history_string(self, firstGrammar):
-        return "\n\n\n%s\n\n%s" % ( HISTORY_KEY_LINE, firstGrammar.get_operation_history() )
+    def _get_history_string(self, firstGrammar, extra_lines="\n\n\n"):
+        return "%s%s\n\n%s" % ( extra_lines, HISTORY_KEY_LINE, firstGrammar.get_operation_history() )
 
 
 if __name__ == "__main__":
