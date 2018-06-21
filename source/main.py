@@ -151,6 +151,7 @@ class ProgramWindow(QtWidgets.QMainWindow):
         self.calculateFirstAndFollow  = QPushButton( "Compute First and Follow" )
         self.convertToProperGrammar   = QPushButton( "Convert to Proper" )
         self.isGrammarFactorable      = QPushButton( "Is Factored" )
+        self.grammarHasLeftRecursion  = QPushButton( "Has Left Recursion" )
         self.isGrammarEmpty           = QPushButton( "Is Empty" )
         self.isGrammarFinite          = QPushButton( "Is Finite" )
         self.isGrammarInfinite        = QPushButton( "Is Infinite" )
@@ -163,6 +164,7 @@ class ProgramWindow(QtWidgets.QMainWindow):
         self.redoGrammarButton.clicked.connect( self.handleRedoGrammarTextEdit )
         self.calculateFirstAndFollow.clicked.connect( self.handleCalculateFirstAndFollow )
         self.isGrammarFactorable.clicked.connect( self.handleIsGrammarFactorable )
+        self.grammarHasLeftRecursion.clicked.connect( self.handleGrammarHasLeftRecursion )
         self.convertToProperGrammar.clicked.connect( self.handleConvertToProperGrammar )
         self.isGrammarEmpty.clicked.connect( self.handleIsGrammarEmpty )
         self.isGrammarFinite.clicked.connect( self.handleIsGrammarFinite )
@@ -181,15 +183,16 @@ class ProgramWindow(QtWidgets.QMainWindow):
         self.grammarVerticalGridLayout.addWidget( self.calculateFirstAndFollow,  3, 0)
         self.grammarVerticalGridLayout.addWidget( self.convertToProperGrammar,   4, 0)
         self.grammarVerticalGridLayout.addWidget( self.isGrammarFactorable,      5, 0)
-        self.grammarVerticalGridLayout.addWidget( self.get_vertical_separator(), 6, 0)
-        self.grammarVerticalGridLayout.addWidget( self.isGrammarEmpty,           7, 0)
-        self.grammarVerticalGridLayout.addWidget( self.isGrammarFinite,          8, 0)
-        self.grammarVerticalGridLayout.addWidget( self.isGrammarInfinite,        9, 0)
-        self.grammarVerticalGridLayout.addWidget( self.isGrammarEmptyOrInFinite, 10, 0)
-        self.grammarVerticalGridLayout.addWidget( self.get_vertical_separator(), 11, 0)
-        self.grammarVerticalGridLayout.addWidget( self.openGrammar,              12, 0)
-        self.grammarVerticalGridLayout.addWidget( self.saveGrammar,              13, 0)
-        self.grammarVerticalGridLayout.addWidget( self.grammarBeautifing,        14, 0)
+        self.grammarVerticalGridLayout.addWidget( self.grammarHasLeftRecursion,  6, 0)
+        self.grammarVerticalGridLayout.addWidget( self.get_vertical_separator(), 7, 0)
+        self.grammarVerticalGridLayout.addWidget( self.isGrammarEmpty,           8, 0)
+        self.grammarVerticalGridLayout.addWidget( self.isGrammarFinite,          9, 0)
+        self.grammarVerticalGridLayout.addWidget( self.isGrammarInfinite,        10, 0)
+        self.grammarVerticalGridLayout.addWidget( self.isGrammarEmptyOrInFinite, 11, 0)
+        self.grammarVerticalGridLayout.addWidget( self.get_vertical_separator(), 12, 0)
+        self.grammarVerticalGridLayout.addWidget( self.openGrammar,              13, 0)
+        self.grammarVerticalGridLayout.addWidget( self.saveGrammar,              14, 0)
+        self.grammarVerticalGridLayout.addWidget( self.grammarBeautifing,        15, 0)
         self.grammarVerticalGridLayout.setSpacing( 0 )
         self.grammarVerticalGridLayout.setAlignment(Qt.AlignTop)
 
@@ -339,7 +342,11 @@ class ProgramWindow(QtWidgets.QMainWindow):
         self._handleGrammarIsSomething( ChomskyGrammar.is_factored, "Factored" )
 
     @ignore_exceptions
-    def _handleGrammarIsSomething(self, function_to_check, property_name):
+    def handleGrammarHasLeftRecursion(self, qt_decorator_bug):
+        self._handleGrammarIsSomething( ChomskyGrammar.has_left_recursion, "Left Recursion Free", True )
+
+    @ignore_exceptions
+    def _handleGrammarIsSomething(self, function_to_check, property_name, inverse_boolean=False):
         """
             How to pass member function as argument in python?
             https://stackoverflow.com/questions/10181450/how-to-pass-member-function-as-argument-in-python
@@ -352,7 +359,7 @@ class ProgramWindow(QtWidgets.QMainWindow):
             is_empty = function_to_check( firstGrammar )
 
             results.append( str( firstGrammar ) )
-            results.append( "\n\nIs %s%s.\n" % ( "" if is_empty else "NOT ", property_name ) )
+            results.append( "\n\nIs %s%s.\n" % ( "" if (not is_empty if inverse_boolean else is_empty) else "NOT ", property_name ) )
             function.results = "".join( results )
 
         self._handleFunctionAsync( function, "The following grammar:\n" )
