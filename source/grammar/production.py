@@ -70,6 +70,10 @@ class Production(LockableType):
             super().__setattr__( name, value )
 
     def __repr__(self):
+        """
+            Return a more complete and precise string representation of this object, useful for
+            debugging purposes. But requires the `_USE_STRING` constant to be set to False.
+        """
 
         if self._USE_STRING:
             return super().__repr__()

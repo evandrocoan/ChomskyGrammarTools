@@ -170,11 +170,13 @@ class ChomskyGrammar():
     def __init__(self):
         """
             Create a new grammar.
+
+            @initial_symbol The initial symbol of this grammar
         """
         ## A dictionary with productions this grammar can generates
         self.productions = {}
 
-        # Saves all grammars operations history
+        ## Saves all grammars operations history
         self.operations_history = []
 
         ## Saves the last step count used to factoring a grammar by the `factor_it()` method

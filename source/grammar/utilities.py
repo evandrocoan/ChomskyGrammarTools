@@ -356,19 +356,35 @@ def get_representation(self, ignore=[], emquote=False):
 
 class IntermediateGrammar(object):
     """
-        Representes a grammar operation history entry, to be parsed later.
+        Represents a grammar operation history entry, to be parsed later.
     """
 
+    ## A constant for the beginning of the time
     BEGINNING = 0
+
+    ## A constant for the end of the time
     END = 1
+
+    ## A constant for any point between the beginning and end of the time
     MIDDLE = 2
 
     class Stage(object):
+        """
+            Represents a point in the grammar history, to determine whether this the beginning of
+            the history, middle or end.
+        """
 
         def __init__(self, value):
+            """
+                Initializes the history with a history point constant.
+            """
+            ## The value of the current time constant
             self.value = value
 
         def __str__(self):
+            """
+                Return the current history point stage name.
+            """
 
             if self.value == IntermediateGrammar.BEGINNING:
                 return ", Beginning"
@@ -379,16 +395,32 @@ class IntermediateGrammar(object):
             return ""
 
     def __init__(self, grammar, name, stage):
+        """
+            Creates a full history entry for the current state of the given `grammar`.
+        """
+        ## The precise time when this history entry was created, useful to merge history for different grammars
         self.timestamp = time.time()
+
+        ## The string representation of the grammar saved
         self.grammar = str( grammar )
+
+        ## The name of the operation which originates the current grammar history entry
         self.name = name
+
+        ## The stage name for the current grammar state
         self.stage = IntermediateGrammar.Stage( stage )
 
     def __str__(self):
+        """
+            Return the full history representation of the saved grammar.
+        """
         return wrap_text( """%s%s\n%s
             """ % ( self.name, self.stage, self.grammar ) )
 
     def __eq__(self, other):
+        """
+            Determines whether this grammar history entry is equal or not to another one given.
+        """
 
         if isinstance(self, other.__class__):
             return str( self ) == str( other )

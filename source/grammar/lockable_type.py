@@ -136,6 +136,7 @@ class LockableType(object):
         self.str = str( self )
         self._str = lambda: self.str
 
+        ## The cached length of this object, used while this object is in locked state
         self.len = len( self )
         self._len = lambda: self.len
 
