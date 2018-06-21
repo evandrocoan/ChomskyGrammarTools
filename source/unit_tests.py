@@ -2027,6 +2027,29 @@ class TestGrammarFirstAndFollow(TestingUtilities):
         """, dictionary_to_string( follow ) )
 
 
+class TestAutomataOperationHistory(TestingUtilities):
+    """
+        Tests automata operations history creation.
+    """
+
+    def test_grammarSuccessfulFactoringHistory(self):
+        firstGrammar = ChomskyGrammar.load_from_text_lines( wrap_text(
+        """
+            P  -> & | L | D L
+            C  -> V =exp | id( E )
+            D  -> d | d D
+            E  -> exp | exp, E
+            L  -> V =exp L' | id( E ) L'
+            V  -> id | id[ E ]
+            L' -> & | ; C L'
+        """ ) )
+        firstGrammar.factor_it(5)
+
+        self.assertTextEqual(
+        """
+        """, firstGrammar.get_operation_history() )
+
+
 if __name__ == "__main__":
     unittest.main()
 

@@ -4,6 +4,7 @@
 import os
 import re
 
+import time
 import random
 
 import PyQt5
@@ -351,6 +352,48 @@ def get_representation(self, ignore=[], emquote=False):
             clean_attributes.append( "{}: {}".format( attribute, pack_attribute( self.__dict__[attribute] ) ) )
 
     return "%s %s;" % ( self.__class__.__name__, ", ".join( clean_attributes ) )
+
+
+class IntermediateGrammar(object):
+    """
+        Representes a grammar operation history entry, to be parsed later.
+    """
+
+    BEGINNING = 0
+    END = 1
+    MIDDLE = 2
+
+    class Stage(object):
+
+        def __init__(self, value):
+            self.value = value
+
+        def __str__(self):
+
+            if self.value == IntermediateGrammar.BEGINNING:
+                return ", Beginning"
+
+            if self.value == IntermediateGrammar.END:
+                return ", End"
+
+            return ""
+
+    def __init__(self, grammar, name, stage):
+        self.timestamp = time.time()
+        self.grammar = str( grammar )
+        self.name = name
+        self.stage = IntermediateGrammar.Stage( stage )
+
+    def __str__(self):
+        return wrap_text( """%s%s\n%s
+            """ % ( self.name, self.stage, self.grammar ) )
+
+    def __eq__(self, other):
+
+        if isinstance(self, other.__class__):
+            return str( self ) == str( other )
+
+        return False
 
 
 class DynamicIterationSet(object):

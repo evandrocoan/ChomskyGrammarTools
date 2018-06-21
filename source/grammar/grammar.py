@@ -17,8 +17,10 @@ from .production import Production
 from .production import epsilon_production
 from .production import end_of_string_terminal
 
-from .utilities import getCleanSpaces
 from .utilities import DynamicIterationSet
+from .utilities import IntermediateGrammar
+
+from .utilities import getCleanSpaces
 from .utilities import dictionary_to_string
 from .utilities import convert_to_text_lines
 from .utilities import get_duplicated_elements
@@ -171,10 +173,42 @@ class ChomskyGrammar():
         ## A dictionary with productions this grammar can generates
         self.productions = {}
 
+        # Saves all grammars operations history
+        self.operations_history = []
+
         ## Saves the last step count used to factoring a grammar by the `factor_it()` method
         self.last_factoring_step = 0
 
         self._initial_symbol = ""
+
+    def _save_history(self, operation_name, operation_stage=IntermediateGrammar.MIDDLE):
+        intermediateGrammar = IntermediateGrammar( self, operation_name, operation_stage )
+
+        if len( self.operations_history ) and intermediateGrammar == self.operations_history[-1]:
+            return
+
+        self.operations_history.append( IntermediateGrammar( self, operation_name, operation_stage ) )
+
+    def get_operation_history(self):
+        """
+            Return a string with all operations' history for this grammar.
+        """
+        counter = 0
+        history_list = []
+
+        for operation in self.operations_history:
+            stage = operation.stage.value
+
+            if stage == IntermediateGrammar.BEGINNING:
+
+                if len( history_list ):
+                    continue
+
+            counter += 1
+            history = "# %s. %s" % ( counter, operation )
+            history_list.append( history )
+
+        return "\n\n".join( history_list )
 
     @property
     def initial_symbol(self):
@@ -525,7 +559,7 @@ class ChomskyGrammar():
         """
 
         if self.initial_symbol == start_symbol:
-            # log( 1, "WARNING: Removing the gramar initial symbol!" )
+            # log( 1, "WARNING: Removing the grammar initial symbol!" )
             new_initial_symbol = self.new_symbol()
 
             self.add_production( new_initial_symbol, new_initial_symbol )
@@ -848,6 +882,9 @@ class ChomskyGrammar():
             factorization was successful, False otherwise.
         """
         log( 16, "self: \n%s", self )
+        self._save_history( "Factoring", IntermediateGrammar.BEGINNING )
+
+        was_factored = False
         self.last_factoring_step = 0
 
         if self.has_left_recursion():
@@ -858,12 +895,16 @@ class ChomskyGrammar():
             is_factored = not self.has_duplicated_factors()
 
             if is_factored:
-                return True
+                was_factored = True
+                break
 
             if self.last_factoring_step > maximum_steps:
-                return False
+                break
 
             self.eliminate_direct_factors()
+
+        self._save_history( "Factoring", IntermediateGrammar.END )
+        return was_factored
 
     def eliminate_direct_factors(self):
         """
