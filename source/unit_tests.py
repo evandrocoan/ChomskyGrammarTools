@@ -1026,22 +1026,6 @@ class TestAutomataOperationHistory(TestingUtilities):
             +  P1 -> id L1 | d D1 L
             +  P2 -> =exp L' | ( E ) L' | [ E ]=exp L'
             +  V1 -> & | [ E ]
-            +
-            + # 5. Factoring, End
-            +   P -> & | d P1 | id P2
-            +   C -> id C1
-            +   D -> d D1
-            +   E -> exp E1
-            +   L -> id L1
-            +   V -> id V1
-            +  C1 -> =exp | ( E ) | [ E ]=exp
-            +  D1 -> & | d D1
-            +  E1 -> & | , E
-            +  L1 -> =exp L' | ( E ) L' | [ E ]=exp L'
-            +  L' -> & | ; C L'
-            +  P1 -> id L1 | d D1 L
-            +  P2 -> =exp L' | ( E ) L' | [ E ]=exp L'
-            +  V1 -> & | [ E ]
         """, firstGrammar.get_operation_history() )
 
 

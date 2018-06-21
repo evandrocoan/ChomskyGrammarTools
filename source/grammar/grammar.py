@@ -698,7 +698,6 @@ class ChomskyGrammar():
             # log( 1, "1. outter_start_symbol: %s", outter_start_symbol )
             # log( 1, "1. outter_productions: %s", outter_productions )
 
-            self._save_history( "Eliminate indirect left recursion" )
             for index in range( 0, maximum_index ):
                 inner_start_symbol = production_keys[index]
                 inner_productions = set( self.productions[inner_start_symbol] )
@@ -724,7 +723,7 @@ class ChomskyGrammar():
                     if remove_outter_production:
                         self.remove_production( outter_start_symbol, outter_production )
 
-            self._save_history( "Eliminate direct left recursion" )
+            self._save_history( "Eliminate indirect left recursion" )
             outter_productions = set( self.productions[outter_start_symbol] )
             new_outter_start_symbol = self.new_symbol( outter_start_symbol )
             outter_productions_recursive = set()
@@ -757,6 +756,8 @@ class ChomskyGrammar():
                     self.remove_production( outter_start_symbol, outter_production )
 
                 self.add_production( new_outter_start_symbol, epsilon_production.new() )
+
+            self._save_history( "Eliminate direct left recursion" )
 
         self._save_history( "Eliminating Left Recursion", IntermediateGrammar.END )
 

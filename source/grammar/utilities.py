@@ -387,6 +387,16 @@ class IntermediateGrammar(object):
             ## The value of the current time constant
             self.value = value
 
+        def __eq__(self, other):
+            """
+                Determines whether this stage history entry is equal or not to another one given.
+            """
+
+            if isinstance(self, other.__class__):
+                return self.value == other.value
+
+            return False
+
         def __str__(self):
             """
                 Return the current history point stage name.
@@ -429,7 +439,8 @@ class IntermediateGrammar(object):
         """
 
         if isinstance(self, other.__class__):
-            return str( self ) == str( other )
+            return ( self.stage.value == self.MIDDLE or other.stage.value == self.MIDDLE or self.stage == other.stage ) \
+                    and str( self.grammar ) == str( other.grammar )
 
         return False
 
