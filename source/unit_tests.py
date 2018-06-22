@@ -780,17 +780,17 @@ class TestGrammarFirstAndFollow(TestingUtilities):
             E' -> + T E' | &
             T  -> F T'
             T' -> * F T' | &
-            F  -> ( E ) | id
+            F  -> ( E ) | id | i
         """ ) )
         first = firstGrammar.first_terminals()
 
         self.assertTextEqual(
         """
-            +  E: ( id
+            +  E: ( i id
             + E': & +
-            +  T: ( id
+            +  T: ( i id
             + T': & *
-            +  F: ( id
+            +  F: ( i id
         """, dictionary_to_string( first ) )
 
     def test_grammarFirstNonTerminalCalculationOfChapter5FollowExample2(self):

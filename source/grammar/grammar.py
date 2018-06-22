@@ -12,6 +12,7 @@ from typing import Dict, Set
 
 from .symbols import Terminal
 from .symbols import NonTerminal
+from .symbols import epsilon_terminal
 from .symbols import HISTORY_KEY_LINE
 
 from .production import Production
@@ -1373,6 +1374,7 @@ class ChomskyGrammar():
                         # If X is a terminal then First(X) is just X!
                         # If there is a production X → ε then add ε to first(X)
                         if type( symbol ) is Terminal:
+                            # symbol = Terminal( symbol.str[0], lock=True )
 
                             if symbol not in first_terminals[start_symbol]:
                                 first_terminals[start_symbol].add( symbol )
@@ -1385,13 +1387,13 @@ class ChomskyGrammar():
                                 current_counter += 1
 
                             # log( 1, "symbol: %s, production: %-6s, first: %s", symbol, production, first_terminals[symbol] )
-                            if epsilon_production in first_terminals[symbol]:
+                            if epsilon_terminal in first_terminals[symbol]:
 
                                 # If First(Y1) First(Y2)..First(Yk) all contain ε, then add ε to First(Y1Y2..Yk) as well
                                 if production.is_last( symbol ):
 
-                                    if epsilon_production not in first_terminals[start_symbol]:
-                                        first_terminals[start_symbol].add( epsilon_production )
+                                    if epsilon_terminal not in first_terminals[start_symbol]:
+                                        first_terminals[start_symbol].add( epsilon_terminal )
                                         current_counter += 1
 
                             else:
@@ -1464,7 +1466,7 @@ class ChomskyGrammar():
                                     # log( 1, "1. start_symbol: %s, current_symbol: %s, next_symbol: %-4s, Adding: %s", start_symbol, current_symbol, next_symbol, following_first )
                                     current_counter += 1
 
-                                if epsilon_production in following_first:
+                                if epsilon_terminal in following_first:
 
                                     if Production.copy_productions_except_epsilon( follow_terminals[start_symbol], follow_terminals[current_symbol] ):
                                         # log( 1, "2. start_symbol: %s, current_symbol: %s, next_symbol: %-4s, Adding: %s", start_symbol, current_symbol, next_symbol, follow_terminals[start_symbol] )
