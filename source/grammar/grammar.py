@@ -338,7 +338,7 @@ class ChomskyGrammar():
         production.lock()
 
         if start_symbol not in self.productions:
-            self.productions[start_symbol] = set()
+            self.productions[start_symbol] = DynamicIterationSet( container_type=list )
 
         log( 24, "   %s -> %s", start_symbol, production )
         self.productions[start_symbol].add( production )
@@ -547,9 +547,10 @@ class ChomskyGrammar():
             grammar `productions` and everywhere it is mentioned.
         """
         log( 24, "%s -> %s", start_symbol, production )
-        self.productions[start_symbol].discard( production )
+        productions = self.productions[start_symbol]
+        productions.discard( production )
 
-        if not self.productions[start_symbol]:
+        if not productions:
             self.remove_start_non_terminal( start_symbol )
 
     def remove_start_non_terminal(self, start_non_terminal):
