@@ -106,6 +106,12 @@ class ChomskyGrammarTreeTransformer(lark.Transformer):
 
     def colon(self, _terminal):
         """
+            Converts the tree leaf ':' symbol into a Terminal ready to be used in the Chomsky Grammar.
+        """
+        return self._parse_symbol( _terminal, ":" )
+
+    def dot(self, _terminal):
+        """
             Converts the tree leaf '.' symbol into a Terminal ready to be used in the Chomsky Grammar.
         """
         return self._parse_symbol( _terminal, "." )

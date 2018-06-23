@@ -63,10 +63,11 @@ class ChomskyGrammar():
         space           : " "
 
         // Tells the tree-builder to inline this branch if it has only one member
-        ?signs    : minus |  plus | star | comma | colon | equals | semicolon | slash | backslash
+        ?signs    : minus |  plus | star | comma | colon | equals | semicolon | slash | backslash | dot
         semicolon : ";"
         comma     : ","
-        colon     : "."
+        colon     : ":"
+        dot       : "."
         equals    : "="
         minus     : "-"
         star      : "*"
