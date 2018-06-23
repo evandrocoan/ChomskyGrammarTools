@@ -839,7 +839,7 @@ class ChomskyGrammar():
                 for first_terminal in first_from:
 
                     if len( first_terminal ):
-                        factors.append( ( start_symbol, first_terminal ) )
+                        factors.append( ( start_symbol, Production( [first_terminal.new()], lock=True ) ) )
 
         return factors
 
@@ -920,25 +920,20 @@ class ChomskyGrammar():
 
                 # Picks up a random nondeterministic symbol to factoring
                 if start_symbol in duplicated_factors_dictionary and duplicated_factors_dictionary[start_symbol]:
-                    start_symbol_non_deterministic_factor = duplicated_factors_dictionary[start_symbol].pop( 0 )
+                    non_deterministic_factor = duplicated_factors_dictionary[start_symbol].pop( 0 )
 
                 else:
                     break
 
                 new_factor_start_symbol = self.new_symbol( start_symbol, True )
                 direct_factors_productions = {}
-                log( 16, "start_symbol_non_deterministic_factor: %s", start_symbol_non_deterministic_factor )
+                log( 16, "non_deterministic_factor: %s", non_deterministic_factor )
                 log( 16, "new_factor_start_symbol: %s", new_factor_start_symbol )
 
                 for start_production in start_productions:
-                    start_production_first_symbol = start_production[0]
 
-                    if type( start_production_first_symbol ) is Terminal:
-                        common_terminal_symbols = Terminal.common_symbols(
-                                start_production_first_symbol, start_symbol_non_deterministic_factor )
-
-                        if common_terminal_symbols:
-                            direct_factors_productions[start_production] = common_terminal_symbols
+                        if start_production[0] == non_deterministic_factor[0]:
+                            direct_factors_productions[start_production] = non_deterministic_factor
 
                 direct_factors_productions = direct_factors_productions
                 log( 16, "direct_factors_productions: %s", direct_factors_productions )
@@ -952,12 +947,12 @@ class ChomskyGrammar():
 
                             if not has_added_first_production:
                                 has_added_first_production = True
-                                new_start_production = Production(symbols=[direct_factors_productions[start_production].new()])
+                                new_start_production = direct_factors_productions[start_production].new()
                                 new_start_production.add( new_factor_start_symbol[0].new() )
                                 self.add_production( start_symbol, new_start_production )
 
                             new_factor_production = start_production.new()
-                            new_factor_production.remove_terminal_prefix( direct_factors_productions[start_production] )
+                            new_factor_production.remove( 0 )
 
                             self.add_production( new_factor_start_symbol, new_factor_production )
                             self.remove_production( start_symbol, start_production )

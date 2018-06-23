@@ -119,28 +119,7 @@ class Terminal(ChomskyGrammarSymbol):
     """
         Represents a terminal symbol on an ChomskyGrammar.
     """
-
-    @staticmethod
-    def common_symbols(first_terminal, second_terminal):
-        """
-            Given two terminals `first_terminal` and `second_terminal`, return a new Terminal which
-            is the common prefix for both terminal's. If the prefix is found, epsilon is returned.
-        """
-        maximum_index = min( len( first_terminal.str ), len( second_terminal.str ) )
-        common_terminal = epsilon_terminal.new()
-        common_symbols = list( epsilon_terminal.str )
-
-        for index in range( 0, maximum_index ):
-
-            if first_terminal.str[index] == second_terminal.str[index]:
-                common_symbols.append( first_terminal.str[index] )
-
-            else:
-                break
-
-        common_terminal.str = "".join( common_symbols )
-        common_terminal.lock()
-        return common_terminal
+    pass
 
 
 # Standard/common symbols used

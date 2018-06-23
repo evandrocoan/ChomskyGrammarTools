@@ -208,33 +208,18 @@ class Production(LockableType):
         self.lock()
         # log( 1, "self: \n%s", self )
 
-    def remove_terminal_prefix(self, prefix_terminal):
-        """
-            Given a `prefix_terminal`, removes it from the string.
-        """
-        self.trim_epsilons()
-        first_terminal = self[0].new()
-        maximum_index = min( len( first_terminal.str ), len( prefix_terminal.str ) )
-        first_terminal_string = list( first_terminal.str )
-
-        for index in range( 0, maximum_index ):
-
-            if first_terminal.str[index] == prefix_terminal.str[index]:
-                first_terminal_string[index] = "&"
-
-            else:
-                break
-
-        first_terminal.str = "".join( first_terminal_string )
-        first_terminal.lock()
-        self[0] = first_terminal
-
     def remove_everything(self, index):
         """
             Given an index starting from 0, removes all the symbols after it.
         """
         self.trim_epsilons()
         self.symbols = self.symbols[:index+1]
+
+    def remove(self, index):
+        """
+            Given an index starting from 0, removes the nth symbol's, either Terminal or NonTerminal.
+        """
+        self.symbols[index] = epsilon_terminal
 
     def remove_terminal(self, index):
         """

@@ -1015,7 +1015,7 @@ class TestAutomataOperationHistory(TestingUtilities):
             D  -> d | d D
             E  -> exp | exp , E
             L  -> V = exp L' | id (E) L'
-            V  -> id | id [E]
+            V  -> id | id [E] | i
             L' -> & | ;C L'
         """ ) )
 
@@ -1028,25 +1028,25 @@ class TestAutomataOperationHistory(TestingUtilities):
             +   D -> d | d D
             +   E -> exp | exp , E
             +   L -> V = exp L' | id ( E ) L'
-            +   V -> id | id [ E ]
+            +   V -> i | id | id [ E ]
             +  L' -> & | ; C L'
             +
             + # 2. Eliminating Indirect Factors, End
-            +   P -> & | d L | d D L | id ( E ) L' | id = exp L' | id [ E ] = exp L'
-            +   C -> id ( E ) | id = exp | id [ E ] = exp
+            +   P -> & | d L | d D L | i = exp L' | id ( E ) L' | id = exp L' | id [ E ] = exp L'
+            +   C -> i = exp | id ( E ) | id = exp | id [ E ] = exp
             +   D -> d | d D
             +   E -> exp | exp , E
-            +   L -> id ( E ) L' | id = exp L' | id [ E ] = exp L'
-            +   V -> id | id [ E ]
+            +   L -> i = exp L' | id ( E ) L' | id = exp L' | id [ E ] = exp L'
+            +   V -> i | id | id [ E ]
             +  L' -> & | ; C L'
             +
             + # 3. Eliminating Direct Factors, End
-            +   P -> & | d P1 | id P2
-            +   C -> id C1
+            +   P -> & | d P1 | id P2 | i = exp L'
+            +   C -> id C1 | i = exp
             +   D -> d D1
             +   E -> exp E1
-            +   L -> id L1
-            +   V -> id V1
+            +   L -> id L1 | i = exp L'
+            +   V -> i | id V1
             +  C1 -> = exp | ( E ) | [ E ] = exp
             +  D1 -> & | D
             +  E1 -> & | , E
