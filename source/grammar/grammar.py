@@ -32,7 +32,9 @@ from .tree_transformer import ChomskyGrammarTreeTransformer
 
 # level 4 - Abstract Syntax Tree Parsing
 # level 8 - Log addition and removal of productions
-log = getLogger( 127-4-8-16, __name__ )
+# level 16 - Factoring logging
+# level 32 - Left Recursion elimination logging
+log = getLogger( 127-4-8-16-32, __name__ )
 log( 1, "Importing " + __name__ )
 
 
@@ -683,12 +685,11 @@ class ChomskyGrammar():
             The indirect recursion elimination order is defined by the `initial_symbol_as_first()`
             function. See that function documentation for the sorting order.
         """
-        # log( 1, "self: \n%s", self )
         self._save_history( "Eliminating Left Recursion", IntermediateGrammar.BEGINNING )
 
         if self.has_left_recursion():
             self.convert_to_proper()
-            # log( 1, "self: \n%s", self )
+            log( 32, "self: \n%s", self )
 
         else:
             return
@@ -699,19 +700,19 @@ class ChomskyGrammar():
         for maximum_index in range( 0, non_terminals_count ):
             outter_start_symbol = production_keys[maximum_index]
             outter_productions = set( self.productions[outter_start_symbol] )
-            # log( 1, "1. outter_start_symbol: %s", outter_start_symbol )
-            # log( 1, "1. outter_productions: %s", outter_productions )
+            log( 32, "1. outter_start_symbol: %s", outter_start_symbol )
+            log( 32, "1. outter_productions: %s", outter_productions )
 
             for index in range( 0, maximum_index ):
                 inner_start_symbol = production_keys[index]
                 inner_productions = set( self.productions[inner_start_symbol] )
                 outter_productions = set( self.productions[outter_start_symbol] )
-                # log( 1, "1.2 inner_start_symbol: %s", inner_start_symbol )
-                # log( 1, "1.2 inner_productions: %s", inner_productions )
-                # log( 1, "1.2 outter_productions: %s", outter_productions )
+                log( 32, "1.2 inner_start_symbol: %s", inner_start_symbol )
+                log( 32, "1.2 inner_productions: %s", inner_productions )
+                log( 32, "1.2 outter_productions: %s", outter_productions )
 
                 for outter_production in outter_productions:
-                    # log( 1, "1.2.3 outter_production: %s", outter_production )
+                    log( 32, "1.2.3 outter_production: %s", outter_production )
                     remove_outter_production = False
                     outter_production_first_symbol = outter_production[0]
 
@@ -732,8 +733,8 @@ class ChomskyGrammar():
             new_outter_start_symbol = self.new_symbol( outter_start_symbol )
             outter_productions_recursive = set()
 
-            # log( 1, "2. new_outter_start_symbol: %s", new_outter_start_symbol )
-            # log( 1, "2. outter_productions: %s", outter_productions )
+            log( 32, "2. new_outter_start_symbol: %s", new_outter_start_symbol )
+            log( 32, "2. outter_productions: %s", outter_productions )
             for outter_production in outter_productions:
 
                 if type( outter_production[0] ) is NonTerminal:
@@ -741,7 +742,7 @@ class ChomskyGrammar():
                     if outter_production[0] == outter_start_symbol:
                         outter_productions_recursive.add( outter_production )
 
-            # log( 1, "2. outter_productions_recursive: %s", outter_productions_recursive )
+            log( 32, "2. outter_productions_recursive: %s", outter_productions_recursive )
             if outter_productions_recursive:
 
                 for outter_production in outter_productions:
