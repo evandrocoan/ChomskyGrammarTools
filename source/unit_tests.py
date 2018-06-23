@@ -1007,6 +1007,56 @@ class TestAutomataOperationHistory(TestingUtilities):
             +  V1 -> & | [ E ]
         """, firstGrammar.get_operation_history() )
 
+    def test_grammarFactoringOfList3Exercice7ItemA(self):
+        firstGrammar = ChomskyGrammar.load_from_text_lines( wrap_text(
+        r"""
+            P  -> & | L | D L
+            C  -> V = exp | id ( E )
+            D  -> d | d D
+            E  -> exp | exp , E
+            L  -> V = exp L' | id (E) L'
+            V  -> id | id [E]
+            L' -> & | ;C L'
+        """ ) )
+
+        factor_it = firstGrammar.factor_it(5)
+        self.assertTextEqual(
+        r"""
+            + # 1. Factoring, Beginning
+            +   P -> & | L | D L
+            +   C -> V = exp | id ( E )
+            +   D -> d | d D
+            +   E -> exp | exp , E
+            +   L -> V = exp L' | id ( E ) L'
+            +   V -> id | id [ E ]
+            +  L' -> & | ; C L'
+            +
+            + # 2. Eliminating Indirect Factors, End
+            +   P -> & | d L | d D L | id ( E ) L' | id = exp L' | id [ E ] = exp L'
+            +   C -> id ( E ) | id = exp | id [ E ] = exp
+            +   D -> d | d D
+            +   E -> exp | exp , E
+            +   L -> id ( E ) L' | id = exp L' | id [ E ] = exp L'
+            +   V -> id | id [ E ]
+            +  L' -> & | ; C L'
+            +
+            + # 3. Eliminating Direct Factors, End
+            +   P -> & | d P1 | id P2
+            +   C -> id C1
+            +   D -> d D1
+            +   E -> exp E1
+            +   L -> id L1
+            +   V -> id V1
+            +  C1 -> = exp | ( E ) | [ E ] = exp
+            +  D1 -> & | D
+            +  E1 -> & | , E
+            +  L1 -> = exp L' | ( E ) L' | [ E ] = exp L'
+            +  L' -> & | ; C L'
+            +  P1 -> L | D L
+            +  P2 -> = exp L' | ( E ) L' | [ E ] = exp L'
+            +  V1 -> & | [ E ]
+        """, firstGrammar.get_operation_history() )
+
     def test_grammarEliminateLeftRecursionCalculationOfChapter5Item5Example2(self):
         firstGrammar = ChomskyGrammar.load_from_text_lines( wrap_text(
         r"""
