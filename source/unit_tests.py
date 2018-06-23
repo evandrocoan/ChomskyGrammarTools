@@ -1007,6 +1007,52 @@ class TestAutomataOperationHistory(TestingUtilities):
             +  V1 -> & | [ E ]
         """, firstGrammar.get_operation_history() )
 
+    def test_grammarEliminateLeftRecursionCalculationOfChapter5Item5Example2(self):
+        firstGrammar = ChomskyGrammar.load_from_text_lines( wrap_text(
+        """
+            E -> E + T | T
+            F -> ( E ) | id
+            T -> T * F | F
+        """ ) )
+        firstGrammar.eliminate_left_recursion()
+
+        self.assertTextEqual(
+        """
+            + # 1. Eliminating Left Recursion, Beginning
+            +  E -> T | E + T
+            +  F -> id | ( E )
+            +  T -> F | T * F
+            +
+            + # 2. Eliminating Infertile Symbols, End
+            +  E -> T | E + T
+            +  F -> id | ( E )
+            +  T -> F | T * F
+            +
+            + # 3. Eliminating Unreachable Symbols, End
+            +  E -> T | E + T
+            +  F -> id | ( E )
+            +  T -> F | T * F
+            +
+            + # 4. Eliminate direct left recursion
+            +   E -> T E'
+            +   F -> id | ( E )
+            +   T -> F | T * F
+            +  E' -> & | + T E'
+            +
+            + # 5. Eliminate indirect left recursion
+            +   E -> T E'
+            +   F -> id | ( E )
+            +   T -> id | ( E ) | T * F
+            +  E' -> & | + T E'
+            +
+            + # 6. Eliminate direct left recursion
+            +   E -> T E'
+            +   F -> id | ( E )
+            +   T -> id T' | ( E ) T'
+            +  E' -> & | + T E'
+            +  T' -> & | * F T'
+        """, firstGrammar.get_operation_history() )
+
 
 class TestGrammarEpsilonConversion(TestingUtilities):
 
