@@ -1032,6 +1032,7 @@ class TestAutomataOperationHistory(TestingUtilities):
             +  L' -> & | ; C L'
             +
             + # 2. Eliminating Indirect Factors, End
+            + # Indirect factors for elimination: [(L, L), (D L, D), (V = exp, V), (V = exp L', V), (V = exp L', V)]
             +   P -> & | d L | d D L | i = exp L' | id ( E ) L' | id = exp L' | id [ E ] = exp L'
             +   C -> i = exp | id ( E ) | id = exp | id [ E ] = exp
             +   D -> d | d D
@@ -1041,6 +1042,7 @@ class TestAutomataOperationHistory(TestingUtilities):
             +  L' -> & | ; C L'
             +
             + # 3. Eliminating Direct Factors, End
+            + # Direct factors for elimination: [(C, id), (D, d), (E, exp), (L, id), (P, d), (P, id), (V, id)]
             +   P -> & | d P1 | id P2 | i = exp L'
             +   C -> id C1 | i = exp
             +   D -> d D1

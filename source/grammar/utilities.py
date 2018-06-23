@@ -433,10 +433,18 @@ class IntermediateGrammar(object):
         ## The stage name for the current grammar state
         self.stage = IntermediateGrammar.Stage( stage )
 
+        ## Additional information to be displayed
+        self.extra_text = []
+
     def __str__(self):
         """
             Return the full history representation of the saved grammar.
         """
+
+        if self.extra_text:
+            return wrap_text( """%s%s\n# %s\n%s
+                """ % ( self.name, self.stage, "".join( self.extra_text ), self.grammar ) )
+
         return wrap_text( """%s%s\n%s
             """ % ( self.name, self.stage, self.grammar ) )
 
@@ -447,7 +455,7 @@ class IntermediateGrammar(object):
 
         if isinstance(self, other.__class__):
             return ( self.stage.value == self.MIDDLE or other.stage.value == self.MIDDLE or self.stage == other.stage ) \
-                    and str( self.grammar ) == str( other.grammar )
+                    and str( self.grammar ) == str( other.grammar ) and self.extra_text == other.extra_text
 
         return False
 

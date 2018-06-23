@@ -199,24 +199,33 @@ class ChomskyGrammar():
 
         self.operations_history.append( IntermediateGrammar( self, operation_name, operation_stage ) )
 
+    def _save_data(self, text_data):
+        self.operations_history[-1].extra_text.append( text_data )
+
     def get_operation_history(self):
         """
             Return a string with all operations' history for this grammar.
         """
         counter = 0
         history_list = []
+        operations_history = self.operations_history
 
-        for operation in self.operations_history:
+        for index, operation in enumerate( self.operations_history ):
             stage = operation.stage.value
 
             if stage == IntermediateGrammar.BEGINNING:
 
                 if len( history_list ):
+                    extra_text = operation.extra_text
+
+                    if extra_text:
+                        # https://stackoverflow.com/questions/8785554/how-do-i-insert-a-list-at-the-front-of-another-list
+                        operations_history[index+1].extra_text[0:0] = extra_text
+
                     continue
 
             counter += 1
-            history = "# %s. %s" % ( counter, operation )
-            history_list.append( history )
+            history_list.append( "# %s. %s" % ( counter, operation ) )
 
         return "\n\n".join( history_list )
 
@@ -791,7 +800,9 @@ class ChomskyGrammar():
         self._save_history( "Eliminating Indirect Factors", IntermediateGrammar.BEGINNING )
         old_counter = -1
         current_counter = 0
+
         production_keys = self.productions.keys()
+        non_deterministic_factors_list = []
 
         while old_counter != current_counter:
             old_counter = current_counter
@@ -805,6 +816,7 @@ class ChomskyGrammar():
                     if type( first_symbol ) is NonTerminal:
                         remove_production = False
                         first_symbol_productions = self.productions[first_symbol]
+                        non_deterministic_factors_list.append( ( start_production, first_symbol ) )
 
                         for first_symbol_production in first_symbol_productions:
                             remove_production = True
@@ -816,6 +828,7 @@ class ChomskyGrammar():
                             self.remove_production( start_symbol, start_production )
 
         self._save_history( "Eliminating Indirect Factors", IntermediateGrammar.END )
+        self._save_data( "Indirect factors for elimination: %s" % non_deterministic_factors_list )
         log( 16, "self out: \n%s", self )
 
     def factors(self):
@@ -900,29 +913,30 @@ class ChomskyGrammar():
         self._save_history( "Eliminating Direct Factors", IntermediateGrammar.BEGINNING )
         production_keys = list( self.productions.keys() )
 
-        duplicated_factors_list = sorted( get_duplicated_elements( self.factors() ) )
-        duplicated_factors_dictionary = {}
+        non_deterministic_factors_list = sorted( get_duplicated_elements( self.factors() ) )
+        non_deterministic_factors_dictionary = {}
 
-        for factor_symbol, factor_terminal in duplicated_factors_list:
+        self._save_data( "Direct factors for elimination: %s" % non_deterministic_factors_list )
+        for factor_symbol, factor_terminal in non_deterministic_factors_list:
 
-            if factor_symbol not in duplicated_factors_dictionary:
-                duplicated_factors_dictionary[factor_symbol]  = []
+            if factor_symbol not in non_deterministic_factors_dictionary:
+                non_deterministic_factors_dictionary[factor_symbol]  = []
 
-            duplicated_factors_dictionary[factor_symbol].append( factor_terminal )
+            non_deterministic_factors_dictionary[factor_symbol].append( factor_terminal )
 
         for start_symbol in production_keys:
             start_productions = list( self.productions[start_symbol] )
             log( 16, "start_symbol: %s", start_symbol )
             log( 16, "start_productions: %s", start_productions )
 
-            if start_symbol in duplicated_factors_dictionary:
-                log( 16, "non_deterministic_factors: %s", duplicated_factors_dictionary[start_symbol] )
+            if start_symbol in non_deterministic_factors_dictionary:
+                log( 16, "non_deterministic_factors: %s", non_deterministic_factors_dictionary[start_symbol] )
 
             while True:
 
                 # Picks up a random nondeterministic symbol to factoring
-                if start_symbol in duplicated_factors_dictionary and duplicated_factors_dictionary[start_symbol]:
-                    non_deterministic_factor = duplicated_factors_dictionary[start_symbol].pop( 0 )
+                if start_symbol in non_deterministic_factors_dictionary and non_deterministic_factors_dictionary[start_symbol]:
+                    non_deterministic_factor = non_deterministic_factors_dictionary[start_symbol].pop( 0 )
 
                 else:
                     break
