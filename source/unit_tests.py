@@ -49,7 +49,7 @@ class TestChomskyGrammar(TestingUtilities):
         dictionary[production_A] = 'cow'
 
         self.assertTextEqual(
-        """
+        r"""
             cow
         """, dictionary[non_terminal_A] )
 
@@ -57,7 +57,7 @@ class TestChomskyGrammar(TestingUtilities):
 
         with self.assertRaisesRegex( RuntimeError, "Invalid Non Terminal `D` added to the grammar" ):
             firstGrammar = ChomskyGrammar.load_from_text_lines( wrap_text(
-            """
+            r"""
                 S -> Ab | A Dc
                 B -> bB | Ad | &
                 A -> aA | &
@@ -86,7 +86,7 @@ class TestChomskyGrammar(TestingUtilities):
 
     def test_grammarNonTerminalHasProductionChapter5Example1First(self):
         firstGrammar = ChomskyGrammar.load_from_text_lines( wrap_text(
-        """
+        r"""
             S -> Ab | A Bc
             A -> aA | &
             B -> bB | Ad | &
@@ -103,7 +103,7 @@ class TestChomskyGrammar(TestingUtilities):
 
     def test_grammarRemovingInitialSymbolChapter5Example1FirstMutated(self):
         firstGrammar = ChomskyGrammar.load_from_text_lines( wrap_text(
-        """
+        r"""
             S -> S
             A -> aA | &
             B -> bB | Ad | &
@@ -111,7 +111,7 @@ class TestChomskyGrammar(TestingUtilities):
         firstGrammar.remove_production( firstGrammar.initial_symbol, firstGrammar.initial_symbol )
 
         self.assertTextEqual(
-        """
+        r"""
             + S' -> S'
             +  A -> & | a A
             +  B -> & | A d | b B
@@ -119,7 +119,7 @@ class TestChomskyGrammar(TestingUtilities):
 
     def test_grammarHasRecursionOnNonTerminalChapter5Example1First(self):
         firstGrammar = ChomskyGrammar.load_from_text_lines( wrap_text(
-        """
+        r"""
             S -> Ab | A Bc
             A -> aA | &
             B -> bB | Ad | &
@@ -132,7 +132,7 @@ class TestChomskyGrammar(TestingUtilities):
 
     def test_grammarIsEmptyStoS(self):
         firstGrammar = ChomskyGrammar.load_from_text_lines( wrap_text(
-        """
+        r"""
             S -> B
             B -> B
         """ ) )
@@ -141,7 +141,7 @@ class TestChomskyGrammar(TestingUtilities):
 
     def test_grammarIsEmptyStoSorEpsilon(self):
         firstGrammar = ChomskyGrammar.load_from_text_lines( wrap_text(
-        """
+        r"""
             S -> S | &
         """ ) )
 
@@ -149,7 +149,7 @@ class TestChomskyGrammar(TestingUtilities):
 
     def test_grammarIsFiniteStoS(self):
         firstGrammar = ChomskyGrammar.load_from_text_lines( wrap_text(
-        """
+        r"""
             S -> B
             B -> B
         """ ) )
@@ -158,7 +158,7 @@ class TestChomskyGrammar(TestingUtilities):
 
     def test_grammarIsFiniteStoSorEpsilon(self):
         firstGrammar = ChomskyGrammar.load_from_text_lines( wrap_text(
-        """
+        r"""
             S -> S | &
         """ ) )
 
@@ -166,7 +166,7 @@ class TestChomskyGrammar(TestingUtilities):
 
     def test_grammarIsInfiniteStoS(self):
         firstGrammar = ChomskyGrammar.load_from_text_lines( wrap_text(
-        """
+        r"""
             S -> B
             B -> B
         """ ) )
@@ -175,7 +175,7 @@ class TestChomskyGrammar(TestingUtilities):
 
     def test_grammarIsInfiniteStoSorEpsilon(self):
         firstGrammar = ChomskyGrammar.load_from_text_lines( wrap_text(
-        """
+        r"""
             S -> aS | &
         """ ) )
 
@@ -186,7 +186,7 @@ class TestGrammarFactoringAndRecursionSymbols(TestingUtilities):
 
     def test_grammarGetNonTerminalSimpleSymbolsChapter4Item5Example1(self):
         firstGrammar = ChomskyGrammar.load_from_text_lines( wrap_text(
-        """
+        r"""
             S -> F G H
             F -> G | a
             G -> dG | H | a
@@ -195,7 +195,7 @@ class TestGrammarFactoringAndRecursionSymbols(TestingUtilities):
         simple_non_terminals = firstGrammar.simple_non_terminals()
 
         self.assertTextEqual(
-        """
+        r"""
             + S: S
             + F: F G H
             + G: G H
@@ -204,7 +204,7 @@ class TestGrammarFactoringAndRecursionSymbols(TestingUtilities):
 
     def test_grammarGetNonTerminalSimpleSymbolsChapter4Item5Example2(self):
         firstGrammar = ChomskyGrammar.load_from_text_lines( wrap_text(
-        """
+        r"""
             S -> a B c D e
             B -> b B | E | F
             D -> d D | F | d
@@ -214,7 +214,7 @@ class TestGrammarFactoringAndRecursionSymbols(TestingUtilities):
         simple_non_terminals = firstGrammar.simple_non_terminals()
 
         self.assertTextEqual(
-        """
+        r"""
             + S: S
             + B: B E F
             + D: D F
@@ -224,7 +224,7 @@ class TestGrammarFactoringAndRecursionSymbols(TestingUtilities):
 
     def test_grammarEliminateNonTerminalSimpleSymbolsChapter4Item5Example1(self):
         firstGrammar = ChomskyGrammar.load_from_text_lines( wrap_text(
-        """
+        r"""
             S -> F G H
             F -> G | a
             G -> dG | H | a
@@ -233,7 +233,7 @@ class TestGrammarFactoringAndRecursionSymbols(TestingUtilities):
         firstGrammar.eliminate_simple_non_terminals()
 
         self.assertTextEqual(
-        """
+        r"""
             + S -> F G H
             + F -> a | c | d G
             + G -> a | c | d G
@@ -242,7 +242,7 @@ class TestGrammarFactoringAndRecursionSymbols(TestingUtilities):
 
     def test_grammarEliminateNonTerminalSimpleSymbolsChapter4Item5Example2(self):
         firstGrammar = ChomskyGrammar.load_from_text_lines( wrap_text(
-        """
+        r"""
             S -> a B c D e
             B -> b B | E | F
             D -> d D | F | d
@@ -252,7 +252,7 @@ class TestGrammarFactoringAndRecursionSymbols(TestingUtilities):
         firstGrammar.eliminate_simple_non_terminals()
 
         self.assertTextEqual(
-        """
+        r"""
             + S -> a B c D e
             + B -> e | f | b B | e E | f F
             + D -> d | f | d D | f F
@@ -262,31 +262,31 @@ class TestGrammarFactoringAndRecursionSymbols(TestingUtilities):
 
     def test_grammarHasLeftRecursionCalculationOfChapter5Item5Example1(self):
         firstGrammar = ChomskyGrammar.load_from_text_lines( wrap_text(
-        """
+        r"""
             S -> Sa | b
         """ ) )
 
         self.assertTextEqual(
-        """
+        r"""
             + (S, 'direct')
         """, convert_to_text_lines( firstGrammar.left_recursion() ) )
 
     def test_grammarEliminateLeftRecursionCalculationOfChapter5Item5Example1(self):
         firstGrammar = ChomskyGrammar.load_from_text_lines( wrap_text(
-        """
+        r"""
             S -> Sa | b
         """ ) )
         firstGrammar.eliminate_left_recursion()
 
         self.assertTextEqual(
-        """
+        r"""
             +  S -> b S'
             + S' -> & | a S'
         """, firstGrammar )
 
     def test_grammarHasLeftRecursionCalculationOfChapter5Item5Example1Mutated(self):
         firstGrammar = ChomskyGrammar.load_from_text_lines( wrap_text(
-        """
+        r"""
             S -> aSa | b
         """ ) )
 
@@ -294,14 +294,14 @@ class TestGrammarFactoringAndRecursionSymbols(TestingUtilities):
 
     def test_grammarHasLeftRecursionCalculationOfChapter5Item5Example2(self):
         firstGrammar = ChomskyGrammar.load_from_text_lines( wrap_text(
-        """
+        r"""
             E -> E + T | T
             T -> T * F | F
             F -> ( E ) | id
         """ ) )
 
         self.assertTextEqual(
-        """
+        r"""
             + (E, 'direct')
             + (T, 'direct')
         """, convert_to_text_lines( firstGrammar.left_recursion() ) )
@@ -310,7 +310,7 @@ class TestGrammarFactoringAndRecursionSymbols(TestingUtilities):
 
     def test_grammarEliminateLeftRecursionCalculationOfChapter5Item5Example2(self):
         firstGrammar = ChomskyGrammar.load_from_text_lines( wrap_text(
-        """
+        r"""
             E -> E + T | T
             F -> ( E ) | id
             T -> T * F | F
@@ -318,7 +318,7 @@ class TestGrammarFactoringAndRecursionSymbols(TestingUtilities):
         firstGrammar.eliminate_left_recursion()
 
         self.assertTextEqual(
-        """
+        r"""
             +  E -> T E'
             +  F -> id | ( E )
             +  T -> id T' | ( E ) T'
@@ -330,7 +330,7 @@ class TestGrammarFactoringAndRecursionSymbols(TestingUtilities):
 
     def test_grammarEliminateLeftRecursionCalculationOfChapter5Item5Example2WithoutSimpleTerminals(self):
         firstGrammar = ChomskyGrammar.load_from_text_lines( wrap_text(
-        """
+        r"""
             E -> E + T | T
             T -> T * F | F
             F -> ( E ) | id
@@ -338,7 +338,7 @@ class TestGrammarFactoringAndRecursionSymbols(TestingUtilities):
         firstGrammar.eliminate_simple_non_terminals()
 
         self.assertTextEqual(
-        """
+        r"""
             + E -> id | ( E ) | E + T | T * F
             + F -> id | ( E )
             + T -> id | ( E ) | T * F
@@ -346,7 +346,7 @@ class TestGrammarFactoringAndRecursionSymbols(TestingUtilities):
         firstGrammar.eliminate_left_recursion()
 
         self.assertTextEqual(
-        """
+        r"""
             +  E -> id E' | ( E ) E' | T * F E'
             +  F -> id | ( E )
             +  T -> id T' | ( E ) T'
@@ -358,7 +358,7 @@ class TestGrammarFactoringAndRecursionSymbols(TestingUtilities):
 
     def test_grammarHasLeftRecursionCalculationOfChapter5Item5Example2Mutated(self):
         firstGrammar = ChomskyGrammar.load_from_text_lines( wrap_text(
-        """
+        r"""
             E -> a E + T | T
             T -> b T * T | F
             F -> ( E ) | id
@@ -368,7 +368,7 @@ class TestGrammarFactoringAndRecursionSymbols(TestingUtilities):
         firstGrammar.eliminate_left_recursion()
 
         self.assertTextEqual(
-        """
+        r"""
             + E -> T | a E + T
             + F -> id | ( E )
             + T -> F | b T * T
@@ -376,13 +376,13 @@ class TestGrammarFactoringAndRecursionSymbols(TestingUtilities):
 
     def test_grammarHasLeftRecursionCalculationOfChapter5Item6Example1(self):
         firstGrammar = ChomskyGrammar.load_from_text_lines( wrap_text(
-        """
+        r"""
             S -> Aa | Sb
             A -> Sc | d
         """ ) )
 
         self.assertTextEqual(
-        """
+        r"""
             + (A, 'indirect')
             + (S, 'direct')
         """, convert_to_text_lines( firstGrammar.left_recursion(), sort=sort_correctly ) )
@@ -391,14 +391,14 @@ class TestGrammarFactoringAndRecursionSymbols(TestingUtilities):
 
     def test_grammarEliminateLeftRecursionOfChapter5Item6Example1(self):
         firstGrammar = ChomskyGrammar.load_from_text_lines( wrap_text(
-        """
+        r"""
             S -> Aa | Sb
             A -> Sc | d
         """ ) )
         firstGrammar.eliminate_left_recursion()
 
         self.assertTextEqual(
-        """
+        r"""
             +  S -> A a S'
             +  A -> d A'
             + A' -> & | a S' c A'
@@ -409,7 +409,7 @@ class TestGrammarFactoringAndRecursionSymbols(TestingUtilities):
 
     def test_grammarHasLeftRecursionCalculationOfChapter5Item6Example1Mutated(self):
         firstGrammar = ChomskyGrammar.load_from_text_lines( wrap_text(
-        """
+        r"""
             S -> aAa | bSb
             A -> Sc | d
         """ ) )
@@ -418,21 +418,21 @@ class TestGrammarFactoringAndRecursionSymbols(TestingUtilities):
         firstGrammar.eliminate_left_recursion()
 
         self.assertTextEqual(
-        """
+        r"""
             + S -> a A a | b S b
             + A -> d | S c
         """, firstGrammar )
 
     def test_grammarHasLeftRecursionCalculationOfChapter5Item6Example2(self):
         firstGrammar = ChomskyGrammar.load_from_text_lines( wrap_text(
-        """
+        r"""
             S -> aS | Ab
             A -> Ab | Bc | a
             B -> Bd | Sa | e
         """ ) )
 
         self.assertTextEqual(
-        """
+        r"""
             + (A, 'direct')
             + (B, 'direct')
             + (S, 'indirect')
@@ -442,7 +442,7 @@ class TestGrammarFactoringAndRecursionSymbols(TestingUtilities):
 
     def test_grammarEliminateLeftRecursionCalculationOfChapter5Item6Example2(self):
         firstGrammar = ChomskyGrammar.load_from_text_lines( wrap_text(
-        """
+        r"""
             S -> aS | Ab
             A -> Ab | Bc | a
             B -> Bd | Sa | e
@@ -450,7 +450,7 @@ class TestGrammarFactoringAndRecursionSymbols(TestingUtilities):
         firstGrammar.eliminate_left_recursion()
 
         self.assertTextEqual(
-        """
+        r"""
             +  S -> A b | a S
             +  A -> a A' | B c A'
             +  B -> e B' | a S a B' | a A' b a B'
@@ -462,7 +462,7 @@ class TestGrammarFactoringAndRecursionSymbols(TestingUtilities):
 
     def test_grammarHasLeftRecursionCalculationOfChapter5Item6Example2Mutated(self):
         firstGrammar = ChomskyGrammar.load_from_text_lines( wrap_text(
-        """
+        r"""
             S -> aS | aAb
             A -> aAb | bBc | a
             B -> bBd | aSa | e
@@ -472,7 +472,7 @@ class TestGrammarFactoringAndRecursionSymbols(TestingUtilities):
         firstGrammar.eliminate_left_recursion()
 
         self.assertTextEqual(
-        """
+        r"""
             + S -> a S | a A b
             + A -> a | a A b | b B c
             + B -> e | a S a | b B d
@@ -480,7 +480,7 @@ class TestGrammarFactoringAndRecursionSymbols(TestingUtilities):
 
     def test_grammarEliminateLeftRecursionCalculationOfExercise6List3ItemC(self):
         firstGrammar = ChomskyGrammar.load_from_text_lines( wrap_text(
-        """
+        r"""
             S -> Bd | &
             A -> Sa | &
             B -> Ab | Bc
@@ -488,7 +488,7 @@ class TestGrammarFactoringAndRecursionSymbols(TestingUtilities):
         firstGrammar.eliminate_left_recursion()
 
         self.assertTextEqual(
-        """
+        r"""
             +  S' -> & | B d
             +   A -> a | S a
             +   B -> b B' | a b B' | S a b B'
@@ -501,7 +501,7 @@ class TestGrammarFactoringAndRecursionSymbols(TestingUtilities):
 
     def test_grammarEliminateLeftRecursionOfList3Exercice7ItemA(self):
         firstGrammar = ChomskyGrammar.load_from_text_lines( wrap_text(
-        """
+        r"""
             P -> D L | &
             C -> V = exp | id (E)
             D -> d D | &
@@ -512,7 +512,7 @@ class TestGrammarFactoringAndRecursionSymbols(TestingUtilities):
         firstGrammar.eliminate_left_recursion()
 
         self.assertTextEqual(
-        """
+        r"""
             +  P -> & | L | D L
             +  C -> V = exp | id ( E )
             +  D -> d | d D
@@ -526,7 +526,7 @@ class TestGrammarFactoringAndRecursionSymbols(TestingUtilities):
 
     def test_grammarConvertToProperCalculationOfExercise6List3ItemC(self):
         firstGrammar = ChomskyGrammar.load_from_text_lines( wrap_text(
-        """
+        r"""
             S -> Bd | &
             A -> Sa | &
             B -> Ab | Bc
@@ -534,7 +534,7 @@ class TestGrammarFactoringAndRecursionSymbols(TestingUtilities):
         firstGrammar.convert_to_epsilon_free()
 
         self.assertTextEqual(
-        """
+        r"""
             + S' -> & | B d
             +  A -> a | S a
             +  B -> b | A b | B c
@@ -545,14 +545,14 @@ class TestGrammarFactoringAndRecursionSymbols(TestingUtilities):
 
     def test_grammarIsFactoredCalculationOfChapter5Example1First(self):
         firstGrammar = ChomskyGrammar.load_from_text_lines( wrap_text(
-        """
+        r"""
             S -> Ab | A Bc
             A -> aA | &
             B -> bB | Ad | &
         """ ) )
 
         self.assertTextEqual(
-        """
+        r"""
             + (A, a)
             + (B, a)
             + (B, b)
@@ -569,7 +569,7 @@ class TestGrammarFactoringAndRecursionSymbols(TestingUtilities):
 
     def test_grammarIsFactoredOfList3Exercice7ItemA(self):
         firstGrammar = ChomskyGrammar.load_from_text_lines( wrap_text(
-        """
+        r"""
             P  -> & | L | D L
             C  -> V = exp | id (E)
             D  -> d | d D
@@ -580,7 +580,7 @@ class TestGrammarFactoringAndRecursionSymbols(TestingUtilities):
         """ ) )
 
         self.assertTextEqual(
-        """
+        r"""
             + (C, id)
             + (C, id)
             + (D, d)
@@ -598,7 +598,7 @@ class TestGrammarFactoringAndRecursionSymbols(TestingUtilities):
 
     def test_grammarFactoringOfChapter5Example1First(self):
         firstGrammar = ChomskyGrammar.load_from_text_lines( wrap_text(
-        """
+        r"""
             S -> Ab | A Bc
             A -> aA | &
             B -> bB | Ad | &
@@ -606,7 +606,7 @@ class TestGrammarFactoringAndRecursionSymbols(TestingUtilities):
         factor_it = firstGrammar.factor_it(3)
 
         self.assertTextEqual(
-        """
+        r"""
             +  S -> c | d c | a S1 | b S2
             +  A -> & | a A
             +  B -> & | d | b B | a A d
@@ -619,7 +619,7 @@ class TestGrammarFactoringAndRecursionSymbols(TestingUtilities):
         """, firstGrammar )
 
         self.assertTextEqual(
-        """
+        r"""
             + (S5, a)
             + (S5, b)
             + (S5, d)
@@ -630,7 +630,7 @@ class TestGrammarFactoringAndRecursionSymbols(TestingUtilities):
 
     def test_grammarFactoringOfList3Exercice7ItemA(self):
         firstGrammar = ChomskyGrammar.load_from_text_lines( wrap_text(
-        """
+        r"""
             P  -> & | L | D L
             C  -> V = exp | id ( E )
             D  -> d | d D
@@ -642,7 +642,7 @@ class TestGrammarFactoringAndRecursionSymbols(TestingUtilities):
 
         factor_it = firstGrammar.factor_it(5)
         self.assertTextEqual(
-        """
+        r"""
             +  P -> & | d P1 | id P2
             +  C -> id C1
             +  D -> d D1
@@ -668,7 +668,7 @@ class TestGrammarFirstAndFollow(TestingUtilities):
 
     def test_grammarNonTerminalFirstCalculationOfChapter5Example1First(self):
         firstGrammar = ChomskyGrammar.load_from_text_lines( wrap_text(
-        """
+        r"""
             S -> Ab | A Bc
             A -> aA | &
             B -> bB | Ad | &
@@ -676,7 +676,7 @@ class TestGrammarFirstAndFollow(TestingUtilities):
         first_non_terminals = firstGrammar.first_non_terminals()
 
         self.assertTextEqual(
-        """
+        r"""
             + S: A B
             + A:
             + B: A
@@ -684,7 +684,7 @@ class TestGrammarFirstAndFollow(TestingUtilities):
 
     def test_grammarFirstCalculationOfChapter5Example1First(self):
         firstGrammar = ChomskyGrammar.load_from_text_lines( wrap_text(
-        """
+        r"""
             S -> Ab | A Bc
             A -> aA | &
             B -> bB | Ad | &
@@ -692,7 +692,7 @@ class TestGrammarFirstAndFollow(TestingUtilities):
         first = firstGrammar.first_terminals()
 
         self.assertTextEqual(
-        """
+        r"""
             + S: a b c d
             + A: & a
             + B: & a b d
@@ -700,7 +700,7 @@ class TestGrammarFirstAndFollow(TestingUtilities):
 
     def test_grammarFollowCalculationOfChapter5Example1First(self):
         firstGrammar = ChomskyGrammar.load_from_text_lines( wrap_text(
-        """
+        r"""
             S -> Ab | A Bc
             A -> aA | &
             B -> bB | Ad | &
@@ -708,7 +708,7 @@ class TestGrammarFirstAndFollow(TestingUtilities):
         follow = firstGrammar.follow_terminals()
 
         self.assertTextEqual(
-        """
+        r"""
             + S: $
             + A: $ a b c d
             + B: c
@@ -716,7 +716,7 @@ class TestGrammarFirstAndFollow(TestingUtilities):
 
     def test_grammarFirstNonTermianlCalculationOfChapter5Example1Follow(self):
         firstGrammar = ChomskyGrammar.load_from_text_lines( wrap_text(
-        """
+        r"""
             S -> A B C
             A -> aA | &
             B -> bB | A Cd
@@ -725,7 +725,7 @@ class TestGrammarFirstAndFollow(TestingUtilities):
         first_non_terminals = firstGrammar.first_non_terminals()
 
         self.assertTextEqual(
-        """
+        r"""
             + S: A B C
             + A:
             + B: A C
@@ -734,7 +734,7 @@ class TestGrammarFirstAndFollow(TestingUtilities):
 
     def test_grammarFirstCalculationOfChapter5Example1Follow(self):
         firstGrammar = ChomskyGrammar.load_from_text_lines( wrap_text(
-        """
+        r"""
             S -> A B C
             A -> aA | &
             B -> bB | A Cd
@@ -743,7 +743,7 @@ class TestGrammarFirstAndFollow(TestingUtilities):
         first = firstGrammar.first_terminals()
 
         self.assertTextEqual(
-        """
+        r"""
             + S: a b c d
             + A: & a
             + B: a b c d
@@ -752,7 +752,7 @@ class TestGrammarFirstAndFollow(TestingUtilities):
 
     def test_grammarFollowCalculationOfChapter5Example1Follow(self):
         firstGrammar = ChomskyGrammar.load_from_text_lines( wrap_text(
-        """
+        r"""
             S -> A B C
             A -> aA | &
             B -> bB | A Cd
@@ -761,7 +761,7 @@ class TestGrammarFirstAndFollow(TestingUtilities):
         follow = firstGrammar.follow_terminals()
 
         self.assertTextEqual(
-        """
+        r"""
             + S: $
             + A: $ a b c d
             + B: $ c
@@ -770,7 +770,7 @@ class TestGrammarFirstAndFollow(TestingUtilities):
 
     def test_grammarFirstCalculationOfChapter5FollowExample2(self):
         firstGrammar = ChomskyGrammar.load_from_text_lines( wrap_text(
-        """
+        r"""
             E  -> T E'
             E' -> + T E' | &
             T  -> F T'
@@ -780,7 +780,7 @@ class TestGrammarFirstAndFollow(TestingUtilities):
         first = firstGrammar.first_terminals()
 
         self.assertTextEqual(
-        """
+        r"""
             +  E: ( i id
             + E': & +
             +  T: ( i id
@@ -790,7 +790,7 @@ class TestGrammarFirstAndFollow(TestingUtilities):
 
     def test_grammarFirstNonTerminalCalculationOfChapter5FollowExample2(self):
         firstGrammar = ChomskyGrammar.load_from_text_lines( wrap_text(
-        """
+        r"""
             E  -> T E'
             E' -> + T E' | &
             T  -> F T'
@@ -800,7 +800,7 @@ class TestGrammarFirstAndFollow(TestingUtilities):
         first_non_terminals = firstGrammar.first_non_terminals()
 
         self.assertTextEqual(
-        """
+        r"""
             +  E: F T
             + E':
             +  T: F
@@ -810,7 +810,7 @@ class TestGrammarFirstAndFollow(TestingUtilities):
 
     def test_grammarFollowCalculationOfChapter5FollowExample2(self):
         firstGrammar = ChomskyGrammar.load_from_text_lines( wrap_text(
-        """
+        r"""
             E  -> T E'
             E' -> + T E' | &
             T  -> F T'
@@ -820,7 +820,7 @@ class TestGrammarFirstAndFollow(TestingUtilities):
         follow = firstGrammar.follow_terminals()
 
         self.assertTextEqual(
-        """
+        r"""
             +  E: $ )
             + E': $ )
             +  T: $ ) +
@@ -830,7 +830,7 @@ class TestGrammarFirstAndFollow(TestingUtilities):
 
     def test_grammarFirstCalculationOfChapter5FollowExample3(self):
         firstGrammar = ChomskyGrammar.load_from_text_lines( wrap_text(
-        """
+        r"""
             S -> Ab C D | E F
             A -> aA | &
             C -> E C F | c
@@ -841,7 +841,7 @@ class TestGrammarFirstAndFollow(TestingUtilities):
         first = firstGrammar.first_terminals()
 
         self.assertTextEqual(
-        """
+        r"""
             + S: a b e f g
             + A: & a
             + C: c e
@@ -852,7 +852,7 @@ class TestGrammarFirstAndFollow(TestingUtilities):
 
     def test_grammarFirstNonTerminalCalculationOfChapter5FollowExample3(self):
         firstGrammar = ChomskyGrammar.load_from_text_lines( wrap_text(
-        """
+        r"""
             S -> Ab C D | E F
             A -> aA | &
             C -> E C F | c
@@ -863,7 +863,7 @@ class TestGrammarFirstAndFollow(TestingUtilities):
         first_non_terminals = firstGrammar.first_non_terminals()
 
         self.assertTextEqual(
-        """
+        r"""
             + S: A E F
             + A:
             + C: C E
@@ -874,7 +874,7 @@ class TestGrammarFirstAndFollow(TestingUtilities):
 
     def test_grammarFollowCalculationOfChapter5FollowExample3(self):
         firstGrammar = ChomskyGrammar.load_from_text_lines( wrap_text(
-        """
+        r"""
             S -> Ab C D | E F
             A -> aA | &
             C -> E C F | c
@@ -885,7 +885,7 @@ class TestGrammarFirstAndFollow(TestingUtilities):
         follow = firstGrammar.follow_terminals()
 
         self.assertTextEqual(
-        """
+        r"""
             + S: $ a b c d e f g
             + A: b
             + C: $ a b c d e f g
@@ -896,7 +896,7 @@ class TestGrammarFirstAndFollow(TestingUtilities):
 
     def test_grammarFirstCalculationOfChapter5FollowExample4(self):
         firstGrammar = ChomskyGrammar.load_from_text_lines( wrap_text(
-        """
+        r"""
             S -> A C | C e B | B a
             A -> a A | B C
             B -> b B | A B | &
@@ -906,7 +906,7 @@ class TestGrammarFirstAndFollow(TestingUtilities):
         first = firstGrammar.first_terminals()
 
         self.assertTextEqual(
-        """
+        r"""
             + S: & a b c e
             + A: & a b c
             + B: & a b c
@@ -915,7 +915,7 @@ class TestGrammarFirstAndFollow(TestingUtilities):
 
     def test_grammarFirstNonTerminalCalculationOfChapter5FollowExample4(self):
         firstGrammar = ChomskyGrammar.load_from_text_lines( wrap_text(
-        """
+        r"""
             S -> A C | C e B | B a
             A -> a A | B C
             B -> b B | A B | &
@@ -925,7 +925,7 @@ class TestGrammarFirstAndFollow(TestingUtilities):
         first_non_terminals = firstGrammar.first_non_terminals()
 
         self.assertTextEqual(
-        """
+        r"""
             + S: A B C
             + A: A B C
             + B: A B C
@@ -934,7 +934,7 @@ class TestGrammarFirstAndFollow(TestingUtilities):
 
     def test_grammarFollowCalculationOfChapter5FollowExample4(self):
         firstGrammar = ChomskyGrammar.load_from_text_lines( wrap_text(
-        """
+        r"""
             S -> A C | C e B | B a
             A -> a A | B C
             B -> b B | A B | &
@@ -944,7 +944,7 @@ class TestGrammarFirstAndFollow(TestingUtilities):
         follow = firstGrammar.follow_terminals()
 
         self.assertTextEqual(
-        """
+        r"""
             + S: $
             + A: $ a b c
             + B: $ a b c
@@ -959,7 +959,7 @@ class TestAutomataOperationHistory(TestingUtilities):
 
     def test_grammarSuccessfulFactoringHistory(self):
         firstGrammar = ChomskyGrammar.load_from_text_lines( wrap_text(
-        """
+        r"""
             P  -> & | L | D L
             C  -> V = exp | id (E)
             D  -> d | d D
@@ -971,7 +971,7 @@ class TestAutomataOperationHistory(TestingUtilities):
         firstGrammar.factor_it(5)
 
         self.assertTextEqual(
-        """
+        r"""
             + # 1. Factoring, Beginning
             +   P -> & | L | D L
             +   C -> V = exp | id ( E )
@@ -1009,7 +1009,7 @@ class TestAutomataOperationHistory(TestingUtilities):
 
     def test_grammarEliminateLeftRecursionCalculationOfChapter5Item5Example2(self):
         firstGrammar = ChomskyGrammar.load_from_text_lines( wrap_text(
-        """
+        r"""
             E -> E + T | T
             F -> ( E ) | id
             T -> T * F | F
@@ -1017,7 +1017,7 @@ class TestAutomataOperationHistory(TestingUtilities):
         firstGrammar.eliminate_left_recursion()
 
         self.assertTextEqual(
-        """
+        r"""
             + # 1. Eliminating Left Recursion, Beginning
             +  E -> T | E + T
             +  F -> id | ( E )
@@ -1058,7 +1058,7 @@ class TestGrammarEpsilonConversion(TestingUtilities):
 
     def test_grammarConvertToEpsilonFreeChapter4Item4Example1(self):
         firstGrammar = ChomskyGrammar.load_from_text_lines( wrap_text(
-        """
+        r"""
             S -> A B
             A -> aA | &
             B -> bB | &
@@ -1066,7 +1066,7 @@ class TestGrammarEpsilonConversion(TestingUtilities):
         firstGrammar.convert_to_epsilon_free()
 
         self.assertTextEqual(
-        """
+        r"""
             + S -> & | A | B | A B
             + A -> a | a A
             + B -> b | b B
@@ -1076,7 +1076,7 @@ class TestGrammarEpsilonConversion(TestingUtilities):
 
     def test_grammarConvertToEpsilonFreeChapter4Item4Example1Mutated(self):
         firstGrammar = ChomskyGrammar.load_from_text_lines( wrap_text(
-        """
+        r"""
             S -> A B | S S
             A -> aA | &
             B -> bB | &
@@ -1084,7 +1084,7 @@ class TestGrammarEpsilonConversion(TestingUtilities):
         firstGrammar.convert_to_epsilon_free()
 
         self.assertTextEqual(
-        """
+        r"""
             + S' -> & | A | B | A B | S S
             +  A -> a | a A
             +  B -> b | b B
@@ -1095,7 +1095,7 @@ class TestGrammarEpsilonConversion(TestingUtilities):
 
     def test_grammarConvertToEpsilonFreeChapter4Item4Example2Mutated(self):
         firstGrammar = ChomskyGrammar.load_from_text_lines( wrap_text(
-        """
+        r"""
             S -> c S c | B a
             A -> aA | A B C | &
             B -> bB | C A | &
@@ -1104,7 +1104,7 @@ class TestGrammarEpsilonConversion(TestingUtilities):
         firstGrammar.convert_to_epsilon_free()
 
         self.assertTextEqual(
-        """
+        r"""
             + S -> a | B a | c S c
             + A -> a | C | a A | A C | B C | A B C
             + B -> b | C | b B | C A
@@ -1115,7 +1115,7 @@ class TestGrammarEpsilonConversion(TestingUtilities):
 
     def test_grammarConvertToEpsilonFreeChapter5Example1First(self):
         firstGrammar = ChomskyGrammar.load_from_text_lines( wrap_text(
-        """
+        r"""
             S -> Ab | A Bc
             A -> aA | &
             B -> bB | Ad | &
@@ -1123,7 +1123,7 @@ class TestGrammarEpsilonConversion(TestingUtilities):
         firstGrammar.convert_to_epsilon_free()
 
         self.assertTextEqual(
-        """
+        r"""
             + S -> b | c | A b | A c | B c | A B c
             + A -> a | a A
             + B -> b | d | A d | b B
@@ -1133,7 +1133,7 @@ class TestGrammarEpsilonConversion(TestingUtilities):
 
     def test_grammarConvertToEpsilonFreeWithNewInitialSymbolChapter5Example1FirstMutatedWithEpsilonS(self):
         firstGrammar = ChomskyGrammar.load_from_text_lines( wrap_text(
-        """
+        r"""
             S -> Ab | A Bc | A B S | &
             A -> aA | &
             B -> bB | Ad | &
@@ -1141,7 +1141,7 @@ class TestGrammarEpsilonConversion(TestingUtilities):
         firstGrammar.convert_to_epsilon_free()
 
         self.assertTextEqual(
-        """
+        r"""
             + S' -> & | b | c | A | B | S | A b | A c | B c | A B | A S | B S | A B c | A B S
             +  A -> a | a A
             +  B -> b | d | A d | b B
@@ -1152,7 +1152,7 @@ class TestGrammarEpsilonConversion(TestingUtilities):
 
     def test_grammarConvertToEpsilonFreeWithNewInitialSymbolChapter5Example1FirstMutatedS(self):
         firstGrammar = ChomskyGrammar.load_from_text_lines( wrap_text(
-        """
+        r"""
             S -> Ab | A Bc | A B S
             A -> aA | &
             B -> bB | Ad | &
@@ -1160,7 +1160,7 @@ class TestGrammarEpsilonConversion(TestingUtilities):
         firstGrammar.convert_to_epsilon_free()
 
         self.assertTextEqual(
-        """
+        r"""
             + S -> b | c | S | A b | A c | B c | A S | B S | A B c | A B S
             + A -> a | a A
             + B -> b | d | A d | b B
@@ -1170,7 +1170,7 @@ class TestGrammarEpsilonConversion(TestingUtilities):
 
     def test_grammarConvertToEpsilonFreeWithNewInitialSymbolChapter5Example1FirstMutatedNoS(self):
         firstGrammar = ChomskyGrammar.load_from_text_lines( wrap_text(
-        """
+        r"""
             S -> Ab | A Bc | A B
             A -> aA | &
             B -> bB | Ad | &
@@ -1178,7 +1178,7 @@ class TestGrammarEpsilonConversion(TestingUtilities):
         firstGrammar.convert_to_epsilon_free()
 
         self.assertTextEqual(
-        """
+        r"""
             + S -> & | b | c | A | B | A b | A c | B c | A B | A B c
             + A -> a | a A
             + B -> b | d | A d | b B
@@ -1189,7 +1189,7 @@ class TestGrammarEpsilonConversion(TestingUtilities):
     def test_grammarGetNonTerminalEpsilonSimpleCaseChapter5Example1First(self):
         LockableType._USE_STRING = False
         firstGrammar = ChomskyGrammar.load_from_text_lines( wrap_text(
-        """
+        r"""
             S -> Ab | A Bc
             A -> aA | &
             B -> bB | Ad | &
@@ -1207,7 +1207,7 @@ class TestGrammarEpsilonConversion(TestingUtilities):
     def test_grammarGetNonTerminalEpsilonChapter5Example1FirstMutated(self):
         LockableType._USE_STRING = False
         firstGrammar = ChomskyGrammar.load_from_text_lines( wrap_text(
-        """
+        r"""
             S -> Ab | A Bc | A B
             A -> aA | &
             B -> bB | Ad | &
@@ -1226,7 +1226,7 @@ class TestGrammarEpsilonConversion(TestingUtilities):
 
     def test_grammarIsNotEpsilonFreeChapter5Example1First(self):
         firstGrammar = ChomskyGrammar.load_from_text_lines( wrap_text(
-        """
+        r"""
             S -> Ab | A Bc
             A -> aA | &
             B -> bB | Ad | &
@@ -1236,7 +1236,7 @@ class TestGrammarEpsilonConversion(TestingUtilities):
 
     def test_grammarIsEpsilonFreeChapter5Example1FirstEpsilonFreed(self):
         firstGrammar = ChomskyGrammar.load_from_text_lines( wrap_text(
-        """
+        r"""
             S -> Ab | A Bc | &
             A -> aA | a
             B -> bB | Ad
@@ -1253,7 +1253,7 @@ class TestGrammarFertileSymbols(TestingUtilities):
 
     def test_grammarFertileNonTerminalsChapter5Example1Follow(self):
         firstGrammar = ChomskyGrammar.load_from_text_lines( wrap_text(
-        """
+        r"""
             S -> A B C
             A -> aA | &
             B -> bB | A Cd
@@ -1272,7 +1272,7 @@ class TestGrammarFertileSymbols(TestingUtilities):
 
     def test_grammarFertileNonTerminalsChapter5Example1FollowSadPath(self):
         firstGrammar = ChomskyGrammar.load_from_text_lines( wrap_text(
-        """
+        r"""
             S -> A B C | B C
             A -> aA
             B -> bB | Cd
@@ -1290,7 +1290,7 @@ class TestGrammarFertileSymbols(TestingUtilities):
 
     def test_grammarFertileNonTerminalsChapter5FollowExample2(self):
         firstGrammar = ChomskyGrammar.load_from_text_lines( wrap_text(
-        """
+        r"""
             E  -> T E'
             E' -> + T E' | &
             T  -> F T'
@@ -1311,7 +1311,7 @@ class TestGrammarFertileSymbols(TestingUtilities):
 
     def test_grammarFertileNonTerminalsChapter5FollowExample2SadPath(self):
         firstGrammar = ChomskyGrammar.load_from_text_lines( wrap_text(
-        """
+        r"""
             E  -> T E'
             E' -> + T E' | &
             T  -> F T'
@@ -1329,7 +1329,7 @@ class TestGrammarFertileSymbols(TestingUtilities):
 
     def test_grammarGetFertileNonTerminalsChapter4Item1Example1(self):
         firstGrammar = ChomskyGrammar.load_from_text_lines( wrap_text(
-        """
+        r"""
             S -> aS | B C | B D
             A -> cC | A B
             B -> bB | &
@@ -1348,7 +1348,7 @@ class TestGrammarFertileSymbols(TestingUtilities):
 
     def test_grammarEliminateNonFertileNonTerminalsChapter4Item1Example1(self):
         firstGrammar = ChomskyGrammar.load_from_text_lines( wrap_text(
-        """
+        r"""
             S -> aS | B C | B D
             A -> cC | A B
             B -> bB | &
@@ -1358,7 +1358,7 @@ class TestGrammarFertileSymbols(TestingUtilities):
         firstGrammar.eliminate_infertile()
 
         self.assertTextEqual(
-        """
+        r"""
             + S -> a S | B D
             + B -> & | b B
             + D -> c | d D d
@@ -1366,7 +1366,7 @@ class TestGrammarFertileSymbols(TestingUtilities):
 
     def test_grammarEliminateUnreachableSymbolsChapter4Item1Example1(self):
         firstGrammar = ChomskyGrammar.load_from_text_lines( wrap_text(
-        """
+        r"""
             S -> aS | B C | B D
             A -> cC | A B
             B -> bB | &
@@ -1376,7 +1376,7 @@ class TestGrammarFertileSymbols(TestingUtilities):
         firstGrammar.eliminate_unreachable()
 
         self.assertTextEqual(
-        """
+        r"""
             + S -> a S | B C | B D
             + A -> c C | A B
             + B -> & | b B
@@ -1386,7 +1386,7 @@ class TestGrammarFertileSymbols(TestingUtilities):
 
     def test_grammarGetReachableChapter4Item1Example2(self):
         firstGrammar = ChomskyGrammar.load_from_text_lines( wrap_text(
-        """
+        r"""
             S -> aSa | dDd
             A -> aB | Cc | a
             B -> dD | bB | b
@@ -1396,7 +1396,7 @@ class TestGrammarFertileSymbols(TestingUtilities):
         reachable = firstGrammar.reachable()
 
         self.assertTextEqual(
-        """
+        r"""
             + Terminal locked: True, str: a, sequence: 1, len: 1;
             + Terminal locked: True, str: b, sequence: 1, len: 1;
             + Terminal locked: True, str: bb, sequence: 1, len: 2;
@@ -1408,7 +1408,7 @@ class TestGrammarFertileSymbols(TestingUtilities):
 
     def test_grammarEliminateUneachableSymbolsChapter4Item1Example2(self):
         firstGrammar = ChomskyGrammar.load_from_text_lines( wrap_text(
-        """
+        r"""
             S -> aSa | dDd
             A -> aB | Cc | a
             B -> dD | bB | b
@@ -1418,7 +1418,7 @@ class TestGrammarFertileSymbols(TestingUtilities):
         firstGrammar.eliminate_unreachable()
 
         self.assertTextEqual(
-        """
+        r"""
             + S -> a S a | d D d
             + B -> b | b B | d D
             + D -> d | bb B
@@ -1426,7 +1426,7 @@ class TestGrammarFertileSymbols(TestingUtilities):
 
     def test_grammarEliminateUnusefulSymbolsChapter4Item1Example3(self):
         firstGrammar = ChomskyGrammar.load_from_text_lines( wrap_text(
-        """
+        r"""
             S -> a F G | b F d | S a
             A -> a A | &
             B -> c G | a C G
@@ -1438,7 +1438,7 @@ class TestGrammarFertileSymbols(TestingUtilities):
         firstGrammar.eliminate_unuseful()
 
         self.assertTextEqual(
-        """
+        r"""
             + S -> S a | b F d
             + A -> & | a A
             + C -> & | c a
@@ -1447,7 +1447,7 @@ class TestGrammarFertileSymbols(TestingUtilities):
 
     def test_grammarGetNonTerminalSimpleSymbolsChapter4Item3Example1(self):
         firstGrammar = ChomskyGrammar.load_from_text_lines( wrap_text(
-        """
+        r"""
             S -> a F G | b F d | S a
             A -> a A | &
             B -> c G | a C G
@@ -1493,12 +1493,12 @@ class TestGrammarTreeParsing(TestingUtilities):
 
     def test_grammarTreeParsingComplexSingleProduction(self):
         firstGrammar = ChomskyGrammar.parse( wrap_text(
-        """
+        r"""
             S -> aABbbCC1aAbA BC | ba | c
         """ ) )
 
         self.assertTextEqual(
-        """
+        r"""
             + productions
             +   non_terminal_start
             +     non_terminal  S
@@ -1540,7 +1540,7 @@ class TestGrammarTreeParsing(TestingUtilities):
 
     def test_grammarInputParsingComplexSingleProduction(self):
         firstGrammar = ChomskyGrammar.load_from_text_lines(
-        """
+        r"""
             S  -> aABbbCC1aAbA BC | ba | c
             A  -> &
             AB -> &
@@ -1549,7 +1549,7 @@ class TestGrammarTreeParsing(TestingUtilities):
         """ )
 
         self.assertTextEqual(
-        """
+        r"""
             +  S -> c | ba | a AB bb CC 1a A b A BC
             +  A -> &
             + AB -> &
@@ -1559,14 +1559,14 @@ class TestGrammarTreeParsing(TestingUtilities):
 
     def test_grammarInputParsingSymbolMerging(self):
         firstGrammar = ChomskyGrammar.load_from_text_lines(
-        """
+        r"""
             S -> a b cd | AccD | Ac cD
             A -> &
             D -> &
         """ )
 
         self.assertTextEqual(
-        """
+        r"""
             + S -> a b cd | A cc D | A c c D
             + A -> &
             + D -> &
@@ -1574,12 +1574,12 @@ class TestGrammarTreeParsing(TestingUtilities):
 
     def test_grammarTreeParsingABandB(self):
         firstGrammar = ChomskyGrammar.parse( wrap_text(
-        """
+        r"""
             S -> aABb BC | b
         """ ) )
 
         self.assertTextEqual(
-        """
+        r"""
             + productions
             +   non_terminal_start
             +     non_terminal  S
@@ -1604,26 +1604,26 @@ class TestGrammarTreeParsing(TestingUtilities):
 
     def test_grammarInputParsingEmptyEpsilon(self):
         firstGrammar = ChomskyGrammar.load_from_text_lines(
-        """
+        r"""
              S ->
             SS -> S |
         """ )
 
         self.assertTextEqual(
-        """
+        r"""
             +  S -> &
             + SS -> & | S
         """, str( firstGrammar ) )
 
     def test_grammarTreeParsingEmptyEpsilon(self):
         firstGrammar = ChomskyGrammar.parse( wrap_text(
-        """
+        r"""
              S ->
             SS -> S |
         """ ) )
 
         self.assertTextEqual(
-        """
+        r"""
             + productions
             +   space
             +   non_terminal_start
@@ -1651,14 +1651,14 @@ class TestGrammarTreeParsing(TestingUtilities):
 
     def test_grammarInputParsingSSandEpsilon(self):
         firstGrammar = ChomskyGrammar.load_from_text_lines(
-        """
+        r"""
             S   -> SS SSS | &
             SS  -> &
             SSS -> &
         """ )
 
         self.assertTextEqual(
-        """
+        r"""
             +   S -> & | SS SSS
             +  SS -> &
             + SSS -> &
@@ -1666,12 +1666,12 @@ class TestGrammarTreeParsing(TestingUtilities):
 
     def test_grammarTreeParsingSSandEpsilon(self):
         firstGrammar = ChomskyGrammar.parse(
-        """
+        r"""
             S -> S SS | &
         """ )
 
         self.assertTextEqual(
-        """
+        r"""
             + productions
             +   new_line
             +
@@ -1717,12 +1717,12 @@ class TestGrammarTreeParsing(TestingUtilities):
 
     def test_grammarSingleAmbiguityCase(self):
         firstGrammar = ChomskyGrammar.parse( wrap_text(
-        """
+        r"""
             S -> S S | &
         """ ) )
 
         self.assertTextEqual(
-        """
+        r"""
             + productions
             +   non_terminal_start
             +     non_terminal  S
@@ -1741,7 +1741,7 @@ class TestGrammarTreeParsing(TestingUtilities):
 
     def test_grammarSpecialSymbolsList3Exercice7ItemA(self):
         firstGrammar = ChomskyGrammar.parse( wrap_text(
-        """
+        r"""
             P -> D L | &
             C -> V=exp | id (E)
             D -> d D | &
@@ -1751,7 +1751,7 @@ class TestGrammarTreeParsing(TestingUtilities):
         """ ) )
 
         self.assertTextEqual(
-        """
+        r"""
             + productions
             +   non_terminal_start
             +     non_terminal  P
@@ -1885,7 +1885,7 @@ class TestGrammarTreeTransformation(TestingUtilities):
 
     def test_grammarTransformationTreeParsingParenStarPlusSymbols(self):
         firstGrammar = ChomskyGrammar.parse( wrap_text(
-        """
+        r"""
             E  -> T E'
             E' -> + T E' | &
             T  -> F T'
@@ -1930,13 +1930,13 @@ class TestGrammarTreeTransformation(TestingUtilities):
 
     def test_grammarTransformationParsingComplexSingleProduction(self):
         firstGrammar = ChomskyGrammar.parse( wrap_text(
-        """
+        r"""
             S -> aABbbCC1aAbA BC | ba | c
         """ ) )
         firstGrammar = ChomskyGrammarTreeTransformer().transform( firstGrammar )
 
         self.assertTextEqual(
-        """
+        r"""
             + productions
             +   S
             +   space
