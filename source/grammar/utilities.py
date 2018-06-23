@@ -14,6 +14,7 @@ from PyQt5 import QtWidgets
 from PyQt5.QtCore import QCoreApplication
 
 from natsort import natsorted
+from contextlib import suppress
 from debug_tools import getLogger
 
 # level 4 - Abstract Syntax Tree Parsing
@@ -149,7 +150,7 @@ def get_largest_item_size(iterable):
     return largest_key
 
 
-def dictionary_to_string(dictionary):
+def dictionary_to_string(dictionary, sort=None):
     """
         Given a dictionary with a list for each string key, call `sort_dictionary_lists()` and
         return a string representation by line of its entries.
@@ -157,6 +158,9 @@ def dictionary_to_string(dictionary):
 
     if not len( dictionary ):
         return " No elements found."
+
+    if sort:
+        iterable = sort( iterable )
 
     strings = []
     elements_strings = []
@@ -181,6 +185,9 @@ def convert_to_text_lines(iterable, use_repr=True, new_line=True, sort=None):
         Given a dictionary with a list for each string key, call `sort_dictionary_lists()` and
         return a string representation by line of its entries.
     """
+
+    if isinstance( iterable, dict):
+        return dictionary_to_string( iterable )
 
     if not len( iterable ):
         return " No elements found."
@@ -445,23 +452,58 @@ class IntermediateGrammar(object):
         return False
 
 
+class ListSetLike(list):
+    """
+        A extended python list version, allowing dynamic patching.
+
+        This is required to monkey patch the builtin type because they are implemented in CPython
+        and are not exposed to the interpreter.
+    """
+
+    def add(self, element):
+        """
+            Add a new element to the end of the list.
+        """
+        if element not in self:
+            self.append( element )
+
+    def discard(self, element):
+        """
+            Remove new element anywhere in the list.
+        """
+        with suppress(ValueError, AttributeError):
+            self.remove( element )
+
+
 class DynamicIterationSet(object):
     """
         A `set()` like object which allows to dynamically add and remove items while iterating over
         its elements as if a `for element in dynamic_set`
     """
 
-    def __init__(self, initial=[]):
+    def __init__(self, initial=[], container_type=set):
         """
             Fully initializes and create a new set.
 
-            `initial` is any list related object used to initialize the set if new values.
+            @param `initial` is any list related object used to initialize the set if new values.
+            @param `container_type` you can choose either list or set to store the elements internally
         """
+        container_type = type( container_type )
+
+        if container_type is type( list ):
+            container_type = ListSetLike
+
+        elif container_type is type( set ):
+            container_type = set
+
+        else:
+            raise RuntimeError( "Invalid type passed by: `%s`" % container_type )
+
         ## The set with the items which were already iterated while iterating over this set
-        self.iterated_items = set()
+        self.iterated_items = container_type()
 
         ## The set with the items which are going to be iterated while iterating over this set
-        self.non_iterated_items = set( initial )
+        self.non_iterated_items = container_type( initial )
 
     def __repr__(self):
         """

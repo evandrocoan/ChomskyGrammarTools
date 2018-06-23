@@ -28,7 +28,7 @@
         {
             "cmd":
             [
-                "python", "unit_tests.py",
+                "pylint", "--disable=I,E,R,W,C,F", "--enable=E0102", "--reports=no", "-sn", "unit_tests.py", "&&", "python", "unit_tests.py",
                 // "python", "unit_tests.py", "TestProduction",
                 // "python", "unit_tests.py", "TestChomskyGrammar.test_grammarChapter5FollowExample1IsTheSameAsFirstExample2",
             ],
@@ -44,7 +44,7 @@
         {
             "cmd":
             [
-                "pylint", "--disable=I,E,R,W,C,F", "--enable=E0102", "--reports=no", "-sn", "unit_tests.py", "&&", "python", "unit_tests.py", "-v", "{test_class}.{test_func}",
+                "python", "unit_tests.py", "-v", "{test_class}.{test_func}",
             ],
             "file_regex": "^[ ]*File \"(...*?)\", line ([0-9]*)",
             "name": "Run Single Test",

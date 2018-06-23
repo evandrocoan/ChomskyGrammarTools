@@ -327,7 +327,7 @@ class Production(LockableType):
 
     def peek_next(self, lookahead=1):
         """
-            Inside a item iteration, allow to the next nth element given by `lookahead`. If the
+            Inside a item iteration, allow to look the next nth element given by `lookahead`. If the
             search goes past end or it is the last item, return None.
         """
         index = self._index + lookahead
@@ -365,32 +365,12 @@ class Production(LockableType):
         if symbol.locked:
             raise RuntimeError( "You can only add `unlocked` symbols in a production! %s" % symbol )
 
-        if not self._merge_terminals( symbol ):
-            self.sequence += 1
-
+        self.sequence += 1
         symbol.sequence = self.sequence
         symbol.lock()
 
         self.symbols.append( symbol )
         # log( 1, "self.symbols: %s (%s)", self.symbols, type( self.symbols ) )
-
-    def _merge_terminals(self, new_symbol):
-        """
-            Return `True` when it is not required to increment the `sequence` counting, as the
-            symbol was squashed with the last one.
-        """
-
-        if type( new_symbol ) is Terminal:
-
-            if len( self.symbols ):
-                last_symbol = self.symbols[-1]
-
-                if type( last_symbol ) is Terminal:
-                    new_symbol.str = last_symbol.str + new_symbol.str
-                    del self.symbols[-1]
-                    return True
-
-        return False
 
     def lock(self):
         """

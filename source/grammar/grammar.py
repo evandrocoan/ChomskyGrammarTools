@@ -171,9 +171,9 @@ class ChomskyGrammar():
     def __init__(self):
         """
             Create a new grammar.
-
-            @initial_symbol The initial symbol of this grammar
         """
+        self._initial_symbol = ""
+
         ## A dictionary with productions this grammar can generates
         self.productions = {}
 
@@ -183,7 +183,10 @@ class ChomskyGrammar():
         ## Saves the last step count used to factoring a grammar by the `factor_it()` method
         self.last_factoring_step = 0
 
-        self._initial_symbol = ""
+        # https://stackoverflow.com/questions/13119066/documenting-a-non-existing-member-with-doxygen
+        if None:
+            ## initial_symbol the initial symbol of this grammar
+            self.initial_symbol = None
 
     def _save_history(self, operation_name, operation_stage=IntermediateGrammar.MIDDLE):
         intermediateGrammar = IntermediateGrammar( self, operation_name, operation_stage )
@@ -822,56 +825,21 @@ class ChomskyGrammar():
             If the list contains duplicated entries, it means this grammar is non factored, i.e.,
             non deterministic.
         """
-        if self.has_indirect_factors():
-            self.eliminate_indirect_factors()
-
         factors = []
+        first_terminals = self.first_terminals()
         production_keys = self.productions.keys()
 
         for start_symbol in production_keys:
             productions = self.productions[start_symbol]
 
             for production in productions:
+                first_from = self.first_from( production, first_terminals )
+                # log( 1, "first_from: %-6s -> %s", production, first_from )
 
-                if type( production[0] ) is Terminal:
+                for first_terminal in first_from:
 
-                    if len( production[0] ):
-                        accumulated_symbols = ""
-
-                        for symbol in production[0].str:
-                            accumulated_symbols += symbol
-                            is_minimum_symbol_start = False
-
-                            for another_production in productions:
-
-                                if another_production != production:
-
-                                    if another_production[0].str[0] == production[0].str[0]:
-                                        minimum_symbol_counter = 0
-
-                                        for another_symbol in another_production[0].str:
-
-                                            if another_symbol != accumulated_symbols[minimum_symbol_counter]:
-                                                is_minimum_symbol_start = True
-                                                accumulated_symbols = accumulated_symbols[:-1]
-                                                break
-
-                                            minimum_symbol_counter += 1
-
-                                            if len( another_production[0].str ) - 1 < minimum_symbol_counter:
-                                                is_minimum_symbol_start = True
-                                                break
-
-                                            if minimum_symbol_counter >= len( accumulated_symbols ):
-                                                break
-
-                            if is_minimum_symbol_start:
-                                break
-
-                        factors.append( ( start_symbol, Terminal( accumulated_symbols, lock=True ) ) )
-
-                else:
-                    raise RuntimeError( "The program cold not remove all indirect factors or left recursions! \n%s" % self )
+                    if len( first_terminal ):
+                        factors.append( ( start_symbol, first_terminal ) )
 
         return factors
 
@@ -917,6 +885,7 @@ class ChomskyGrammar():
             if self.last_factoring_step > maximum_steps:
                 break
 
+            self.eliminate_indirect_factors()
             self.eliminate_direct_factors()
 
         self._save_history( "Factoring", IntermediateGrammar.END )
@@ -1401,7 +1370,7 @@ class ChomskyGrammar():
 
         return first_terminals
 
-    def first_from(self, symbols, first_terminals=None ):
+    def first_from(self, symbols, first_terminals=None):
         """
             Given a list of `symbols` get their FIRST symbols set.
         """
@@ -1411,14 +1380,21 @@ class ChomskyGrammar():
             first_terminals = self.first_terminals()
 
         for symbol in symbols:
+            symbol_type = type( symbol )
 
-            if type( symbol ) is Terminal:
+            if symbol_type is NonTerminal:
+                first_set = first_terminals[symbol]
+                following_first.update( first_set )
+
+                if epsilon_terminal not in first_set:
+                    break
+
+            elif symbol_type is Terminal:
                 following_first.add( symbol )
                 break
 
-            if type( symbol ) is NonTerminal:
-                following_first.update( first_terminals[symbol] )
-                break
+            else:
+                raise RuntimeError( "Expecting a Terminal or NonTerminal symbol. Got: %s! (%s) \n%s" % ( type( symbol ), symbol, self ) )
 
         return following_first
 

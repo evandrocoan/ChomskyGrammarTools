@@ -453,9 +453,9 @@ class TestGrammarFactoringAndRecursionSymbols(TestingUtilities):
         """
             +  S -> A b | a S
             +  A -> a A' | B c A'
-            +  B -> e B' | a S a B' | a A' ba B'
+            +  B -> e B' | a S a B' | a A' b a B'
             + A' -> & | b A'
-            + B' -> & | d B' | c A' ba B'
+            + B' -> & | d B' | c A' b a B'
         """, firstGrammar )
 
         self.assertFalse( firstGrammar.has_left_recursion() )
@@ -491,10 +491,10 @@ class TestGrammarFactoringAndRecursionSymbols(TestingUtilities):
         """
             +  S' -> & | B d
             +   A -> a | S a
-            +   B -> b B' | ab B' | S ab B'
-            +   S -> b B' d S'' | ab B' d S''
+            +   B -> b B' | a b B' | S a b B'
+            +   S -> b B' d S'' | a b B' d S''
             +  B' -> & | c B'
-            + S'' -> & | ab B' d S''
+            + S'' -> & | a b B' d S''
         """, firstGrammar )
 
         self.assertFalse( firstGrammar.has_left_recursion() )
@@ -503,22 +503,22 @@ class TestGrammarFactoringAndRecursionSymbols(TestingUtilities):
         firstGrammar = ChomskyGrammar.load_from_text_lines( wrap_text(
         """
             P -> D L | &
-            C -> V=exp | id (E)
+            C -> V = exp | id (E)
             D -> d D | &
-            E -> exp, E | exp
-            L -> L; C | C
-            V -> id[E] | id
+            E -> exp , E | exp
+            L -> L ;C | C
+            V -> id [E] | id
         """ ) )
         firstGrammar.eliminate_left_recursion()
 
         self.assertTextEqual(
         """
             +  P -> & | L | D L
-            +  C -> V =exp | id( E )
+            +  C -> V = exp | id ( E )
             +  D -> d | d D
-            +  E -> exp | exp, E
-            +  L -> V =exp L' | id( E ) L'
-            +  V -> id | id[ E ]
+            +  E -> exp | exp , E
+            +  L -> V = exp L' | id ( E ) L'
+            +  V -> id | id [ E ]
             + L' -> & | ; C L'
         """, firstGrammar )
 
@@ -559,11 +559,10 @@ class TestGrammarFactoringAndRecursionSymbols(TestingUtilities):
             + (B, d)
             + (S, a)
             + (S, a)
-            + (S, a)
             + (S, b)
             + (S, b)
             + (S, c)
-            + (S, dc)
+            + (S, d)
         """, convert_to_text_lines( firstGrammar.factors(), sort=sort_correctly ) )
 
         self.assertFalse( firstGrammar.is_factored() )
@@ -572,30 +571,25 @@ class TestGrammarFactoringAndRecursionSymbols(TestingUtilities):
         firstGrammar = ChomskyGrammar.load_from_text_lines( wrap_text(
         """
             P  -> & | L | D L
-            C  -> V =exp | id( E )
+            C  -> V = exp | id (E)
             D  -> d | d D
-            E  -> exp | exp, E
-            L  -> V =exp L' | id( E ) L'
-            V  -> id | id[ E ]
-            L' -> & | ; C L'
+            E  -> exp | exp , E
+            L  -> V = exp L' | id (E) L'
+            V  -> id | id [E]
+            L' -> & | ;C L'
         """ ) )
 
         self.assertTextEqual(
         """
             + (C, id)
             + (C, id)
-            + (C, id)
             + (D, d)
             + (D, d)
             + (E, exp)
             + (E, exp)
             + (L, id)
             + (L, id)
-            + (L, id)
             + (P, d)
-            + (P, d)
-            + (P, id)
-            + (P, id)
             + (P, id)
             + (V, id)
             + (V, id)
@@ -613,21 +607,22 @@ class TestGrammarFactoringAndRecursionSymbols(TestingUtilities):
 
         self.assertTextEqual(
         """
-            +  S -> c | dc | a S1 | b S2
+            +  S -> c | d c | a S1 | b S2
             +  A -> & | a A
             +  B -> & | d | b B | a A d
-            + S1 -> c | dc | a S3 | b S4
-            + S2 -> & | c | dc | b B c | a A dc
-            + S3 -> c | dc | a S5 | b S6
-            + S4 -> & | c | dc | b B c | a A dc
-            + S5 -> b | c | dc | a A b | b B c | a A dc | a A B c
-            + S6 -> & | c | dc | b B c | a A dc
+            + S1 -> c | d c | a S3 | b S4
+            + S2 -> & | c | d c | b B c | a A d c
+            + S3 -> c | d c | a S5 | b S6
+            + S4 -> & | c | d c | b B c | a A d c
+            + S5 -> A b | A B c | A d c
+            + S6 -> & | B c
         """, firstGrammar )
 
         self.assertTextEqual(
         """
             + (S5, a)
             + (S5, b)
+            + (S5, d)
         """, convert_to_text_lines( get_duplicated_elements( firstGrammar.factors() ) ) )
 
         self.assertFalse( factor_it )
@@ -637,12 +632,12 @@ class TestGrammarFactoringAndRecursionSymbols(TestingUtilities):
         firstGrammar = ChomskyGrammar.load_from_text_lines( wrap_text(
         """
             P  -> & | L | D L
-            C  -> V =exp | id( E )
+            C  -> V = exp | id ( E )
             D  -> d | d D
-            E  -> exp | exp, E
-            L  -> V =exp L' | id( E ) L'
-            V  -> id | id[ E ]
-            L' -> & | ; C L'
+            E  -> exp | exp , E
+            L  -> V = exp L' | id (E) L'
+            V  -> id | id [E]
+            L' -> & | ;C L'
         """ ) )
 
         factor_it = firstGrammar.factor_it(5)
@@ -654,13 +649,13 @@ class TestGrammarFactoringAndRecursionSymbols(TestingUtilities):
             +  E -> exp E1
             +  L -> id L1
             +  V -> id V1
-            + C1 -> =exp | ( E ) | [ E ]=exp
-            + D1 -> & | d D1
+            + C1 -> = exp | ( E ) | [ E ] = exp
+            + D1 -> & | D
             + E1 -> & | , E
-            + L1 -> =exp L' | ( E ) L' | [ E ]=exp L'
+            + L1 -> = exp L' | ( E ) L' | [ E ] = exp L'
             + L' -> & | ; C L'
-            + P1 -> id L1 | d D1 L
-            + P2 -> =exp L' | ( E ) L' | [ E ]=exp L'
+            + P1 -> L | D L
+            + P2 -> = exp L' | ( E ) L' | [ E ] = exp L'
             + V1 -> & | [ E ]
         """, firstGrammar )
 
@@ -715,7 +710,7 @@ class TestGrammarFirstAndFollow(TestingUtilities):
         self.assertTextEqual(
         """
             + S: $
-            + A: $ a b d
+            + A: $ a b c d
             + B: c
         """, dictionary_to_string( follow ) )
 
@@ -966,12 +961,12 @@ class TestAutomataOperationHistory(TestingUtilities):
         firstGrammar = ChomskyGrammar.load_from_text_lines( wrap_text(
         """
             P  -> & | L | D L
-            C  -> V =exp | id( E )
+            C  -> V = exp | id (E)
             D  -> d | d D
-            E  -> exp | exp, E
-            L  -> V =exp L' | id( E ) L'
-            V  -> id | id[ E ]
-            L' -> & | ; C L'
+            E  -> exp | exp , E
+            L  -> V = exp L' | id (E) L'
+            V  -> id | id [E]
+            L' -> & | ;C L'
         """ ) )
         firstGrammar.factor_it(5)
 
@@ -979,20 +974,20 @@ class TestAutomataOperationHistory(TestingUtilities):
         """
             + # 1. Factoring, Beginning
             +   P -> & | L | D L
-            +   C -> V =exp | id( E )
+            +   C -> V = exp | id ( E )
             +   D -> d | d D
-            +   E -> exp | exp, E
-            +   L -> V =exp L' | id( E ) L'
-            +   V -> id | id[ E ]
+            +   E -> exp | exp , E
+            +   L -> V = exp L' | id ( E ) L'
+            +   V -> id | id [ E ]
             +  L' -> & | ; C L'
             +
             + # 2. Eliminating Indirect Factors, End
-            +   P -> & | d L | d D L | id=exp L' | id( E ) L' | id[ E ]=exp L'
-            +   C -> id=exp | id( E ) | id[ E ]=exp
+            +   P -> & | d L | d D L | id ( E ) L' | id = exp L' | id [ E ] = exp L'
+            +   C -> id ( E ) | id = exp | id [ E ] = exp
             +   D -> d | d D
-            +   E -> exp | exp, E
-            +   L -> id=exp L' | id( E ) L' | id[ E ]=exp L'
-            +   V -> id | id[ E ]
+            +   E -> exp | exp , E
+            +   L -> id ( E ) L' | id = exp L' | id [ E ] = exp L'
+            +   V -> id | id [ E ]
             +  L' -> & | ; C L'
             +
             + # 3. Eliminating Direct Factors, End
@@ -1002,29 +997,13 @@ class TestAutomataOperationHistory(TestingUtilities):
             +   E -> exp E1
             +   L -> id L1
             +   V -> id V1
-            +  C1 -> =exp | ( E ) | [ E ]=exp
+            +  C1 -> = exp | ( E ) | [ E ] = exp
             +  D1 -> & | D
             +  E1 -> & | , E
-            +  L1 -> =exp L' | ( E ) L' | [ E ]=exp L'
+            +  L1 -> = exp L' | ( E ) L' | [ E ] = exp L'
             +  L' -> & | ; C L'
             +  P1 -> L | D L
-            +  P2 -> =exp L' | ( E ) L' | [ E ]=exp L'
-            +  V1 -> & | [ E ]
-            +
-            + # 4. Eliminating Indirect Factors, End
-            +   P -> & | d P1 | id P2
-            +   C -> id C1
-            +   D -> d D1
-            +   E -> exp E1
-            +   L -> id L1
-            +   V -> id V1
-            +  C1 -> =exp | ( E ) | [ E ]=exp
-            +  D1 -> & | d D1
-            +  E1 -> & | , E
-            +  L1 -> =exp L' | ( E ) L' | [ E ]=exp L'
-            +  L' -> & | ; C L'
-            +  P1 -> id L1 | d D1 L
-            +  P2 -> =exp L' | ( E ) L' | [ E ]=exp L'
+            +  P2 -> = exp L' | ( E ) L' | [ E ] = exp L'
             +  V1 -> & | [ E ]
         """, firstGrammar.get_operation_history() )
 
@@ -1416,7 +1395,7 @@ class TestGrammarFertileSymbols(TestingUtilities):
         """
             + S -> S a | b F d
             + A -> & | a A
-            + C -> & | ca
+            + C -> & | c a
             + F -> A b | a C | b F d
         """, firstGrammar )
 
@@ -1431,17 +1410,36 @@ class TestGrammarFertileSymbols(TestingUtilities):
             F -> b F d | a C | A b | G A
             G -> B c | B C a
         """ ) )
+        non_terminal_epsilon = firstGrammar.non_terminal_epsilon()
         simple_non_terminals = firstGrammar.simple_non_terminals()
 
         self.assertTextEqual(
         r"""
             + Production locked: True, str: A, symbols: [NonTerminal locked: True, str: A, sequence: 1, len: 1;], sequence: 1, len: 1;
-            + Production locked: True, str: B, symbols: [NonTerminal locked: True, str: B, sequence: 1, len: 1;], sequence: 1, len: 1;
             + Production locked: True, str: C, symbols: [NonTerminal locked: True, str: C, sequence: 1, len: 1;], sequence: 1, len: 1;
             + Production locked: True, str: D, symbols: [NonTerminal locked: True, str: D, sequence: 1, len: 1;], sequence: 1, len: 1;
-            + Production locked: True, str: F, symbols: [NonTerminal locked: True, str: F, sequence: 1, len: 1;], sequence: 1, len: 1;
-            + Production locked: True, str: G, symbols: [NonTerminal locked: True, str: G, sequence: 1, len: 1;], sequence: 1, len: 1;
-            + Production locked: True, str: S, symbols: [NonTerminal locked: True, str: S, sequence: 1, len: 1;], sequence: 1, len: 1;
+        """, wrap_text( convert_to_text_lines( non_terminal_epsilon, new_line=False ), wrap=120 ) )
+
+        self.assertTextEqual(
+        r"""
+            + S -> S a | a F G | b F d
+            + A -> a | a A
+            + B -> a G | c G | a C G
+            + C -> c a | c B a
+            + D -> d c | d C c
+            + F -> a | b | G | A b | a C | G A | b F d
+            + G -> B a | B c | B C a
+        """, firstGrammar )
+
+        self.assertTextEqual(
+        r"""
+            + S: S
+            + A: A
+            + B: B
+            + C: C
+            + D: D
+            + F: F G
+            + G: G
         """, wrap_text( convert_to_text_lines( simple_non_terminals, new_line=False ), wrap=120 ) )
 
 
@@ -1523,7 +1521,7 @@ class TestGrammarTreeParsing(TestingUtilities):
 
         self.assertTextEqual(
         """
-            + S -> abcd | A cc D
+            + S -> a b cd | A cc D | A c c D
             + A -> &
             + D -> &
         """, str( firstGrammar ) )
@@ -1701,8 +1699,8 @@ class TestGrammarTreeParsing(TestingUtilities):
             P -> D L | &
             C -> V=exp | id (E)
             D -> d D | &
-            E -> exp, E | exp
-            L -> L; C | C
+            E -> exp , E | exp
+            L -> L ;C | C
             V -> id[E] | id
         """ ) )
 
@@ -1778,6 +1776,8 @@ class TestGrammarTreeParsing(TestingUtilities):
             +         e
             +         x
             +         p
+            +       space
+            +       terminal
             +         comma
             +       space
             +       non_terminal  E
@@ -1798,9 +1798,9 @@ class TestGrammarTreeParsing(TestingUtilities):
             +     production
             +       space
             +       non_terminal  L
+            +       space
             +       terminal
             +         semicolon
-            +       space
             +       non_terminal  C
             +       space
             +     production
@@ -2073,8 +2073,8 @@ class TestProduction(TestingUtilities):
 
         self.assertTextEqual(
         r"""
-            + [Production locked: True, str: aa, symbols: [Terminal locked: True, str: aa, sequence: 1, len: 2;],
-            + sequence: 1, len: 2;
+            + [Production locked: True, str: a a, symbols: [Terminal locked: True, str: a, sequence: 1, len: 1;,
+            + Terminal locked: True, str: a, sequence: 2, len: 1;], sequence: 2, len: 2;
             + ]
         """, wrap_text( sort_alphabetically_and_by_length( production.combinations( symbols ) ), wrap=100 ) )
 
@@ -2085,7 +2085,7 @@ class TestProduction(TestingUtilities):
 
         self.assertTextEqual(
         r"""
-            + [Terminal locked: True, str: aa, sequence: 1, len: 2;]
+            + [Terminal locked: True, str: a, sequence: 1, len: 1;, Terminal locked: True, str: a, sequence: 2, len: 1;]
         """, sort_alphabetically_and_by_length( production ) )
 
     def test_combinationFilterNonTerminalsFromAa(self):
