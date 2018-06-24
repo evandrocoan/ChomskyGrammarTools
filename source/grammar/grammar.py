@@ -836,44 +836,6 @@ class ChomskyGrammar():
 
         return False
 
-    def eliminate_indirect_factors(self):
-        """
-            Converts all indirect factors on this grammar to direct factors.
-        """
-        self._save_history( "Eliminating Indirect Factors", IntermediateGrammar.BEGINNING )
-        old_counter = -1
-        current_counter = 0
-
-        production_keys = self.productions
-        non_deterministic_factors_list = []
-
-        while old_counter != current_counter:
-            old_counter = current_counter
-
-            for start_symbol in production_keys:
-                start_productions = production_keys[start_symbol]
-
-                for start_production in start_productions(1):
-                    first_symbol = start_production[0]
-
-                    if type( first_symbol ) is NonTerminal:
-                        remove_production = False
-                        first_symbol_productions = production_keys[first_symbol]
-                        non_deterministic_factors_list.append( ( start_production, first_symbol ) )
-
-                        for first_symbol_production in first_symbol_productions:
-                            remove_production = True
-                            new_production = start_production.replace( 0, first_symbol_production )
-                            self.add_production( start_symbol, new_production )
-
-                        if remove_production:
-                            current_counter += 1
-                            self.remove_production( start_symbol, start_production )
-
-        self._save_history( "Eliminating Indirect Factors", IntermediateGrammar.END )
-        self._save_data( "Indirect factors for elimination: %s" % non_deterministic_factors_list )
-        log( 16, "self out: \n%s", self )
-
     def factors(self):
         """
             Call `eliminate_indirect_factors()` then returns a list with tuple on the format
@@ -948,6 +910,44 @@ class ChomskyGrammar():
 
         self._save_history( "Factoring", IntermediateGrammar.END )
         return was_factored
+
+    def eliminate_indirect_factors(self):
+        """
+            Converts all indirect factors on this grammar to direct factors.
+        """
+        self._save_history( "Eliminating Indirect Factors", IntermediateGrammar.BEGINNING )
+        old_counter = -1
+        current_counter = 0
+
+        production_keys = self.productions
+        non_deterministic_factors_list = []
+
+        while old_counter != current_counter:
+            old_counter = current_counter
+
+            for start_symbol in production_keys:
+                start_productions = production_keys[start_symbol]
+
+                for start_production in start_productions(1):
+                    first_symbol = start_production[0]
+
+                    if type( first_symbol ) is NonTerminal:
+                        remove_production = False
+                        first_symbol_productions = production_keys[first_symbol]
+                        non_deterministic_factors_list.append( ( start_production, first_symbol ) )
+
+                        for first_symbol_production in first_symbol_productions:
+                            remove_production = True
+                            new_production = start_production.replace( 0, first_symbol_production )
+                            self.add_production( start_symbol, new_production )
+
+                        if remove_production:
+                            current_counter += 1
+                            self.remove_production( start_symbol, start_production )
+
+        self._save_history( "Eliminating Indirect Factors", IntermediateGrammar.END )
+        self._save_data( "Indirect factors for elimination: %s" % non_deterministic_factors_list )
+        log( 16, "self out: \n%s", self )
 
     def eliminate_direct_factors(self):
         """
