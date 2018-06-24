@@ -1019,7 +1019,7 @@ class TestAutomataOperationHistory(TestingUtilities):
             +  L' -> & | ; C L'
             +
             + # 2. Eliminating Indirect Factors, End
-            + # Indirect factors for elimination: [(L, L), (D L, D), (V = exp, V), (V = exp L', V), (V = exp L', V)]
+            + #    Indirect factors for elimination: [(L, L), (D L, D), (V = exp, V), (V = exp L', V), (V = exp L', V)]
             +   P -> & | d L | d D L | i = exp L' | id ( E ) L' | id = exp L' | id [ E ] = exp L'
             +   C -> i = exp | id ( E ) | id = exp | id [ E ] = exp
             +   D -> d | d D
@@ -1029,7 +1029,7 @@ class TestAutomataOperationHistory(TestingUtilities):
             +  L' -> & | ; C L'
             +
             + # 3. Eliminating Direct Factors, End
-            + # Direct factors for elimination: [(C, id), (D, d), (E, exp), (L, id), (P, d), (P, id), (V, id)]
+            + #    Direct factors for elimination: [(C, id), (D, d), (E, exp), (L, id), (P, d), (P, id), (V, id)]
             +   P -> & | d P1 | id P2 | i = exp L'
             +   C -> id C1 | i = exp
             +   D -> d D1
@@ -1073,18 +1073,21 @@ class TestAutomataOperationHistory(TestingUtilities):
             +  T -> F | T * F
             +
             + # 4. Eliminate direct left recursion
+            + #    Direct recursion for elimination: [E + T] -> [T E']
             +   E -> T E'
             +   F -> id | ( E )
             +   T -> F | T * F
             +  E' -> & | + T E'
             +
             + # 5. Eliminate indirect left recursion
+            + #    Indirect recursion for elimination: [F] -> [( E ), id]
             +   E -> T E'
             +   F -> id | ( E )
             +   T -> id | ( E ) | T * F
             +  E' -> & | + T E'
             +
             + # 6. Eliminate direct left recursion
+            + #    Direct recursion for elimination: [T * F] -> [( E ) T', id T']
             +   E -> T E'
             +   F -> id | ( E )
             +   T -> id T' | ( E ) T'

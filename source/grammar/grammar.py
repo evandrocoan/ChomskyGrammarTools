@@ -220,8 +220,15 @@ class ChomskyGrammar():
 
         self.operations_history.append( IntermediateGrammar( self, operation_name, operation_stage ) )
 
-    def _save_data(self, text_data):
-        self.operations_history[-1].extra_text.append( text_data )
+    def _save_data(self, text_data, *arguments):
+
+        if arguments:
+
+            for argument in arguments:
+
+                if argument:
+                    self.operations_history[-1].extra_text.append( text_data % arguments )
+                    break
 
     def get_operation_history(self):
         """
@@ -748,6 +755,9 @@ class ChomskyGrammar():
         non_terminals_count = len( production_keys_list )
 
         for maximum_index in range( 0, non_terminals_count ):
+            indirect_recursions = list()
+            indirect_replacements = list()
+
             outter_start_symbol = production_keys_list[maximum_index]
             outter_productions = productions_keys[outter_start_symbol]
             log( 32, "1. outter_start_symbol: %s", outter_start_symbol )
@@ -769,38 +779,44 @@ class ChomskyGrammar():
                     if type( outter_production_first_symbol ) is NonTerminal:
 
                         if outter_production_first_symbol == inner_start_symbol:
+                            indirect_recursions.append( outter_production )
 
                             for inner_production in inner_productions(1):
                                 remove_outter_production = True
                                 new_production = outter_production.replace( 0, inner_production )
+
                                 self.add_production( outter_start_symbol, new_production )
+                                indirect_replacements.append( inner_production )
 
                     if remove_outter_production:
                         self.remove_production( outter_start_symbol, outter_production, False )
 
+            direct_recursions = set()
+            direct_recursions_list = list()
+            direct_replacements = list()
             new_outter_start_symbol = self.new_symbol( outter_start_symbol )
-            outter_productions_recursive = set()
-            self._save_history( "Eliminate indirect left recursion" )
 
             for outter_production in outter_productions:
 
                 if type( outter_production[0] ) is NonTerminal:
 
                     if outter_production[0] == outter_start_symbol:
-                        outter_productions_recursive.add( outter_production )
+                        direct_recursions.add( outter_production )
+                        direct_recursions_list.append( outter_production )
 
             log( 32, "self: \n%s", self )
             log( 32, "2. new_outter_start_symbol: %s", new_outter_start_symbol )
-            log( 32, "2. outter_productions_recursive: %s", outter_productions_recursive )
+            log( 32, "2. direct_recursions: %s", direct_recursions )
+            self._save_history( "Eliminate indirect left recursion" )
+            self._save_data( "Indirect recursion for elimination: %s -> %s", indirect_recursions, indirect_replacements )
 
-            if outter_productions_recursive:
+            if direct_recursions:
 
                 for outter_production in outter_productions(1):
                     log( 32, "2.1 outter_productions: %s", outter_productions )
 
-                    if outter_production in outter_productions_recursive:
+                    if outter_production in direct_recursions:
                         new_production = outter_production.new()
-
                         new_production.remove_non_terminal( 0 )
                         new_production.add( new_outter_start_symbol[0].new() )
                         self.add_production( new_outter_start_symbol, new_production )
@@ -808,6 +824,7 @@ class ChomskyGrammar():
                     else:
                         new_production = outter_production.new()
                         new_production.add( new_outter_start_symbol[0].new() )
+                        direct_replacements.append( new_production )
                         self.add_production( outter_start_symbol, new_production )
 
                     self.remove_production( outter_start_symbol, outter_production, False )
@@ -816,6 +833,7 @@ class ChomskyGrammar():
 
             log( 32, "self: \n%s", self )
             self._save_history( "Eliminate direct left recursion" )
+            self._save_data( "Direct recursion for elimination: %s -> %s", direct_recursions_list, direct_replacements )
 
         self._save_history( "Eliminating Left Recursion", IntermediateGrammar.END )
 
@@ -946,7 +964,7 @@ class ChomskyGrammar():
                             self.remove_production( start_symbol, start_production )
 
         self._save_history( "Eliminating Indirect Factors", IntermediateGrammar.END )
-        self._save_data( "Indirect factors for elimination: %s" % non_deterministic_factors_list )
+        self._save_data( "Indirect factors for elimination: %s", non_deterministic_factors_list )
         log( 16, "self out: \n%s", self )
 
     def eliminate_direct_factors(self):
@@ -962,7 +980,7 @@ class ChomskyGrammar():
         for start_symbol in production_keys:
             non_deterministic_factors_dictionary[start_symbol]  = []
 
-        self._save_data( "Direct factors for elimination: %s" % non_deterministic_factors_list )
+        self._save_data( "Direct factors for elimination: %s", non_deterministic_factors_list )
         for factor_symbol, factor_terminal in reversed( non_deterministic_factors_list ):
             non_deterministic_factors_dictionary[factor_symbol].append( factor_terminal )
 
