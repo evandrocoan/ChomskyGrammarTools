@@ -345,7 +345,7 @@ class TestGrammarFactoringAndRecursionSymbols(TestingUtilities):
 
         self.assertTrue( firstGrammar.has_left_recursion() )
 
-    def test_grammarEliminateLeftRecursionCalculationOfChapter5Item5Example2(self):
+    def test_historyEliminateLeftRecursionCalculationOfChapter5Item5Example2(self):
         firstGrammar = ChomskyGrammar.load_from_text_lines( wrap_text(
         r"""
             E -> E + T | T
@@ -356,12 +356,43 @@ class TestGrammarFactoringAndRecursionSymbols(TestingUtilities):
 
         self.assertTextEqual(
         r"""
-            +  E -> T E'
+            + # 1. Eliminating Left Recursion, Beginning
+            +  E -> T | E + T
             +  F -> id | ( E )
-            +  T -> id T' | ( E ) T'
-            + E' -> & | + T E'
-            + T' -> & | * F T'
-        """, firstGrammar )
+            +  T -> F | T * F
+            +
+            + # 2. Eliminating Infertile Symbols, End
+            +  E -> T | E + T
+            +  F -> id | ( E )
+            +  T -> F | T * F
+            +
+            + # 3. Eliminating Unreachable Symbols, End
+            +  E -> T | E + T
+            +  F -> id | ( E )
+            +  T -> F | T * F
+            +
+            + # 4. Eliminate direct left recursion
+            + #    Direct recursion for elimination: [E + T] -> [T E']
+            +   E -> T E'
+            +   F -> id | ( E )
+            +   T -> F | T * F
+            +  E' -> & | + T E'
+            +
+            + # 5. Eliminate indirect left recursion
+            + #    Indirect recursion for elimination: [F] -> [( E ), id]
+            +   E -> T E'
+            +   F -> id | ( E )
+            +   T -> id | ( E ) | T * F
+            +  E' -> & | + T E'
+            +
+            + # 6. Eliminate direct left recursion
+            + #    Direct recursion for elimination: [T * F] -> [( E ) T', id T']
+            +   E -> T E'
+            +   F -> id | ( E )
+            +   T -> id T' | ( E ) T'
+            +  E' -> & | + T E'
+            +  T' -> & | * F T'
+        """, firstGrammar.get_operation_history() )
 
         self.assertFalse( firstGrammar.has_left_recursion() )
 
@@ -700,6 +731,58 @@ class TestGrammarFactoringAndRecursionSymbols(TestingUtilities):
         self.assertTrue( firstGrammar.is_factored() )
         self.assertTextEqual( " No elements found.", convert_to_text_lines( get_duplicated_elements( firstGrammar.factors() ) ) )
 
+    def test_historyFactoringOfList3Exercice7ItemAMutated(self):
+        firstGrammar = ChomskyGrammar.load_from_text_lines( wrap_text(
+        r"""
+            P  -> & | L | D L
+            C  -> V = exp | id ( E )
+            D  -> d | d D
+            E  -> exp | exp , E
+            L  -> V = exp L' | id (E) L'
+            V  -> id | id [E] | i
+            L' -> & | ;C L'
+        """ ) )
+
+        factor_it = firstGrammar.factor_it(5)
+        self.assertTextEqual(
+        r"""
+            + # 1. Factoring, Beginning
+            +   P -> & | L | D L
+            +   C -> V = exp | id ( E )
+            +   D -> d | d D
+            +   E -> exp | exp , E
+            +   L -> V = exp L' | id ( E ) L'
+            +   V -> i | id | id [ E ]
+            +  L' -> & | ; C L'
+            +
+            + # 2. Eliminating Indirect Factors, End
+            + #    Indirect factors for elimination: [(L, L), (D L, D), (V = exp, V), (V = exp L', V), (V = exp L', V)]
+            +   P -> & | d L | d D L | i = exp L' | id ( E ) L' | id = exp L' | id [ E ] = exp L'
+            +   C -> i = exp | id ( E ) | id = exp | id [ E ] = exp
+            +   D -> d | d D
+            +   E -> exp | exp , E
+            +   L -> i = exp L' | id ( E ) L' | id = exp L' | id [ E ] = exp L'
+            +   V -> i | id | id [ E ]
+            +  L' -> & | ; C L'
+            +
+            + # 3. Eliminating Direct Factors, End
+            + #    Direct factors for elimination: [(C, id), (D, d), (E, exp), (L, id), (P, d), (P, id), (V, id)]
+            +   P -> & | d P1 | id P2 | i = exp L'
+            +   C -> id C1 | i = exp
+            +   D -> d D1
+            +   E -> exp E1
+            +   L -> id L1 | i = exp L'
+            +   V -> i | id V1
+            +  C1 -> = exp | ( E ) | [ E ] = exp
+            +  D1 -> & | D
+            +  E1 -> & | , E
+            +  L1 -> = exp L' | ( E ) L' | [ E ] = exp L'
+            +  L' -> & | ; C L'
+            +  P1 -> L | D L
+            +  P2 -> = exp L' | ( E ) L' | [ E ] = exp L'
+            +  V1 -> & | [ E ]
+        """, firstGrammar.get_operation_history() )
+
 
 class TestGrammarFirstAndFollow(TestingUtilities):
 
@@ -987,113 +1070,6 @@ class TestGrammarFirstAndFollow(TestingUtilities):
             + B: $ a b c
             + C: $ a b c e
         """, dictionary_to_string( follow ) )
-
-
-class TestAutomataOperationHistory(TestingUtilities):
-    """
-        Tests automata operations history creation.
-    """
-
-    def test_historyFactoringOfList3Exercice7ItemAMutated(self):
-        firstGrammar = ChomskyGrammar.load_from_text_lines( wrap_text(
-        r"""
-            P  -> & | L | D L
-            C  -> V = exp | id ( E )
-            D  -> d | d D
-            E  -> exp | exp , E
-            L  -> V = exp L' | id (E) L'
-            V  -> id | id [E] | i
-            L' -> & | ;C L'
-        """ ) )
-
-        factor_it = firstGrammar.factor_it(5)
-        self.assertTextEqual(
-        r"""
-            + # 1. Factoring, Beginning
-            +   P -> & | L | D L
-            +   C -> V = exp | id ( E )
-            +   D -> d | d D
-            +   E -> exp | exp , E
-            +   L -> V = exp L' | id ( E ) L'
-            +   V -> i | id | id [ E ]
-            +  L' -> & | ; C L'
-            +
-            + # 2. Eliminating Indirect Factors, End
-            + #    Indirect factors for elimination: [(L, L), (D L, D), (V = exp, V), (V = exp L', V), (V = exp L', V)]
-            +   P -> & | d L | d D L | i = exp L' | id ( E ) L' | id = exp L' | id [ E ] = exp L'
-            +   C -> i = exp | id ( E ) | id = exp | id [ E ] = exp
-            +   D -> d | d D
-            +   E -> exp | exp , E
-            +   L -> i = exp L' | id ( E ) L' | id = exp L' | id [ E ] = exp L'
-            +   V -> i | id | id [ E ]
-            +  L' -> & | ; C L'
-            +
-            + # 3. Eliminating Direct Factors, End
-            + #    Direct factors for elimination: [(C, id), (D, d), (E, exp), (L, id), (P, d), (P, id), (V, id)]
-            +   P -> & | d P1 | id P2 | i = exp L'
-            +   C -> id C1 | i = exp
-            +   D -> d D1
-            +   E -> exp E1
-            +   L -> id L1 | i = exp L'
-            +   V -> i | id V1
-            +  C1 -> = exp | ( E ) | [ E ] = exp
-            +  D1 -> & | D
-            +  E1 -> & | , E
-            +  L1 -> = exp L' | ( E ) L' | [ E ] = exp L'
-            +  L' -> & | ; C L'
-            +  P1 -> L | D L
-            +  P2 -> = exp L' | ( E ) L' | [ E ] = exp L'
-            +  V1 -> & | [ E ]
-        """, firstGrammar.get_operation_history() )
-
-    def test_historyEliminateLeftRecursionCalculationOfChapter5Item5Example2(self):
-        firstGrammar = ChomskyGrammar.load_from_text_lines( wrap_text(
-        r"""
-            E -> E + T | T
-            F -> ( E ) | id
-            T -> T * F | F
-        """ ) )
-        firstGrammar.eliminate_left_recursion()
-
-        self.assertTextEqual(
-        r"""
-            + # 1. Eliminating Left Recursion, Beginning
-            +  E -> T | E + T
-            +  F -> id | ( E )
-            +  T -> F | T * F
-            +
-            + # 2. Eliminating Infertile Symbols, End
-            +  E -> T | E + T
-            +  F -> id | ( E )
-            +  T -> F | T * F
-            +
-            + # 3. Eliminating Unreachable Symbols, End
-            +  E -> T | E + T
-            +  F -> id | ( E )
-            +  T -> F | T * F
-            +
-            + # 4. Eliminate direct left recursion
-            + #    Direct recursion for elimination: [E + T] -> [T E']
-            +   E -> T E'
-            +   F -> id | ( E )
-            +   T -> F | T * F
-            +  E' -> & | + T E'
-            +
-            + # 5. Eliminate indirect left recursion
-            + #    Indirect recursion for elimination: [F] -> [( E ), id]
-            +   E -> T E'
-            +   F -> id | ( E )
-            +   T -> id | ( E ) | T * F
-            +  E' -> & | + T E'
-            +
-            + # 6. Eliminate direct left recursion
-            + #    Direct recursion for elimination: [T * F] -> [( E ) T', id T']
-            +   E -> T E'
-            +   F -> id | ( E )
-            +   T -> id T' | ( E ) T'
-            +  E' -> & | + T E'
-            +  T' -> & | * F T'
-        """, firstGrammar.get_operation_history() )
 
 
 class TestGrammarEpsilonConversion(TestingUtilities):
