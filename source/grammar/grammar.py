@@ -20,14 +20,15 @@ from .production import epsilon_production
 from .production import end_of_string_terminal
 
 from .utilities import IntermediateGrammar
-from .utilities import DynamicIterationSet
-from .utilities import DynamicIterationDict
 
 from .utilities import getCleanSpaces
 from .utilities import dictionary_to_string
 from .utilities import convert_to_text_lines
 from .utilities import get_duplicated_elements
 from .utilities import sort_alphabetically_and_by_length
+
+from .dynamic_iteration import DynamicIterationSet
+from .dynamic_iteration import DynamicIterationDict
 
 from .tree_transformer import ChomskyGrammarTreeTransformer
 
