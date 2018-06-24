@@ -585,31 +585,35 @@ class ChomskyGrammar():
         if recursive and not productions:
             self.remove_start_non_terminal( start_symbol )
 
-    def remove_start_non_terminal(self, start_non_terminal):
+    def remove_start_non_terminal(self, start_non_terminal, recursive=True):
         """
             Given a `start_non_terminal` remove it from the grammar and all productions which points to it.
 
             If `start_non_terminal` is a initial symbol, `clean_initial_symbol()` will also be called.
+
+            If `recursive` is True the `start_non_terminal` symbol will be removed everywhere it is mentioned.
         """
         production_keys = self.productions
 
-        for start_symbol in production_keys(1):
-            # Do remove the productions from itself, because:
-            # 1. There is no need for it as everything is going to be removed anyway
-            # 2. It can cause a recursion with `remove_production()` which also call
-            #    `remove_start_non_terminal()` when all productions are removed from `start_symbol`
-            if start_symbol == start_non_terminal:
-                continue
+        if recursive:
 
-            start_productions = production_keys[start_symbol]
+            for start_symbol in production_keys(1):
+                # Do remove the productions from itself, because:
+                # 1. There is no need for it as everything is going to be removed anyway
+                # 2. It can cause a recursion with `remove_production()` which also call
+                #    `remove_start_non_terminal()` when all productions are removed from `start_symbol`
+                if start_symbol == start_non_terminal:
+                    continue
 
-            for production in start_productions:
+                start_productions = production_keys[start_symbol]
 
-                for symbol in production:
+                for production in start_productions:
 
-                    if symbol == start_non_terminal:
-                        self.remove_production( start_symbol, production )
-                        break
+                    for symbol in production:
+
+                        if symbol == start_non_terminal:
+                            self.remove_production( start_symbol, production )
+                            break
 
         del production_keys[start_non_terminal]
         self.clean_initial_symbol( start_non_terminal )
@@ -1093,6 +1097,7 @@ class ChomskyGrammar():
         """
         self._save_history( "Eliminating Infertile Symbols", IntermediateGrammar.BEGINNING )
         fertile = self.fertile()
+        infertile = list()
         production_keys = self.productions
 
         for start_symbol in production_keys(1):
@@ -1113,9 +1118,14 @@ class ChomskyGrammar():
                             break
 
                 if not all_fertile:
-                    self.remove_production( start_symbol, production )
+                    infertile.append( "%s -> %s" % ( start_symbol, production ) )
+                    self.remove_production( start_symbol, production, False )
+
+                    if not start_productions:
+                        self.remove_start_non_terminal( start_symbol, False )
 
         self._save_history( "Eliminating Infertile Symbols", IntermediateGrammar.END )
+        self._save_data( "Infertile symbols: %s", infertile )
 
     def reachable(self):
         """

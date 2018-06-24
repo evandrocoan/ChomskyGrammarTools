@@ -1388,7 +1388,7 @@ class TestGrammarFertileSymbols(TestingUtilities):
             + ]
         """, sort_alphabetically_and_by_length( fertile ) )
 
-    def test_grammarEliminateNonFertileNonTerminalsChapter4Item1Example1(self):
+    def test_grammarEliminateInfertileNonTerminalsChapter4Item1Example1(self):
         firstGrammar = ChomskyGrammar.load_from_text_lines( wrap_text(
         r"""
             S -> aS | B C | B D
@@ -1401,10 +1401,19 @@ class TestGrammarFertileSymbols(TestingUtilities):
 
         self.assertTextEqual(
         r"""
-            + S -> a S | B D
-            + B -> & | b B
-            + D -> c | d D d
-        """, firstGrammar )
+            + # 1. Eliminating Infertile Symbols, Beginning
+            +  S -> a S | B C | B D
+            +  A -> c C | A B
+            +  B -> & | b B
+            +  C -> a A | B C
+            +  D -> c | d D d
+            +
+            + # 2. Eliminating Infertile Symbols, End
+            + #    Infertile symbols: ['S -> B C', 'A -> c C', 'A -> A B', 'C -> a A', 'C -> B C']
+            +  S -> a S | B D
+            +  B -> & | b B
+            +  D -> c | d D d
+        """, firstGrammar.get_operation_history() )
 
     def test_grammarEliminateUnreachableSymbolsChapter4Item1Example1(self):
         firstGrammar = ChomskyGrammar.load_from_text_lines( wrap_text(
