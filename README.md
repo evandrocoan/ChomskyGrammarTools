@@ -20,7 +20,6 @@ involving the following checks / operations:
 
 ## II - Observations:
 1. Represent the CFG in a textual way, following the pattern of the examples below:
-
    **a)**
    ```
    E -> E + T | E-T | T
@@ -36,7 +35,6 @@ involving the following checks / operations:
    T1 -> * F T1 | &
     F -> (E) | id
    ```
-
 2. Leave a blank space between the symbols on the right.
 3. Represent non-terminals by capital letter (followed by 0 or + digits).
 4. Represent terminals with one or more contiguous characters (any characters,
@@ -52,3 +50,26 @@ involving the following checks / operations:
    JoaoF-MariaG.zip).
 9. In addition to the correctness,
    aspects of usability and robustness of the application will be evaluated.
+
+
+## Licensing
+
+```python
+#
+# Chomsky Grammar Tools for Context Free Grammars (CFG)
+# Copyright (C) 2018 Evandro Coan <https://github.com/evandrocoan>
+#
+#  This program is free software; you can redistribute it and/or modify it
+#  under the terms of the GNU General Public License as published by the
+#  Free Software Foundation; either version 3 of the License, or ( at
+#  your option ) any later version.
+#
+#  This program is distributed in the hope that it will be useful, but
+#  WITHOUT ANY WARRANTY; without even the implied warranty of
+#  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+#  General Public License for more details.
+#
+#  You should have received a copy of the GNU General Public License
+#  along with this program.  If not, see <http://www.gnu.org/licenses/>.
+#
+```
