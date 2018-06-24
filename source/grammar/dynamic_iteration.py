@@ -223,7 +223,7 @@ class DynamicIterationDict(object):
             empty_slots = self.empty_slots
             values_list = self.values_list
 
-            if empty_slots and False:
+            if empty_slots and self.new_items_skip_count > 0:
                 free_slot = empty_slots.pop()
                 self.filled_slots.add( free_slot )
 
