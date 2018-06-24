@@ -130,10 +130,27 @@ class TestChomskyGrammar(TestingUtilities):
         self.assertFalse( firstGrammar.has_recursion_on_the_non_terminal( non_terminal_S ) )
         self.assertTrue( firstGrammar.has_recursion_on_the_non_terminal( non_terminal_A ) )
 
+    def test_grammarIsEmptyStoSandA(self):
+        firstGrammar = ChomskyGrammar.load_from_text_lines( wrap_text(
+        r"""
+            S -> B | a
+            B -> B
+        """ ) )
+
+        self.assertFalse( firstGrammar.is_empty() )
+
     def test_grammarIsEmptyStoS(self):
         firstGrammar = ChomskyGrammar.load_from_text_lines( wrap_text(
         r"""
-            S -> B
+            S -> S
+        """ ) )
+
+        self.assertTrue( firstGrammar.is_empty() )
+
+    def test_grammarIsEmptyStoStoBtoB(self):
+        firstGrammar = ChomskyGrammar.load_from_text_lines( wrap_text(
+        r"""
+            S -> S
             B -> B
         """ ) )
 
