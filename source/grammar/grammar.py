@@ -524,10 +524,10 @@ class ChomskyGrammar():
         non_terminal_epsilon = self.non_terminal_epsilon()
 
         for start_symbol in production_keys:
-            non_terminal_productions = production_keys[start_symbol]
-            non_terminal_productions.not_iterate_over_new_items()
+            start_production = production_keys[start_symbol]
+            start_production.not_iterate_over_new_items()
 
-            for production in non_terminal_productions:
+            for production in start_production:
 
                 for combination in production.combinations( non_terminal_epsilon ):
                     # log( 1, "combination: %s", combination )
@@ -554,11 +554,6 @@ class ChomskyGrammar():
             grammar `productions` and everywhere it is mentioned.
         """
         log( 58, "%s -> %s", start_symbol, production )
-
-        # initial_symbol = Production( [NonTerminal( "S'" )], lock=True )
-        # if initial_symbol in self.productions and self.has_production( initial_symbol, initial_symbol ) and len( self.productions[initial_symbol] ) == 1:
-        #     raise RuntimeError()
-
         productions = self.productions[start_symbol]
         productions.discard( production )
 
@@ -583,7 +578,6 @@ class ChomskyGrammar():
                 continue
 
             start_productions = production_keys[start_symbol]
-            start_productions.not_iterate_over_new_items()
 
             for production in start_productions:
 
