@@ -22,8 +22,9 @@
 #
 
 from contextlib import suppress
-
 from debug_tools import getLogger
+
+from .utilities import emquote_string
 
 # level 4 - Abstract Syntax Tree Parsing
 log = getLogger( 127-4, __name__ )
@@ -159,7 +160,19 @@ class DynamicIterationDict(object):
             On the first part is showed all already iterated elements, followed by the not yet
             iterated. When the iteration process is not running, it shows the last state registered.
         """
-        return "(%s) (%s; %s)" % ( self.items_dictionary, self.keys_list, self.values_list )
+        keys_list = self.keys_list
+        values_list = self.values_list
+        empty_slots = self.empty_slots
+        items_dictionary = self.items_dictionary
+        representation = []
+
+        for index in range( 0, len( keys_list ) ):
+
+            if index not in empty_slots:
+                key = keys_list[index]
+                representation.append( "%s[%s]: %s" % ( emquote_string( key ), items_dictionary[key], values_list[index] ) )
+
+        return ", ".join( representation )
 
     def __contains__(self, key):
         """
@@ -208,7 +221,7 @@ class DynamicIterationDict(object):
             empty_slots = self.empty_slots
             values_list = self.values_list
 
-            if empty_slots:
+            if empty_slots and False:
                 free_slot = empty_slots.pop()
                 self.new_empty_slots.add( free_slot )
 
@@ -259,6 +272,7 @@ class DynamicIterationDict(object):
             clean_keys.append( key )
             clean_values.append( values_list[value_index] )
 
+        self.empty_slots.clear()
         self.keys_list = clean_keys
         self.values_list = clean_values
 
@@ -274,11 +288,15 @@ class DynamicIterationDict(object):
 
         while empty_slots:
             empty_slot = empty_slots.pop()
-            keys_list[empty_slot] = keys_list.pop()
-            values_list[empty_slot] = values_list.pop()
+            list_length = len( keys_list )
+            key = keys_list.pop()
 
-            if last_slot < empty_slot:
-                last_slot = empty_slot
+            keys_list[empty_slot] = key
+            values_list[empty_slot] = values_list.pop()
+            self.items_dictionary[key] = empty_slot
+
+            if last_slot >= list_length:
+                last_slot = last_slot
 
         if last_slot > -1:
             del keys_list[last_slot:]

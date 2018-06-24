@@ -48,7 +48,9 @@ from grammar.production import epsilon_terminal
 
 from grammar.lockable_type import LockableType
 from grammar.tree_transformer import ChomskyGrammarTreeTransformer
+
 from grammar.testing_utilities import TestingUtilities
+from grammar.dynamic_iteration import DynamicIterationDict
 
 log = getLogger( 127, os.path.basename( os.path.dirname( os.path.abspath ( __file__ ) ) ) )
 log( 1, "Importing " + __name__ )
@@ -2171,6 +2173,40 @@ class TestProduction(TestingUtilities):
             + [Terminal locked: True, str: a, sequence: 1, len: 1;]
         """, sort_alphabetically_and_by_length( production ) )
 
+
+class TestDynamicIterationDict(TestingUtilities):
+
+    def test_removalAtBeginingWithIterationAtEnd(self):
+        elements = DynamicIterationDict([0, 1, 2, 3, 4, 5, 6, 7])
+        current_index = -1
+        iterated_elements = []
+
+        for element in elements:
+            current_index += 1
+
+            if current_index == 2:
+                elements.remove( 1 )
+
+            if current_index == 5:
+                elements.add( 8 )
+
+            iterated_elements.append( element )
+
+        self.assertTextEqual(
+        r"""
+            + '0'[0]: None, '2'[2]: None, '3'[3]: None, '4'[4]: None, '5'[5]: None, '6'[6]: None, '7'[7]: None, '8'[8]: None
+        """, wrap_text( elements, wrap=0 ) )
+
+        self.assertTextEqual(
+        r"""
+            + [0, 1, 2, 3, 4, 5, 6, 7, 8]
+        """, wrap_text( iterated_elements, wrap=0 ) )
+
+        elements.trim_indexes_unsorted()
+        self.assertTextEqual(
+        r"""
+            + '0'[0]: None, '8'[1]: None, '2'[2]: None, '3'[3]: None, '4'[4]: None, '5'[5]: None, '6'[6]: None, '7'[7]: None
+        """, wrap_text( elements, wrap=0 ) )
 
 if __name__ == "__main__":
     unittest.main()

@@ -22,6 +22,7 @@
 #
 
 import os
+import difflib
 import unittest
 
 from debug_tools import getLogger
@@ -60,5 +61,22 @@ class TestingUtilities(unittest.TestCase):
 
         # print( goal.encode( 'ascii' ) )
         # print( results.encode( 'ascii' ) )
+        # self.unidiff_output( goal, results )
         self.assertEqual( goal, results )
+
+    def unidiff_output(self, expected, actual):
+        """
+            Helper function. Returns a string containing the unified diff of two multiline strings.
+
+            https://stackoverflow.com/questions/845276/how-to-print-the-comparison-of-two-multiline-strings-in-unified-diff-format
+            https://stackoverflow.com/questions/15864641/python-difflib-comparing-files
+            https://stackoverflow.com/questions/32359402/comparison-of-multi-line-strings-in-python-unit-test
+        """
+        expected = expected.splitlines( 1 )
+        actual = actual.splitlines( 1 )
+
+        # diff = difflib.ndiff( expected, actual )
+        if expected != actual:
+            diff = difflib.context_diff( expected, actual, fromfile='expected input', tofile='actual output', lineterm='\n' )
+            self.fail( '\n' + ''.join( diff ) )
 
