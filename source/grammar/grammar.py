@@ -27,9 +27,7 @@ from .utilities import convert_to_text_lines
 from .utilities import get_duplicated_elements
 from .utilities import sort_alphabetically_and_by_length
 
-from .dynamic_iteration import DynamicIterationSet
 from .dynamic_iteration import DynamicIterationDict
-
 from .tree_transformer import ChomskyGrammarTreeTransformer
 
 # level 2 - Add and remove productions
@@ -341,7 +339,7 @@ class ChomskyGrammar():
         production.lock()
 
         if start_symbol not in self.productions:
-            self.productions[start_symbol] = DynamicIterationSet( container_type=list )
+            self.productions[start_symbol] = DynamicIterationDict()
 
         log( 58, "   %s -> %s", start_symbol, production )
         self.productions[start_symbol].add( production )
@@ -444,7 +442,7 @@ class ChomskyGrammar():
         """
             Return `True` if the given `non_terminal_to_check` is recursive with himself.
         """
-        recursive_terminals = DynamicIterationSet([non_terminal_to_check])
+        recursive_terminals = DynamicIterationDict([non_terminal_to_check])
 
         for non_terminal in recursive_terminals:
             productions = self.productions[non_terminal]
@@ -476,7 +474,7 @@ class ChomskyGrammar():
         current_counter = 0
 
         production_keys = self.productions
-        non_terminal_epsilon = DynamicIterationSet()
+        non_terminal_epsilon = DynamicIterationDict()
 
         for start_symbol in production_keys:
 
@@ -525,9 +523,8 @@ class ChomskyGrammar():
 
         for start_symbol in production_keys:
             start_production = production_keys[start_symbol]
-            start_production.not_iterate_over_new_items()
 
-            for production in start_production:
+            for production in start_production(1):
 
                 for combination in production.combinations( non_terminal_epsilon ):
                     # log( 1, "combination: %s", combination )
@@ -546,18 +543,19 @@ class ChomskyGrammar():
 
         self._save_history( "Converting to Epsilon Free", IntermediateGrammar.END )
 
-    def remove_production(self, start_symbol, production):
+    def remove_production(self, start_symbol, production, recursive=True):
         """
             Given a `start_symbol` remove its `production`.
 
-            If was the last production, then the `start_symbol` symbol is also removed from the
-            grammar `productions` and everywhere it is mentioned.
+            If `recursive` is True and the removed production was the last production, then the
+            `start_symbol` symbol is also removed from the grammar `productions` and everywhere it
+            is mentioned.
         """
         log( 58, "%s -> %s", start_symbol, production )
         productions = self.productions[start_symbol]
         productions.discard( production )
 
-        if not productions:
+        if recursive and not productions:
             self.remove_start_non_terminal( start_symbol )
 
     def remove_start_non_terminal(self, start_non_terminal):
@@ -567,9 +565,8 @@ class ChomskyGrammar():
             If `start_non_terminal` is a initial symbol, `clean_initial_symbol()` will also be called.
         """
         production_keys = self.productions
-        production_keys.not_iterate_over_new_items()
 
-        for start_symbol in production_keys:
+        for start_symbol in production_keys(1):
             # Do remove the productions from itself, because:
             # 1. There is no need for it as everything is going to be removed anyway
             # 2. It can cause a recursion with `remove_production()` which also call
@@ -740,12 +737,11 @@ class ChomskyGrammar():
                 inner_start_symbol = production_keys_list[index]
                 inner_productions = productions_keys[inner_start_symbol]
 
-                outter_productions.not_iterate_over_new_items()
                 log( 32, "1.2 inner_start_symbol: %s", inner_start_symbol )
                 log( 32, "1.2 inner_productions: %s", inner_productions )
                 log( 32, "1.2 outter_productions: %s", outter_productions )
 
-                for outter_production in outter_productions:
+                for outter_production in outter_productions(1):
                     log( 32, "1.2.3 outter_production: %s", outter_production )
                     remove_outter_production = False
                     outter_production_first_symbol = outter_production[0]
@@ -753,22 +749,19 @@ class ChomskyGrammar():
                     if type( outter_production_first_symbol ) is NonTerminal:
 
                         if outter_production_first_symbol == inner_start_symbol:
-                            inner_productions.not_iterate_over_new_items()
 
-                            for inner_production in inner_productions:
+                            for inner_production in inner_productions(1):
                                 remove_outter_production = True
                                 new_production = outter_production.replace( 0, inner_production )
                                 self.add_production( outter_start_symbol, new_production )
 
                     if remove_outter_production:
-                        self.remove_production( outter_start_symbol, outter_production )
+                        self.remove_production( outter_start_symbol, outter_production, False )
 
-            self._save_history( "Eliminate indirect left recursion" )
             new_outter_start_symbol = self.new_symbol( outter_start_symbol )
             outter_productions_recursive = set()
+            self._save_history( "Eliminate indirect left recursion" )
 
-            log( 32, "2. new_outter_start_symbol: %s", new_outter_start_symbol )
-            log( 32, "2. outter_productions: %s", outter_productions )
             for outter_production in outter_productions:
 
                 if type( outter_production[0] ) is NonTerminal:
@@ -776,11 +769,14 @@ class ChomskyGrammar():
                     if outter_production[0] == outter_start_symbol:
                         outter_productions_recursive.add( outter_production )
 
+            log( 32, "self: \n%s", self )
+            log( 32, "2. new_outter_start_symbol: %s", new_outter_start_symbol )
             log( 32, "2. outter_productions_recursive: %s", outter_productions_recursive )
-            if outter_productions_recursive:
-                outter_productions.not_iterate_over_new_items()
 
-                for outter_production in outter_productions:
+            if outter_productions_recursive:
+
+                for outter_production in outter_productions(1):
+                    log( 32, "2.1 outter_productions: %s", outter_productions )
 
                     if outter_production in outter_productions_recursive:
                         new_production = outter_production.new()
@@ -794,10 +790,11 @@ class ChomskyGrammar():
                         new_production.add( new_outter_start_symbol[0].new() )
                         self.add_production( outter_start_symbol, new_production )
 
-                    self.remove_production( outter_start_symbol, outter_production )
+                    self.remove_production( outter_start_symbol, outter_production, False )
 
                 self.add_production( new_outter_start_symbol, epsilon_production.new() )
 
+            log( 32, "self: \n%s", self )
             self._save_history( "Eliminate direct left recursion" )
 
         self._save_history( "Eliminating Left Recursion", IntermediateGrammar.END )
@@ -834,9 +831,9 @@ class ChomskyGrammar():
             old_counter = current_counter
 
             for start_symbol in production_keys:
-                start_productions = list( production_keys[start_symbol] )
+                start_productions = production_keys[start_symbol]
 
-                for start_production in start_productions:
+                for start_production in start_productions(1):
                     first_symbol = start_production[0]
 
                     if type( first_symbol ) is NonTerminal:
@@ -942,12 +939,11 @@ class ChomskyGrammar():
         non_deterministic_factors_list = sorted( get_duplicated_elements( self.factors() ) )
         non_deterministic_factors_dictionary = {}
 
+        for start_symbol in production_keys:
+            non_deterministic_factors_dictionary[start_symbol]  = []
+
         self._save_data( "Direct factors for elimination: %s" % non_deterministic_factors_list )
-        for factor_symbol, factor_terminal in non_deterministic_factors_list:
-
-            if factor_symbol not in non_deterministic_factors_dictionary:
-                non_deterministic_factors_dictionary[factor_symbol]  = []
-
+        for factor_symbol, factor_terminal in reversed( non_deterministic_factors_list ):
             non_deterministic_factors_dictionary[factor_symbol].append( factor_terminal )
 
         for start_symbol in production_keys:
@@ -956,49 +952,51 @@ class ChomskyGrammar():
             log( 16, "start_productions: %s", start_productions )
 
             if start_symbol in non_deterministic_factors_dictionary:
-                log( 16, "non_deterministic_factors: %s", non_deterministic_factors_dictionary[start_symbol] )
+                start_symbol_non_deterministic_factors_dictionary = non_deterministic_factors_dictionary[start_symbol]
 
-            while True:
+                log( 16, "non_deterministic_factors: %s", start_symbol_non_deterministic_factors_dictionary )
+                start_productions.not_iterate_over_new_items( len( start_symbol_non_deterministic_factors_dictionary ) )
 
-                # Picks up a random nondeterministic symbol to factoring
-                if start_symbol in non_deterministic_factors_dictionary and non_deterministic_factors_dictionary[start_symbol]:
-                    non_deterministic_factor = non_deterministic_factors_dictionary[start_symbol].pop( 0 )
+                while True:
 
-                else:
-                    break
+                    # Picks up a random nondeterministic symbol to factoring
+                    if start_symbol_non_deterministic_factors_dictionary:
+                        non_deterministic_factor = start_symbol_non_deterministic_factors_dictionary.pop()
 
-                new_factor_start_symbol = self.new_symbol( start_symbol, True )
-                direct_factors_productions = {}
-                log( 16, "non_deterministic_factor: %s", non_deterministic_factor )
-                log( 16, "new_factor_start_symbol: %s", new_factor_start_symbol )
+                    else:
+                        break
 
-                for start_production in start_productions:
-
-                        if start_production[0] == non_deterministic_factor[0]:
-                            direct_factors_productions[start_production] = non_deterministic_factor
-
-                direct_factors_productions = direct_factors_productions
-                log( 16, "direct_factors_productions: %s", direct_factors_productions )
-
-                if direct_factors_productions:
-                    has_added_first_production = False
-                    start_productions.not_iterate_over_new_items()
+                    new_factor_start_symbol = self.new_symbol( start_symbol, True )
+                    direct_factors_productions = {}
+                    log( 16, "non_deterministic_factor: %s", non_deterministic_factor )
+                    log( 16, "new_factor_start_symbol: %s", new_factor_start_symbol )
 
                     for start_production in start_productions:
 
-                        if start_production in direct_factors_productions:
+                            if start_production[0] == non_deterministic_factor[0]:
+                                direct_factors_productions[start_production] = non_deterministic_factor
 
-                            if not has_added_first_production:
-                                has_added_first_production = True
-                                new_start_production = direct_factors_productions[start_production].new()
-                                new_start_production.add( new_factor_start_symbol[0].new() )
-                                self.add_production( start_symbol, new_start_production )
+                    direct_factors_productions = direct_factors_productions
+                    log( 16, "direct_factors_productions: %s", direct_factors_productions )
 
-                            new_factor_production = start_production.new()
-                            new_factor_production.remove( 0 )
+                    if direct_factors_productions:
+                        has_added_first_production = False
 
-                            self.add_production( new_factor_start_symbol, new_factor_production )
-                            self.remove_production( start_symbol, start_production )
+                        for start_production in start_productions(1):
+
+                            if start_production in direct_factors_productions:
+
+                                if not has_added_first_production:
+                                    has_added_first_production = True
+                                    new_start_production = direct_factors_productions[start_production].new()
+                                    new_start_production.add( new_factor_start_symbol[0].new() )
+                                    self.add_production( start_symbol, new_start_production )
+
+                                new_factor_production = start_production.new()
+                                new_factor_production.remove( 0 )
+
+                                self.add_production( new_factor_start_symbol, new_factor_production )
+                                self.remove_production( start_symbol, start_production )
 
         self._save_history( "Eliminating Direct Factors", IntermediateGrammar.END )
         log( 16, "self out: \n%s", self )
@@ -1058,13 +1056,11 @@ class ChomskyGrammar():
         self._save_history( "Eliminating Infertile Symbols", IntermediateGrammar.BEGINNING )
         fertile = self.fertile()
         production_keys = self.productions
-        production_keys.not_iterate_over_new_items()
 
-        for start_symbol in production_keys:
+        for start_symbol in production_keys(1):
             start_productions = production_keys[start_symbol]
-            start_productions.not_iterate_over_new_items()
 
-            for production in start_productions:
+            for production in start_productions(1):
                 all_fertile = True
 
                 for symbol in production:
@@ -1089,7 +1085,7 @@ class ChomskyGrammar():
         """
         production_keys = self.productions
         reachable_terminals = set()
-        reachable_non_terminals = DynamicIterationSet( [self.initial_symbol.non_terminals(0)] )
+        reachable_non_terminals = DynamicIterationDict( [self.initial_symbol.non_terminals(0)] )
 
         for start_symbol in reachable_non_terminals:
             start_productions = production_keys[start_symbol]
@@ -1113,9 +1109,8 @@ class ChomskyGrammar():
         self._save_history( "Eliminating Unreachable Symbols", IntermediateGrammar.BEGINNING )
         reachable = self.reachable()
         production_keys = self.productions
-        production_keys.not_iterate_over_new_items()
 
-        for start_symbol in production_keys:
+        for start_symbol in production_keys(1):
             # log( 1, "1. start_symbol: %s, production_keys: %s", start_symbol, production_keys )
 
             if start_symbol not in reachable:
@@ -1199,7 +1194,7 @@ class ChomskyGrammar():
         production_keys = self.productions
 
         for non_terminal_to_check in production_keys:
-            recursive_terminals = DynamicIterationSet([non_terminal_to_check])
+            recursive_terminals = DynamicIterationDict([non_terminal_to_check])
 
             for non_terminal in recursive_terminals:
                 productions = production_keys[non_terminal]

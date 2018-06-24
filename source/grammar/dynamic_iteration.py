@@ -9,155 +9,6 @@ from debug_tools import getLogger
 log = getLogger( 127-4, __name__ )
 
 
-class ListSetLike(list):
-    """
-        A extended python list version, allowing dynamic patching.
-
-        This is required to monkey patch the builtin type because they are implemented in CPython
-        and are not exposed to the interpreter.
-    """
-
-    def add(self, element):
-        """
-            Add a new element to the end of the list.
-        """
-        if element not in self:
-            self.append( element )
-
-    def discard(self, element):
-        """
-            Remove new element anywhere in the list.
-        """
-        with suppress(ValueError, AttributeError):
-            self.remove( element )
-
-
-class DynamicIterationSet(object):
-    """
-        A `set()` like object which allows to dynamically add and remove items while iterating over
-        its elements as if a `for element in dynamic_set`
-    """
-
-    def __init__(self, initial=[], container_type=set):
-        """
-            Fully initializes and create a new set.
-
-            @param `initial` is any list related object used to initialize the set if new values.
-            @param `container_type` you can choose either list or set to store the elements internally
-        """
-        container_type = type( container_type )
-
-        if container_type is type( list ):
-            container_type = ListSetLike
-
-        elif container_type is type( set ):
-            container_type = set
-
-        else:
-            raise RuntimeError( "Invalid type passed by: `%s`" % container_type )
-
-        ## The set with the items which were already iterated while iterating over this set
-        self.iterated_items = container_type()
-
-        ## The set with the items which are going to be iterated while iterating over this set
-        self.non_iterated_items = container_type( initial )
-
-        ## Whether the iteration process is allowed to use new items added on the current iteration
-        self.new_items_skip_count = 0
-
-    def __repr__(self):
-        """
-            Return a full representation of all public attributes of this object set state for
-            debugging purposes.
-        """
-        return get_representation( self )
-
-    def __str__(self):
-        """
-            Return a nice string representation of this set.
-
-            On the first part is showed all already iterated elements, followed by the not yet
-            iterated. When the iteration process is not running, it shows the last state registered.
-        """
-        return "%s %s" % ( self.iterated_items, self.non_iterated_items )
-
-    def __contains__(self, key):
-        """
-            Determines whether this set contains or not a given element.
-        """
-        return key in self.iterated_items or key in self.non_iterated_items
-
-    def __len__(self):
-        """
-            Return the total length of this set.
-        """
-        return len( self.iterated_items ) + len( self.non_iterated_items )
-
-    def not_iterate_over_new_items(self, how_many_times=1):
-        """
-            If called before start iterating over this dictionary, it will not iterate over the
-            new keys added until the current iteration is over.
-
-            `how_many_times` is for how many iterations it should keep ignoring the new items.
-        """
-        self.new_items_skip_count = how_many_times + 1
-
-    def __iter__(self):
-        """
-            Called by Python automatically when iterating over this set and python wants to start
-            the iteration process.
-        """
-        self.new_items_skip_count -= 1
-
-        for item in self.iterated_items:
-            self.non_iterated_items.add( item )
-
-        self.iterated_items.clear()
-        return self
-
-    def __next__(self):
-        """
-            Called by Python automatically when iterating over this set and python wants to know the
-            next element to iterate.
-
-            Raises `StopIteration` when the iteration has been finished.
-        """
-
-        for first_element in self.non_iterated_items:
-            self.non_iterated_items.discard( first_element )
-            break
-
-        else:
-            self.iterated_items, self.non_iterated_items = self.non_iterated_items, self.iterated_items
-            raise StopIteration
-
-        self.iterated_items.add( first_element )
-        return first_element
-
-    def add(self, item):
-        """
-            An new element to the set, if it is not already present.
-
-            The element can be the immediate next if there is an iteration running.
-        """
-
-        if item not in self.iterated_items and item not in self.non_iterated_items:
-
-            if self.new_items_skip_count > 0:
-                self.iterated_items.add( item )
-
-            else:
-                self.non_iterated_items.add( item )
-
-    def discard(self, item):
-        """
-            Remove an element from the set, either the element was iterated or not in the current
-            iteration.
-        """
-        self.iterated_items.discard( item )
-        self.non_iterated_items.discard( item )
-
-
 class DynamicIterable(object):
     """
         Dynamically creates creates a unique iterable which can be used one time.
@@ -166,19 +17,25 @@ class DynamicIterable(object):
         https://stackoverflow.com/questions/36681312/why-have-an-iter-method-in-python
     """
 
-    def __init__(self, iterable_access, empty_slots, end_index=None):
+    def __init__(self, iterable_access, empty_slots, end_index=None, new_empty_slots=set()):
         """
             Receives a iterable an initialize the object to start an iteration.
+
+            @param `iterable_access` a function pointer to function which returns the next element given its index
+            @param `end_index` it must be a list with one integer element
+            @param `empty_slots` it must be a set with indexes of free place to put new elements
         """
         ## The current index used when iterating over this collection items
         self.current_index = -1
 
-        ## List the empty free spots for new items, which should be skipped when iterating over
+        ## List the empty free spots for old items, which should be skipped when iterating over
         self.empty_slots = empty_slots
+
+        ## List the empty free spots for new items, which should be skipped when iterating over
+        self.new_empty_slots = new_empty_slots
 
         ## The iterable access method to get the next item given a index
         if end_index:
-            int( end_index[0] ) # ensure it is a list starting with a integer
             self.iterable_access = lambda index: iterable_access( index ) if index < end_index[0] else self.stop_iteration( index )
 
         else:
@@ -195,12 +52,14 @@ class DynamicIterable(object):
         """
         empty_slots = self.empty_slots
         current_index = self.current_index + 1
+        new_empty_slots = self.new_empty_slots
 
-        while current_index in empty_slots:
+        while current_index in empty_slots or current_index in new_empty_slots:
             current_index += 1
 
         try:
             self.current_index = current_index
+            # log( 1, "current_index: %s", current_index )
             return self.iterable_access( current_index )
 
         except IndexError:
@@ -241,8 +100,11 @@ class DynamicIterationDict(object):
         ## The list with the elements of this collection
         self.values_list = list()
 
-        ## List the empty free spots for new items
+        ## List the empty free spots for old items, used globally before the iteration starts
         self.empty_slots = set()
+
+        ## List the empty free spots for old items, used globally after the iteration starts with `new_items_skip_count`
+        self.new_empty_slots = set()
 
         ## A dictionary with the indexes of the elements in this collection
         self.items_dictionary = dict()
@@ -255,8 +117,13 @@ class DynamicIterationDict(object):
 
         if initial:
 
-            for key in initial:
-                self[key] = initial[key]
+            if isinstance( initial, dict ):
+
+                for key, value in initial.items():
+                    self[key] = value
+
+            else:
+                self.fromkeys( initial )
 
     def __repr__(self):
         """
@@ -286,6 +153,15 @@ class DynamicIterationDict(object):
         """
         return len( self.items_dictionary )
 
+    def __call__(self, how_many_times=-1):
+        """
+            Return a iterable for the keys elements of this collection when calling its object as a
+            function call.
+
+            `how_many_times` is for how many iterations it should keep ignoring the new items.
+        """
+        return self.get_iterator( self.get_key, how_many_times )
+
     def __iter__(self):
         """
             Called by Python automatically when iterating over this set and python wants to start
@@ -314,6 +190,8 @@ class DynamicIterationDict(object):
 
             if empty_slots:
                 free_slot = empty_slots.pop()
+                self.new_empty_slots.add( free_slot )
+
                 values_list[free_slot] = value
                 self.keys_list[free_slot] = key
 
@@ -342,10 +220,6 @@ class DynamicIterationDict(object):
 
         self.empty_slots.add( item_index )
         del items_dictionary[key]
-
-        # Fix the maximum index, when some item bellow the maximum was removed
-        if item_index < self.maximum_iterable_index[0]:
-            self.maximum_iterable_index[0] -= 1
 
     def trim_indexes_sorted(self):
         """
@@ -376,29 +250,43 @@ class DynamicIterationDict(object):
         keys_list = self.keys_list
         values_list = self.values_list
         empty_slots = self.empty_slots
+        last_slot = -1
 
         while empty_slots:
             empty_slot = empty_slots.pop()
             keys_list[empty_slot] = keys_list.pop()
             values_list[empty_slot] = values_list.pop()
 
-    def keys(self):
+            if last_slot < empty_slot:
+                last_slot = empty_slot
+
+        if last_slot > -1:
+            del keys_list[last_slot:]
+            del values_list[last_slot:]
+
+    def keys(self, how_many_times=-1):
         """
             Return a DynamicIterable over the keys stored in this collection.
-        """
-        return self.get_iterator( self.get_key )
 
-    def values(self):
+            `how_many_times` is for how many iterations it should keep ignoring the new items.
+        """
+        return self.get_iterator( self.get_key, how_many_times )
+
+    def values(self, how_many_times=-1):
         """
             Return a DynamicIterable over the values stored in this collection.
-        """
-        return self.get_iterator( self.get_value )
 
-    def items(self):
+            `how_many_times` is for how many iterations it should keep ignoring the new items.
+        """
+        return self.get_iterator( self.get_value, how_many_times )
+
+    def items(self, how_many_times=-1):
         """
             Return a DynamicIterable over the (key, value) stored in this collection.
+
+            `how_many_times` is for how many iterations it should keep ignoring the new items.
         """
-        return self.get_iterator( self.get_key_value )
+        return self.get_iterator( self.get_key_value, how_many_times )
 
     def get_key(self, index):
         """
@@ -418,15 +306,17 @@ class DynamicIterationDict(object):
         """
         return ( self.keys_list[index], self.values_list[index] )
 
-    def get_iterator(self, target_generation):
+    def get_iterator(self, target_generation, how_many_times=-1):
         """
             Get fully configured iterable given the `target_generation` function.
+
+            `how_many_times` is for how many iterations it should keep ignoring the new items.
         """
+        self.not_iterate_over_new_items( how_many_times )
         self.new_items_skip_count -= 1
 
         if self.new_items_skip_count > 0:
-            self.maximum_iterable_index[0] = len( self )
-            return DynamicIterable( target_generation, self.empty_slots, self.maximum_iterable_index )
+            return DynamicIterable( target_generation, self.empty_slots, self.maximum_iterable_index, self.new_empty_slots )
 
         return DynamicIterable( target_generation, self.empty_slots )
 
@@ -437,12 +327,53 @@ class DynamicIterationDict(object):
 
             `how_many_times` is for how many iterations it should keep ignoring the new items.
         """
-        self.new_items_skip_count = how_many_times + 1
+
+        if how_many_times > -1:
+            self.new_empty_slots.clear()
+            self.new_items_skip_count = how_many_times + 1
+            self.maximum_iterable_index[0] = len( self.keys_list )
+
+    def fromkeys(self, iterable):
+        """
+            Initialize a dictionary with any default value, acting like a indexed set.
+        """
+
+        for key in iterable:
+            self[key] = None
+
+    def append(self, element):
+        """
+            Add a new element to the end of the list.
+        """
+        self[element] = None
+
+    def remove(self, element):
+        """
+            Remove new `element` anywhere in the container.
+        """
+        del self[element]
+
+    def add(self, element):
+        """
+            Add a new element to the end of the list.
+        """
+        self[element] = None
+
+    def discard(self, element):
+        """
+            Remove new `element` anywhere in the container.
+        """
+
+        with suppress(KeyError):
+            del self[element]
 
     def clear(self):
         """
             Remove all items from this dict.
         """
+        self.empty_slots.clear()
+        self.new_empty_slots.clear()
+
         self.keys_list.clear()
         self.values_list.clear()
         self.items_dictionary.clear()

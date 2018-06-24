@@ -974,7 +974,7 @@ class TestAutomataOperationHistory(TestingUtilities):
         Tests automata operations history creation.
     """
 
-    def test_grammarSuccessfulFactoringHistory(self):
+    def test_historySuccessfulFactoringHistory(self):
         firstGrammar = ChomskyGrammar.load_from_text_lines( wrap_text(
         r"""
             P  -> & | L | D L
@@ -1026,7 +1026,7 @@ class TestAutomataOperationHistory(TestingUtilities):
             +  V1 -> & | [ E ]
         """, firstGrammar.get_operation_history() )
 
-    def test_grammarFactoringOfList3Exercice7ItemA(self):
+    def test_historyFactoringOfList3Exercice7ItemA(self):
         firstGrammar = ChomskyGrammar.load_from_text_lines( wrap_text(
         r"""
             P  -> & | L | D L
@@ -1078,7 +1078,7 @@ class TestAutomataOperationHistory(TestingUtilities):
             +  V1 -> & | [ E ]
         """, firstGrammar.get_operation_history() )
 
-    def test_grammarEliminateLeftRecursionCalculationOfChapter5Item5Example2(self):
+    def test_historyEliminateLeftRecursionCalculationOfChapter5Item5Example2(self):
         firstGrammar = ChomskyGrammar.load_from_text_lines( wrap_text(
         r"""
             E -> E + T | T
