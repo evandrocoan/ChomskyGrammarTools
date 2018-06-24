@@ -2202,11 +2202,20 @@ class TestDynamicIterationDict(TestingUtilities):
             + [0, 1, 2, 3, 4, 5, 6, 7, 8]
         """, wrap_text( iterated_elements, wrap=0 ) )
 
+        new_elements = elements.copy()
         elements.trim_indexes_unsorted()
+        new_elements.trim_indexes_sorted()
+
         self.assertTextEqual(
         r"""
             + '0'[0]: None, '8'[1]: None, '2'[2]: None, '3'[3]: None, '4'[4]: None, '5'[5]: None, '6'[6]: None, '7'[7]: None
         """, wrap_text( elements, wrap=0 ) )
+
+        self.assertTextEqual(
+        r"""
+            + '0'[0]: None, '2'[1]: None, '3'[2]: None, '4'[3]: None, '5'[4]: None, '6'[5]: None, '7'[6]: None, '8'[7]: None
+        """, wrap_text( new_elements, wrap=0 ) )
+
 
 if __name__ == "__main__":
     unittest.main()

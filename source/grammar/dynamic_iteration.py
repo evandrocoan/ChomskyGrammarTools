@@ -21,6 +21,8 @@
 #  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
 
+import copy
+
 from contextlib import suppress
 from debug_tools import getLogger
 
@@ -404,6 +406,12 @@ class DynamicIterationDict(object):
 
         with suppress(KeyError):
             del self[element]
+
+    def copy(self):
+        """
+            Return a deep copy of this collection.
+        """
+        return copy.deepcopy( self )
 
     def clear(self):
         """
