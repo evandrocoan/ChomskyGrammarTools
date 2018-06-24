@@ -166,12 +166,15 @@ class DynamicIterable(object):
         https://stackoverflow.com/questions/36681312/why-have-an-iter-method-in-python
     """
 
-    def __init__(self, iterable_access, end_index=None):
+    def __init__(self, iterable_access, empty_slots, end_index=None):
         """
             Receives a iterable an initialize the object to start an iteration.
         """
         ## The current index used when iterating over this collection items
         self.current_index = -1
+
+        ## List the empty free spots for new items, which should be skipped when iterating over
+        self.empty_slots = empty_slots
 
         ## The iterable access method to get the next item given a index
         if end_index:
@@ -190,10 +193,15 @@ class DynamicIterable(object):
             https://stackoverflow.com/questions/21665485/how-to-make-a-custom-object-iterable
             https://stackoverflow.com/questions/4019971/how-to-implement-iter-self-for-a-container-object-python
         """
-        self.current_index += 1
+        empty_slots = self.empty_slots
+        current_index = self.current_index + 1
+
+        while current_index in empty_slots:
+            current_index += 1
 
         try:
-            return self.iterable_access( self.current_index )
+            self.current_index = current_index
+            return self.iterable_access( current_index )
 
         except IndexError:
             raise StopIteration
@@ -215,7 +223,7 @@ class DynamicIterable(object):
 class DynamicIterationDict(object):
     """
         A `dict()` like object which allows to dynamically add and remove items while iterating over
-        its elements as if a `for element in dynamic_set`
+        its elements as in `for element in dynamic_set`
 
         https://wiki.python.org/moin/TimeComplexity
         https://stackoverflow.com/questions/4014621/a-python-class-that-acts-like-dict
@@ -232,6 +240,9 @@ class DynamicIterationDict(object):
 
         ## The list with the elements of this collection
         self.values_list = list()
+
+        ## List the empty free spots for new items
+        self.empty_slots = set()
 
         ## A dictionary with the indexes of the elements in this collection
         self.items_dictionary = dict()
@@ -298,11 +309,20 @@ class DynamicIterationDict(object):
             self.values_list[item_index] = value
 
         else:
+            empty_slots = self.empty_slots
             values_list = self.values_list
-            self.items_dictionary[key] = len( values_list )
 
-            values_list.append( value )
-            self.keys_list.append( key )
+            if empty_slots:
+                free_slot = empty_slots.pop()
+                values_list[free_slot] = value
+                self.keys_list[free_slot] = key
+
+            else:
+                free_slot = len( values_list )
+                values_list.append( value )
+                self.keys_list.append( key )
+
+            self.items_dictionary[key] = free_slot
 
     def __getitem__(self, key):
         """
@@ -320,18 +340,47 @@ class DynamicIterationDict(object):
         keys_list = self.keys_list
         item_index = items_dictionary[key]
 
-        del self.keys_list[item_index]
-        del self.values_list[item_index]
+        self.empty_slots.add( item_index )
         del items_dictionary[key]
 
-        # Fix the maximum index, when some item bellow the maximum was remove
+        # Fix the maximum index, when some item bellow the maximum was removed
         if item_index < self.maximum_iterable_index[0]:
             self.maximum_iterable_index[0] -= 1
 
-        # Fix the the outdated indexes in the dictionary after the removal
-        for key_index in range( item_index, len( items_dictionary ) ):
-            key_name = keys_list[key_index]
-            items_dictionary[key_name] = items_dictionary[key_name] - 1
+    def trim_indexes_sorted(self):
+        """
+            Fix the the outdated indexes on the internal lists after their dictionary removal,
+            keeping the items original ordering O(n).
+        """
+        new_index = -1
+        clean_keys = []
+        clean_values = []
+
+        values_list = self.values_list
+        items_dictionary = self.items_dictionary
+
+        for key, value_index in items_dictionary.items():
+            new_index += 1
+            items_dictionary[key] = new_index
+            clean_keys.append( key )
+            clean_values.append( values_list[value_index] )
+
+        self.keys_list = clean_keys
+        self.values_list = clean_values
+
+    def trim_indexes_unsorted(self):
+        """
+            Fix the the outdated indexes on the internal lists after their dictionary removal.
+            keeping the items original ordering O(k), where `k` is length of `self.empty_slots`.
+        """
+        keys_list = self.keys_list
+        values_list = self.values_list
+        empty_slots = self.empty_slots
+
+        while empty_slots:
+            empty_slot = empty_slots.pop()
+            keys_list[empty_slot] = keys_list.pop()
+            values_list[empty_slot] = values_list.pop()
 
     def keys(self):
         """
@@ -365,7 +414,7 @@ class DynamicIterationDict(object):
 
     def get_key_value(self, index):
         """
-            Given a `index` returns its corresponding ( key, value ) pair.
+            Given a `index` returns its corresponding (key, value) pair.
         """
         return ( self.keys_list[index], self.values_list[index] )
 
@@ -377,9 +426,9 @@ class DynamicIterationDict(object):
 
         if self.new_items_skip_count > 0:
             self.maximum_iterable_index[0] = len( self )
-            return DynamicIterable( target_generation, self.maximum_iterable_index )
+            return DynamicIterable( target_generation, self.empty_slots, self.maximum_iterable_index )
 
-        return DynamicIterable( target_generation )
+        return DynamicIterable( target_generation, self.empty_slots )
 
     def not_iterate_over_new_items(self, how_many_times=1):
         """
