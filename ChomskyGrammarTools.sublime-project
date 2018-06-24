@@ -28,7 +28,7 @@
         {
             "cmd":
             [
-                "pylint", "--disable=I,E,R,W,C,F", "--enable=E0102", "--reports=no", "-sn", "unit_tests.py", "&&", "python", "unit_tests.py",
+                "pylint", "--disable=I,E,R,W,C,F", "--enable=E0102", "--reports=no", "-sn", "unit_tests.py", "&&", "python", "unit_tests.py", "-f"
                 // "python", "unit_tests.py", "TestProduction",
                 // "python", "unit_tests.py", "TestChomskyGrammar.test_grammarChapter5FollowExample1IsTheSameAsFirstExample2",
             ],
