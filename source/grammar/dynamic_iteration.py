@@ -40,7 +40,7 @@ class DynamicIterable(object):
         https://stackoverflow.com/questions/36681312/why-have-an-iter-method-in-python
     """
 
-    def __init__(self, iterable_access, empty_slots, end_index=None, new_empty_slots=set()):
+    def __init__(self, iterable_access, empty_slots, end_index=None, filled_slots=set()):
         """
             Receives a iterable an initialize the object to start an iteration.
 
@@ -55,7 +55,7 @@ class DynamicIterable(object):
         self.empty_slots = empty_slots
 
         ## List the empty free spots for new items, which should be skipped when iterating over
-        self.new_empty_slots = new_empty_slots
+        self.filled_slots = filled_slots
 
         ## The iterable access method to get the next item given a index
         if end_index:
@@ -75,9 +75,9 @@ class DynamicIterable(object):
         """
         empty_slots = self.empty_slots
         current_index = self.current_index + 1
-        new_empty_slots = self.new_empty_slots
+        filled_slots = self.filled_slots
 
-        while current_index in empty_slots or current_index in new_empty_slots:
+        while current_index in empty_slots or current_index in filled_slots:
             current_index += 1
 
         try:
@@ -127,7 +127,7 @@ class DynamicIterationDict(object):
         self.empty_slots = set()
 
         ## List the empty free spots for old items, used globally after the iteration starts with `new_items_skip_count`
-        self.new_empty_slots = set()
+        self.filled_slots = set()
 
         ## A dictionary with the indexes of the elements in this collection
         self.items_dictionary = dict()
@@ -225,7 +225,7 @@ class DynamicIterationDict(object):
 
             if empty_slots and False:
                 free_slot = empty_slots.pop()
-                self.new_empty_slots.add( free_slot )
+                self.filled_slots.add( free_slot )
 
                 values_list[free_slot] = value
                 self.keys_list[free_slot] = key
@@ -356,7 +356,7 @@ class DynamicIterationDict(object):
         self.new_items_skip_count -= 1
 
         if self.new_items_skip_count > 0:
-            return DynamicIterable( target_generation, self.empty_slots, self.maximum_iterable_index, self.new_empty_slots )
+            return DynamicIterable( target_generation, self.empty_slots, self.maximum_iterable_index, self.filled_slots )
 
         return DynamicIterable( target_generation, self.empty_slots )
 
@@ -369,7 +369,7 @@ class DynamicIterationDict(object):
         """
 
         if how_many_times > -1:
-            self.new_empty_slots.clear()
+            self.filled_slots.clear()
             self.new_items_skip_count = how_many_times + 1
             self.maximum_iterable_index[0] = len( self.keys_list )
 
@@ -418,7 +418,7 @@ class DynamicIterationDict(object):
             Remove all items from this dict.
         """
         self.empty_slots.clear()
-        self.new_empty_slots.clear()
+        self.filled_slots.clear()
 
         self.keys_list.clear()
         self.values_list.clear()
