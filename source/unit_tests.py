@@ -484,36 +484,108 @@ class TestGrammarFactoringAndRecursionSymbols(TestingUtilities):
             +  T -> F | b T * T
         """, firstGrammar.get_operation_history() )
 
-    def test_grammarHasLeftRecursionCalculationOfChapter5Item6Example1(self):
-        firstGrammar = ChomskyGrammar.load_from_text_lines( wrap_text(
-        r"""
-            S -> Aa | Sb
-            A -> Sc | d
-        """ ) )
-
-        self.assertTextEqual(
-        r"""
-            + (A, 'indirect')
-            + (S, 'direct')
-        """, convert_to_text_lines( firstGrammar.left_recursion(), sort=sort_correctly ) )
-
-        self.assertTrue( firstGrammar.has_left_recursion() )
-
     def test_grammarEliminateLeftRecursionOfChapter5Item6Example1(self):
         firstGrammar = ChomskyGrammar.load_from_text_lines( wrap_text(
         r"""
             S -> Aa | Sb
             A -> Sc | d
         """ ) )
+
+        self.assertTrue( firstGrammar.has_left_recursion() )
         firstGrammar.eliminate_left_recursion()
 
         self.assertTextEqual(
         r"""
-            +  S -> A a S'
-            +  A -> d A'
-            + A' -> & | a S' c A'
-            + S' -> & | b S'
-        """, firstGrammar )
+            + # 1. Eliminating Left Recursion, Beginning
+            +  S -> A a | S b
+            +  A -> d | S c
+            +
+            + # 2. Eliminating Infertile Symbols, End
+            + #    No changes required/performed here.
+            +  S -> A a | S b
+            +  A -> d | S c
+            +
+            + # 3. Eliminating Unreachable Symbols, End
+            + #    No changes required/performed here.
+            +  S -> A a | S b
+            +  A -> d | S c
+            +
+            + # 4. Eliminate direct left recursion
+            + #    Direct recursion for elimination: [S b] -> [A a S'] @ S' -> {b S', &}
+            +   S -> A a S'
+            +   A -> d | S c
+            +  S' -> & | b S'
+            +
+            + # 5. Eliminate indirect left recursion
+            + #    Indirect recursion for elimination: [S c] -> [A a S']
+            +   S -> A a S'
+            +   A -> d | A a S' c
+            +  S' -> & | b S'
+            +
+            + # 6. Eliminate direct left recursion
+            + #    Direct recursion for elimination: [A a S' c] -> [d A'] @ A' -> {a S' c A', &}
+            +   S -> A a S'
+            +   A -> d A'
+            +  A' -> & | a S' c A'
+            +  S' -> & | b S'
+        """, firstGrammar.get_operation_history() )
+
+        self.assertFalse( firstGrammar.has_left_recursion() )
+
+    def test_grammarEliminateLeftRecursionOfChapter5Item6Example1Mutated(self):
+        firstGrammar = ChomskyGrammar.load_from_text_lines( wrap_text(
+        r"""
+            S -> Aa | Sb | &
+            A -> Sc | d | C D
+            C -> C
+            D -> d
+        """ ) )
+
+        self.assertTrue( firstGrammar.has_left_recursion() )
+        firstGrammar.eliminate_left_recursion()
+
+        self.assertTextEqual(
+        r"""
+            + # 1. Eliminating Left Recursion, Beginning
+            +  S -> & | A a | S b
+            +  A -> d | S c | C D
+            +  C -> C
+            +  D -> d
+            +
+            + # 2. Converting to Epsilon Free, End
+            + #    Non Terminal's Deriving Epsilon: S -> &
+            +  S' -> & | b | A a | S b
+            +   A -> c | d | S c | C D
+            +   C -> C
+            +   D -> d
+            +   S -> b | A a | S b
+            +
+            + # 3. Eliminating Infertile Symbols, End
+            + #    Infertile symbols: ['A -> C D', 'C -> C']
+            +  S' -> & | b | A a | S b
+            +   A -> c | d | S c
+            +   D -> d
+            +   S -> b | A a | S b
+            +
+            + # 4. Eliminating Unreachable Symbols, End
+            + #    Unreachable symbols: ['D -> {d}']
+            +  S' -> & | b | A a | S b
+            +   A -> c | d | S c
+            +   S -> b | A a | S b
+            +
+            + # 5. Eliminate indirect left recursion
+            + #    Indirect recursion for elimination: [A a] -> [S c, d, c]
+            +  S' -> & | b | A a | S b
+            +   A -> c | d | S c
+            +   S -> b | c a | d a | S b | S c a
+            +
+            + # 6. Eliminate direct left recursion
+            + #    Direct recursion for elimination: [S b, S c a] -> [b S'', d a S'', c a S''] @ S'' -> {b S'', c a S'', &}
+            +   S' -> & | b | A a | S b
+            +    A -> c | d | S c
+            +    S -> b S'' | c a S'' | d a S''
+            +  S'' -> & | b S'' | c a S''
+        """, firstGrammar.get_operation_history() )
 
         self.assertFalse( firstGrammar.has_left_recursion() )
 

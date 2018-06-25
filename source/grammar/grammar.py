@@ -1179,17 +1179,18 @@ class ChomskyGrammar():
         """
         self._save_history( "Eliminating Unreachable Symbols", IntermediateGrammar.BEGINNING )
         reachable = self.reachable()
+        unreachable = list()
         productions_keys = self.productions
 
         for start_symbol in productions_keys(1):
+            start_productions = productions_keys[start_symbol]
             # log( 1, "1. start_symbol: %s, productions_keys: %s", start_symbol, productions_keys )
+            # log( 1, "2. start_productions: %s", start_productions )
 
             if start_symbol not in reachable:
+                unreachable.append( "%s -> %s" % ( start_symbol, start_productions.keys() ) )
                 self.remove_start_non_terminal( start_symbol )
                 continue
-
-            start_productions = productions_keys[start_symbol]
-            # log( 1, "2. start_productions: %s", start_productions )
 
             for production in start_productions:
                 # log( 1, "2. production: %s", production )
@@ -1205,9 +1206,14 @@ class ChomskyGrammar():
                         break
 
                 if not all_reachable:
-                    self.remove_production( start_symbol, production )
+                    unreachable.append( "%s -> %s" % ( start_symbol, production ) )
+                    self.remove_production( start_symbol, production, False )
+
+                    if not start_productions:
+                        self.remove_start_non_terminal( start_symbol, False )
 
         # log( 1, "productions: %s", self.productions )
+        self._save_data( "Unreachable symbols: %s", unreachable )
         self._save_history( "Eliminating Unreachable Symbols", IntermediateGrammar.END )
 
     def eliminate_unuseful(self):
