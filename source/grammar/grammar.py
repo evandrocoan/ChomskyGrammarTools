@@ -77,13 +77,24 @@ class ChomskyGrammar():
         // Forces them to appear in the tree as branches
         epsilon         : [] | "&"+
         end_symbol      : ";"* space* new_line ( new_line | space )*
-        terminal        : ( DIGIT | LCASE_LETTER | signs | signs_extra | parens )+
-        non_terminal    : UCASE_LETTER+ ( UCASE_LETTER | DIGIT | quote )*
+        terminal        : ( DIGIT | low_case_letter | signs | signs_extra | parens )+
+        non_terminal    : upper_case_letter+ ( upper_case_letter | DIGIT | quote )*
         new_line        : NEWLINE
         quote           : "'"
         space           : " "
 
+        // Common definitions
+        DIGIT     : "0".."9"
+        NEWLINE   : (CR? LF)+
+        CR        : /\r/
+        LF        : /\n/
+        WS_INLINE : (" "|/\t/)+
+
         // Tells the tree-builder to inline this branch if it has only one member
+        // https://stackoverflow.com/questions/20690499/concrete-javascript-regex-for-accented-characters-diacritics
+        ?low_case_letter   : /[a-zØ-öø-ÿ]/
+        ?upper_case_letter : /[A-ZÀ-Ö]/
+
         ?signs    : minus |  plus | star | comma | colon | equals | semicolon | slash | backslash | dot
         semicolon : ";"
         comma     : ","
@@ -96,12 +107,14 @@ class ChomskyGrammar():
         slash     : "/"
         backslash : "\\"
 
-        ?signs_extra : question | double_quote | percentage | dollar | at_sign | sharp | exclamation | tick | backtick
+        ?signs_extra : question | double_quote | percentage | dollar | at_sign | sharp | exclamation | tick | backtick | caret | tilde
         sharp        : "#"
         dollar       : "$"
         question     : "?"
         at_sign      : "@"
         tick         : "´"
+        caret        : "^"
+        tilde        : "~"
         backtick     : "`"
         percentage   : "%"
         exclamation  : "!"
@@ -125,15 +138,6 @@ class ChomskyGrammar():
         null   : "null"
         true   : "true"
         false  : "false"
-
-        // Import common definitions
-        %import common.INT
-        %import common.DIGIT
-        %import common.UCASE_LETTER
-        %import common.LCASE_LETTER
-        %import common.SIGNED_NUMBER
-        %import common.NEWLINE
-        %import common.WS_INLINE
 
         // Set to ignore white spaces
         // %ignore WS_INLINE

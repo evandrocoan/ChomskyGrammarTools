@@ -184,6 +184,18 @@ class ChomskyGrammarTreeTransformer(lark.Transformer):
         """
         return self._parse_symbol( _terminal, "´" )
 
+    def caret(self, _terminal):
+        """
+            Converts the tree leaf '^' symbol into a Terminal ready to be used in the Chomsky Grammar.
+        """
+        return self._parse_symbol( _terminal, "^" )
+
+    def tilde(self, _terminal):
+        """
+            Converts the tree leaf '~' symbol into a Terminal ready to be used in the Chomsky Grammar.
+        """
+        return self._parse_symbol( _terminal, "~" )
+
     def question(self, _terminal):
         """
             Converts the tree leaf '?' symbol into a Terminal ready to be used in the Chomsky Grammar.
