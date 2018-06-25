@@ -779,8 +779,8 @@ class ChomskyGrammar():
         non_terminals_count = len( production_keys_list )
 
         for maximum_index in range( 0, non_terminals_count ):
-            indirect_recursions = list()
-            indirect_replacements = list()
+            indirect_recursions = DynamicIterationDict()
+            indirect_replacements = DynamicIterationDict()
 
             outter_start_symbol = production_keys_list[maximum_index]
             outter_productions = productions_keys[outter_start_symbol]
@@ -816,8 +816,8 @@ class ChomskyGrammar():
                         self.remove_production( outter_start_symbol, outter_production, False )
 
             direct_recursions = set()
-            direct_recursions_list = list()
-            direct_replacements = list()
+            direct_recursions_list = DynamicIterationDict()
+            direct_replacements = DynamicIterationDict()
             new_outter_start_symbol = self.new_symbol( outter_start_symbol )
 
             for outter_production in outter_productions:
@@ -832,7 +832,7 @@ class ChomskyGrammar():
             log( 32, "2. new_outter_start_symbol: %s", new_outter_start_symbol )
             log( 32, "2. direct_recursions: %s", direct_recursions )
             self._save_history( "Eliminate indirect left recursion" )
-            self._save_data( "Indirect recursion for elimination: %s -> %s", indirect_recursions, indirect_replacements )
+            self._save_data( "Indirect recursion for elimination: %s -> %s", indirect_recursions.keys(), indirect_replacements.keys() )
 
             if direct_recursions:
 
@@ -859,7 +859,8 @@ class ChomskyGrammar():
             self._save_history( "Eliminate direct left recursion" )
 
             if new_outter_start_symbol in productions_keys:
-                self._save_data( "Direct recursion for elimination: %s -> %s @ %s -> %s", direct_recursions_list, direct_replacements,
+                self._save_data( "Direct recursion for elimination: %s -> %s @ %s -> %s",
+                        direct_recursions_list.keys(), direct_replacements.keys(),
                         new_outter_start_symbol, productions_keys[new_outter_start_symbol].keys() )
 
         self._save_history( "Eliminating Left Recursion", IntermediateGrammar.END )
@@ -1120,7 +1121,7 @@ class ChomskyGrammar():
         """
         self._save_history( "Eliminating Infertile Symbols", IntermediateGrammar.BEGINNING )
         fertile = self.fertile()
-        infertile = list()
+        infertile = DynamicIterationDict()
         productions_keys = self.productions
 
         for start_symbol in productions_keys(1):
@@ -1148,7 +1149,7 @@ class ChomskyGrammar():
                         self.remove_start_non_terminal( start_symbol, False )
 
         self._save_history( "Eliminating Infertile Symbols", IntermediateGrammar.END )
-        self._save_data( "Infertile symbols: %s", infertile )
+        self._save_data( "Infertile symbols: %s", infertile.keys() )
 
     def reachable(self):
         """
@@ -1179,7 +1180,7 @@ class ChomskyGrammar():
         """
         self._save_history( "Eliminating Unreachable Symbols", IntermediateGrammar.BEGINNING )
         reachable = self.reachable()
-        unreachable = list()
+        unreachable = DynamicIterationDict()
         productions_keys = self.productions
 
         for start_symbol in productions_keys(1):
@@ -1214,7 +1215,7 @@ class ChomskyGrammar():
 
         # log( 1, "productions: %s", self.productions )
         self._save_history( "Eliminating Unreachable Symbols", IntermediateGrammar.END )
-        self._save_data( "Unreachable symbols: %s", unreachable )
+        self._save_data( "Unreachable symbols: %s", unreachable.keys() )
 
     def eliminate_unuseful(self):
         """

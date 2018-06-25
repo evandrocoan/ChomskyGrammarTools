@@ -346,7 +346,7 @@ class TestGrammarFactoringAndRecursionSymbols(TestingUtilities):
             +  S -> b | S a
             +
             + # 4. Eliminate direct left recursion
-            + #    Direct recursion for elimination: [S a] -> [b S'] @ S' -> {a S', &}
+            + #    Direct recursion for elimination: {S a} -> {b S'} @ S' -> {a S', &}
             +   S -> b S'
             +  S' -> & | a S'
         """, firstGrammar.get_operation_history() )
@@ -390,21 +390,21 @@ class TestGrammarFactoringAndRecursionSymbols(TestingUtilities):
             +  T -> F | T * F
             +
             + # 4. Eliminate direct left recursion
-            + #    Direct recursion for elimination: [E + T] -> [T E'] @ E' -> {+ T E', &}
+            + #    Direct recursion for elimination: {E + T} -> {T E'} @ E' -> {+ T E', &}
             +   E -> T E'
             +   F -> id | ( E )
             +   T -> F | T * F
             +  E' -> & | + T E'
             +
             + # 5. Eliminate indirect left recursion
-            + #    Indirect recursion for elimination: [F] -> [( E ), id]
+            + #    Indirect recursion for elimination: {F} -> {( E ), id}
             +   E -> T E'
             +   F -> id | ( E )
             +   T -> id | ( E ) | T * F
             +  E' -> & | + T E'
             +
             + # 6. Eliminate direct left recursion
-            + #    Direct recursion for elimination: [T * F] -> [( E ) T', id T'] @ T' -> {* F T', &}
+            + #    Direct recursion for elimination: {T * F} -> {( E ) T', id T'} @ T' -> {* F T', &}
             +   E -> T E'
             +   F -> id | ( E )
             +   T -> id T' | ( E ) T'
@@ -463,19 +463,19 @@ class TestGrammarFactoringAndRecursionSymbols(TestingUtilities):
             +  A -> d | S c
             +
             + # 4. Eliminate direct left recursion
-            + #    Direct recursion for elimination: [S b] -> [A a S'] @ S' -> {b S', &}
+            + #    Direct recursion for elimination: {S b} -> {A a S'} @ S' -> {b S', &}
             +   S -> A a S'
             +   A -> d | S c
             +  S' -> & | b S'
             +
             + # 5. Eliminate indirect left recursion
-            + #    Indirect recursion for elimination: [S c] -> [A a S']
+            + #    Indirect recursion for elimination: {S c} -> {A a S'}
             +   S -> A a S'
             +   A -> d | A a S' c
             +  S' -> & | b S'
             +
             + # 6. Eliminate direct left recursion
-            + #    Direct recursion for elimination: [A a S' c] -> [d A'] @ A' -> {a S' c A', &}
+            + #    Direct recursion for elimination: {A a S' c} -> {d A'} @ A' -> {a S' c A', &}
             +   S -> A a S'
             +   A -> d A'
             +  A' -> & | a S' c A'
@@ -513,26 +513,26 @@ class TestGrammarFactoringAndRecursionSymbols(TestingUtilities):
             +   S -> b | A a | S b
             +
             + # 3. Eliminating Infertile Symbols, End
-            + #    Infertile symbols: ['A -> C D', 'C -> C']
+            + #    Infertile symbols: {A -> C D, C -> C}
             +  S' -> & | b | A a | S b
             +   A -> c | d | S c
             +   D -> d
             +   S -> b | A a | S b
             +
             + # 4. Eliminating Unreachable Symbols, End
-            + #    Unreachable symbols: ['D -> {d}']
+            + #    Unreachable symbols: {D -> {d}}
             +  S' -> & | b | A a | S b
             +   A -> c | d | S c
             +   S -> b | A a | S b
             +
             + # 5. Eliminate indirect left recursion
-            + #    Indirect recursion for elimination: [A a] -> [S c, d, c]
+            + #    Indirect recursion for elimination: {A a} -> {S c, d, c}
             +  S' -> & | b | A a | S b
             +   A -> c | d | S c
             +   S -> b | c a | d a | S b | S c a
             +
             + # 6. Eliminate direct left recursion
-            + #    Direct recursion for elimination: [S b, S c a] -> [b S'', d a S'', c a S''] @ S'' -> {b S'', c a S'', &}
+            + #    Direct recursion for elimination: {S b, S c a} -> {b S'', d a S'', c a S''} @ S'' -> {b S'', c a S'', &}
             +   S' -> & | b | A a | S b
             +    A -> c | d | S c
             +    S -> b S'' | c a S'' | d a S''
@@ -590,21 +590,21 @@ class TestGrammarFactoringAndRecursionSymbols(TestingUtilities):
             +  B -> e | B d | S a
             +
             + # 4. Eliminate direct left recursion
-            + #    Direct recursion for elimination: [A b] -> [B c A', a A'] @ A' -> {b A', &}
+            + #    Direct recursion for elimination: {A b} -> {B c A', a A'} @ A' -> {b A', &}
             +   S -> A b | a S
             +   A -> a A' | B c A'
             +   B -> e | B d | S a
             +  A' -> & | b A'
             +
             + # 5. Eliminate indirect left recursion
-            + #    Indirect recursion for elimination: [S a, A b a] -> [a S, A b, B c A', a A']
+            + #    Indirect recursion for elimination: {S a, A b a} -> {a S, A b, B c A', a A'}
             +   S -> A b | a S
             +   A -> a A' | B c A'
             +   B -> e | B d | a S a | a A' b a | B c A' b a
             +  A' -> & | b A'
             +
             + # 6. Eliminate direct left recursion
-            + #    Direct recursion for elimination: [B d, B c A' b a] -> [e B', a S a B', a A' b a B'] @ B' -> {d B', c A' b a B', &}
+            + #    Direct recursion for elimination: {B d, B c A' b a} -> {e B', a S a B', a A' b a B'} @ B' -> {d B', c A' b a B', &}
             +   S -> A b | a S
             +   A -> a A' | B c A'
             +   B -> e B' | a S a B' | a A' b a B'
@@ -674,14 +674,14 @@ class TestGrammarFactoringAndRecursionSymbols(TestingUtilities):
             +   S -> B d
             +
             + # 5. Eliminate indirect left recursion
-            + #    Indirect recursion for elimination: [A b] -> [S a, a]
+            + #    Indirect recursion for elimination: {A b} -> {S a, a}
             +  S' -> & | B d
             +   A -> a | S a
             +   B -> b | a b | B c | S a b
             +   S -> B d
             +
             + # 6. Eliminate direct left recursion
-            + #    Direct recursion for elimination: [B c] -> [b B', S a b B', a b B'] @ B' -> {c B', &}
+            + #    Direct recursion for elimination: {B c} -> {b B', S a b B', a b B'} @ B' -> {c B', &}
             +  S' -> & | B d
             +   A -> a | S a
             +   B -> b B' | a b B' | S a b B'
@@ -689,7 +689,7 @@ class TestGrammarFactoringAndRecursionSymbols(TestingUtilities):
             +  B' -> & | c B'
             +
             + # 7. Eliminate indirect left recursion
-            + #    Indirect recursion for elimination: [B d] -> [b B', S a b B', a b B']
+            + #    Indirect recursion for elimination: {B d} -> {b B', S a b B', a b B'}
             +  S' -> & | B d
             +   A -> a | S a
             +   B -> b B' | a b B' | S a b B'
@@ -697,7 +697,7 @@ class TestGrammarFactoringAndRecursionSymbols(TestingUtilities):
             +  B' -> & | c B'
             +
             + # 8. Eliminate direct left recursion
-            + #    Direct recursion for elimination: [S a b B' d] -> [b B' d S'', a b B' d S''] @ S'' -> {a b B' d S'', &}
+            + #    Direct recursion for elimination: {S a b B' d} -> {b B' d S'', a b B' d S''} @ S'' -> {a b B' d S'', &}
             +   S' -> & | B d
             +    A -> a | S a
             +    B -> b B' | a b B' | S a b B'
@@ -758,7 +758,7 @@ class TestGrammarFactoringAndRecursionSymbols(TestingUtilities):
             +  V -> id | id [ E ]
             +
             + # 5. Eliminate indirect left recursion
-            + #    Indirect recursion for elimination: [C] -> [V = exp, id ( E )]
+            + #    Indirect recursion for elimination: {C} -> {V = exp, id ( E )}
             +  P -> & | L | D L
             +  C -> V = exp | id ( E )
             +  D -> d | d D
@@ -767,7 +767,7 @@ class TestGrammarFactoringAndRecursionSymbols(TestingUtilities):
             +  V -> id | id [ E ]
             +
             + # 6. Eliminate direct left recursion
-            + #    Direct recursion for elimination: [L ; C] -> [V = exp L', id ( E ) L'] @ L' -> {; C L', &}
+            + #    Direct recursion for elimination: {L ; C} -> {V = exp L', id ( E ) L'} @ L' -> {; C L', &}
             +   P -> & | L | D L
             +   C -> V = exp | id ( E )
             +   D -> d | d D
@@ -1694,7 +1694,7 @@ class TestGrammarFertileSymbols(TestingUtilities):
             +  D -> c | d D d
             +
             + # 2. Eliminating Infertile Symbols, End
-            + #    Infertile symbols: ['S -> B C', 'A -> c C', 'A -> A B', 'C -> a A', 'C -> B C']
+            + #    Infertile symbols: {S -> B C, A -> c C, A -> A B, C -> a A, C -> B C}
             +  S -> a S | B D
             +  B -> & | b B
             +  D -> c | d D d
@@ -1723,7 +1723,7 @@ class TestGrammarFertileSymbols(TestingUtilities):
             +  H -> a C
             +
             + # 2. Eliminating Unreachable Symbols, End
-            + #    Unreachable symbols: ['H -> {a C}']
+            + #    Unreachable symbols: {H -> {a C}}
             +  S -> a S | B C | B D
             +  A -> c C | A B
             +  B -> & | b B
@@ -1766,10 +1766,19 @@ class TestGrammarFertileSymbols(TestingUtilities):
 
         self.assertTextEqual(
         r"""
-            + S -> a S a | d D d
-            + B -> b | b B | d D
-            + D -> d | bb B
-        """, firstGrammar )
+            + # 1. Eliminating Unreachable Symbols, Beginning
+            +  S -> a S a | d D d
+            +  A -> a | a B | C c
+            +  B -> b | b B | d D
+            +  C -> c | A a | d D
+            +  D -> d | bb B
+            +
+            + # 2. Eliminating Unreachable Symbols, End
+            + #    Unreachable symbols: {A -> {a B, C c, a}, C -> {d D, c}}
+            +  S -> a S a | d D d
+            +  B -> b | b B | d D
+            +  D -> d | bb B
+        """, firstGrammar.get_operation_history() )
 
     def test_grammarEliminateUnusefulSymbolsChapter4Item1Example3(self):
         firstGrammar = ChomskyGrammar.load_from_text_lines( wrap_text(
@@ -1786,11 +1795,30 @@ class TestGrammarFertileSymbols(TestingUtilities):
 
         self.assertTextEqual(
         r"""
-            + S -> S a | b F d
-            + A -> & | a A
-            + C -> & | c a
-            + F -> A b | a C | b F d
-        """, firstGrammar )
+            + # 1. Eliminating Unuseful Symbols, Beginning
+            +  S -> S a | a F G | b F d
+            +  A -> & | a A
+            +  B -> c G | a C G
+            +  C -> & | c a | c B a
+            +  D -> & | d C c
+            +  F -> A b | a C | G A | b F d
+            +  G -> B c | B C a
+            +
+            + # 2. Eliminating Infertile Symbols, End
+            + #    Infertile symbols: {S -> a F G, B -> c G, B -> a C G, C -> c B a, F -> G A, G -> B c, G -> B C a}
+            +  S -> S a | b F d
+            +  A -> & | a A
+            +  C -> & | c a
+            +  D -> & | d C c
+            +  F -> A b | a C | b F d
+            +
+            + # 3. Eliminating Unreachable Symbols, End
+            + #    Unreachable symbols: {D -> {d C c, &}}
+            +  S -> S a | b F d
+            +  A -> & | a A
+            +  C -> & | c a
+            +  F -> A b | a C | b F d
+        """, firstGrammar.get_operation_history() )
 
     def test_grammarGetNonTerminalSimpleSymbolsChapter4Item3Example1(self):
         firstGrammar = ChomskyGrammar.load_from_text_lines( wrap_text(
@@ -1815,14 +1843,25 @@ class TestGrammarFertileSymbols(TestingUtilities):
 
         self.assertTextEqual(
         r"""
-            + S -> S a | a F G | b F d
-            + A -> a | a A
-            + B -> a G | c G | a C G
-            + C -> c a | c B a
-            + D -> d c | d C c
-            + F -> a | b | G | A b | a C | G A | b F d
-            + G -> B a | B c | B C a
-        """, firstGrammar )
+            + # 1. Converting to Epsilon Free, Beginning
+            +  S -> S a | a F G | b F d
+            +  A -> & | a A
+            +  B -> c G | a C G
+            +  C -> & | c a | c B a
+            +  D -> & | d C c
+            +  F -> A b | a C | G A | b F d
+            +  G -> B c | B C a
+            +
+            + # 2. Converting to Epsilon Free, End
+            + #    Non Terminal's Deriving Epsilon: A -> &; C -> &; D -> &
+            +  S -> S a | a F G | b F d
+            +  A -> a | a A
+            +  B -> a G | c G | a C G
+            +  C -> c a | c B a
+            +  D -> d c | d C c
+            +  F -> a | b | G | A b | a C | G A | b F d
+            +  G -> B a | B c | B C a
+        """, firstGrammar.get_operation_history() )
 
         self.assertTextEqual(
         r"""

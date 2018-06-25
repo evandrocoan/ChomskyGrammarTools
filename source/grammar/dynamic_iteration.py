@@ -41,7 +41,7 @@ class DynamicIterable(object):
         https://stackoverflow.com/questions/36681312/why-have-an-iter-method-in-python
     """
 
-    def __init__(self, iterable_access, empty_slots, end_index=None, filled_slots=set()):
+    def __init__(self, data_container, iterable_access, empty_slots, end_index=None, filled_slots=set()):
         """
             Receives a iterable an initialize the object to start an iteration.
 
@@ -58,12 +58,21 @@ class DynamicIterable(object):
         ## List the empty free spots for new items, which should be skipped when iterating over
         self.filled_slots = filled_slots
 
+        ## The underlying container used to calculate this iterable length
+        self.data_container = data_container
+
         ## The iterable access method to get the next item given a index
         if end_index:
             self.iterable_access = lambda index: iterable_access( index ) if index < end_index[0] else self.stop_iteration( index )
 
         else:
             self.iterable_access = iterable_access
+
+    def __len__(self):
+        """
+            Return the total length of this container.
+        """
+        return len( self.data_container )
 
     def __iter__(self):
         """
@@ -366,21 +375,23 @@ class DynamicIterationDict(object):
         """
         self.new_items_skip_count -= 1
 
-        if self.new_items_skip_count > 0:
-            self.not_iterate_over_new_items( how_many_times )
+        # When the current sequence is exhausted, search for an old one
+        if not self.new_items_skip_count > 0:
 
-        else:
-
-            if self.new_items_skip_stack:
+            # Unwind the stack until a valid item is found
+            while self.new_items_skip_stack:
                 self.new_items_skip_count, self.filled_slots, self.maximum_iterable_index = self.new_items_skip_stack.pop()
+                self.new_items_skip_count -= 1
 
-            else:
-                self.not_iterate_over_new_items( how_many_times )
+                if self.new_items_skip_count > 0:
+                    break
+
+        self.not_iterate_over_new_items( how_many_times )
 
         if self.new_items_skip_count > 0:
-            return DynamicIterable( target_generation, self.empty_slots, self.maximum_iterable_index, self.filled_slots )
+            return DynamicIterable( self.items_dictionary, target_generation, self.empty_slots, self.maximum_iterable_index, self.filled_slots )
 
-        return DynamicIterable( target_generation, self.empty_slots )
+        return DynamicIterable( self.items_dictionary, target_generation, self.empty_slots )
 
     def not_iterate_over_new_items(self, how_many_times=1):
         """
