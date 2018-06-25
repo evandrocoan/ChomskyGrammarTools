@@ -113,7 +113,7 @@ class RunFunctionAsyncThread(QtCore.QThread):
             self.waiting( self )
             self.has_showed_waiting = True
 
-            if not self.function.isToStop[0]:
+            if self.function.isToStop[0]:
                 self.sleep( 1 )
 
                 if self.process_thread.isRunning():
