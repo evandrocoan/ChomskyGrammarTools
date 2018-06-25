@@ -965,7 +965,7 @@ class ChomskyGrammar():
         current_counter = 0
 
         productions_keys = self.productions
-        non_deterministic_factors_list = []
+        non_deterministic_factors_list = DynamicIterationDict()
 
         while old_counter != current_counter:
             old_counter = current_counter
@@ -979,9 +979,9 @@ class ChomskyGrammar():
                     if type( first_symbol ) is NonTerminal:
                         remove_production = False
                         first_symbol_productions = productions_keys[first_symbol]
-                        non_deterministic_factors_list.append( ( start_production, first_symbol ) )
+                        non_deterministic_factors_list.append( "%s => %s" % ( start_symbol, start_production ) )
 
-                        for first_symbol_production in first_symbol_productions:
+                        for first_symbol_production in first_symbol_productions(1):
                             remove_production = True
                             new_production = start_production.replace( 0, first_symbol_production )
                             self.add_production( start_symbol, new_production )
@@ -991,7 +991,7 @@ class ChomskyGrammar():
                             self.remove_production( start_symbol, start_production )
 
         self._save_history( "Eliminating Indirect Factors", IntermediateGrammar.END )
-        self._save_data( "Indirect factors for elimination: %s", non_deterministic_factors_list )
+        self._save_data( "Indirect factors for elimination: %s", non_deterministic_factors_list.keys() )
         log( 16, "self out: \n%s", self )
 
     def eliminate_direct_factors(self):
