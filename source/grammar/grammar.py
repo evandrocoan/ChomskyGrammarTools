@@ -131,9 +131,6 @@ class ChomskyGrammar():
         // Rename the start symbol, so when parsing the tree it is simple to find it
         non_terminal_start : non_terminal
 
-        // Tells the tree-builder to inline this branch if it has only one member
-        ?non_terminal_epsilon : non_terminal | epsilon
-
         // Stops Lark from automatically filtering out these literals from the tree
         null   : "null"
         true   : "true"

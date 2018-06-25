@@ -14,23 +14,26 @@ https://gist.github.com/anirudhjayaraman/f020fddf11f6b3d20fda
 import os
 cur_path = os.path.join( os.getcwd(), '..', 'source' )
 
-ignore_set = set([])
-# ignore_set = set(["__init__.py", "count_sourcelines.py"])
+ignore_set = set( [] )
+# ignore_set = set( ["__init__.py", "count_sourcelines.py"] )
 
 loc_list = []
 
-for py_dir, _, py_files in os.walk(cur_path):
+for py_dir, _, py_files in os.walk( cur_path ):
 
     for py_file in py_files:
 
-        if py_file.endswith(".py") and py_file not in ignore_set:
-            total_path = os.path.join(py_dir, py_file)
+        if py_file.endswith( ".py" ) and py_file not in ignore_set:
+            total_path = os.path.join( py_dir, py_file )
 
-            loc_list.append((len(open(total_path, "r", encoding='utf-8').read().splitlines()),
-                               total_path.split(cur_path)[1]))
+            loc_list.append( ( len( open( total_path, "r", encoding='utf-8' ).read().splitlines() ),
+                               total_path.split( cur_path )[1] ) )
+
+def format_number(number):
+    return "{:,}".format( number ).replace( ',', '.' )
 
 for line_number_count, filename in loc_list:
-    print("%5d lines in %s" % (line_number_count, filename))
+    print( "%5s lines in %s" % ( format_number( line_number_count ), filename ) )
 
-print("\nTotal: %s lines (%s)" %(sum([x[0] for x in loc_list]), cur_path))
+print("\nTotal: %s lines (%s)" %( format_number( sum( [x[0] for x in loc_list] ) ), cur_path ) )
 
