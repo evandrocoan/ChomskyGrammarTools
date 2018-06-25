@@ -1213,8 +1213,8 @@ class ChomskyGrammar():
                         self.remove_start_non_terminal( start_symbol, False )
 
         # log( 1, "productions: %s", self.productions )
-        self._save_data( "Unreachable symbols: %s", unreachable )
         self._save_history( "Eliminating Unreachable Symbols", IntermediateGrammar.END )
+        self._save_data( "Unreachable symbols: %s", unreachable )
 
     def eliminate_unuseful(self):
         """

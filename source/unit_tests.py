@@ -1700,25 +1700,36 @@ class TestGrammarFertileSymbols(TestingUtilities):
             +  D -> c | d D d
         """, firstGrammar.get_operation_history() )
 
-    def test_grammarEliminateUnreachableSymbolsChapter4Item1Example1(self):
+    def test_grammarEliminateUnreachableSymbolsChapter4Item1Example1Mutated(self):
         firstGrammar = ChomskyGrammar.load_from_text_lines( wrap_text(
         r"""
             S -> aS | B C | B D
             A -> cC | A B
             B -> bB | &
             C -> aA | B C
-            D -> d D d | c
+            D -> dD d | c
+            H -> aC
         """ ) )
         firstGrammar.eliminate_unreachable()
 
         self.assertTextEqual(
         r"""
-            + S -> a S | B C | B D
-            + A -> c C | A B
-            + B -> & | b B
-            + C -> a A | B C
-            + D -> c | d D d
-        """, firstGrammar )
+            + # 1. Eliminating Unreachable Symbols, Beginning
+            +  S -> a S | B C | B D
+            +  A -> c C | A B
+            +  B -> & | b B
+            +  C -> a A | B C
+            +  D -> c | d D d
+            +  H -> a C
+            +
+            + # 2. Eliminating Unreachable Symbols, End
+            + #    Unreachable symbols: ['H -> {a C}']
+            +  S -> a S | B C | B D
+            +  A -> c C | A B
+            +  B -> & | b B
+            +  C -> a A | B C
+            +  D -> c | d D d
+        """, firstGrammar.get_operation_history() )
 
     def test_grammarGetReachableChapter4Item1Example2(self):
         firstGrammar = ChomskyGrammar.load_from_text_lines( wrap_text(
