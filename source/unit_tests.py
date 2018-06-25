@@ -24,7 +24,10 @@
 import os
 import sys
 import lark
+
 import unittest
+import profile
+import cProfile
 
 from natsort import natsorted
 from collections import OrderedDict
