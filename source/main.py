@@ -64,6 +64,7 @@ from grammar.utilities import setTextWithoutCleaningHistory
 from grammar.utilities import trimMessage
 from grammar.utilities import getCleanSpaces
 from grammar.utilities import dictionary_to_string
+from grammar.utilities import get_duplicated_elements
 
 from debug_tools import getLogger
 
@@ -379,10 +380,9 @@ class ProgramWindow(QtWidgets.QMainWindow):
 
             else:
                 results.append( "\n\n# Is NOT Factored!" )
-                results.append( "\n\n# Does still has the following factor/nondeterminism(s)\n" )
-                results.append( convert_to_text_lines( factors, sort=sort_correctly ) )
+                results.append( "\n\n# It does still has the following factor/nondeterminism(s)\n" )
+                results.append( convert_to_text_lines( get_duplicated_elements( factors ), sort=sort_correctly ) )
 
-            results.append( self._get_history_string( firstGrammar ) )
             function.results = "".join( results )
 
         self._handleFunctionAsync( function, "# The following grammar:" )
@@ -466,8 +466,6 @@ class ProgramWindow(QtWidgets.QMainWindow):
 
             results.append( str( firstGrammar ) )
             results.append( "\n\n# Is %s%s.\n" % ( "" if (not is_empty if inverse_boolean else is_empty) else "NOT ", property_name ) )
-
-            results.append( self._get_history_string( firstGrammar, "\n\n" ) )
             function.results = "".join( results )
 
         self._handleFunctionAsync( function, "# The following grammar:" )
