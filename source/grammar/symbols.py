@@ -84,16 +84,6 @@ class ChomskyGrammarSymbol(LockableType):
         raise TypeError( "'<' not supported between instances of '%s' and '%s'" % (
                 self.__class__.__name__, other.__class__.__name__ ) )
 
-    def _len(self):
-        length = len( self.str )
-
-        for symbol in self.str:
-
-            if symbol == '&':
-                length -= 1
-
-        return length
-
     def _str(self):
         return self.str
 
@@ -139,7 +129,18 @@ class Terminal(ChomskyGrammarSymbol):
     """
         Represents a terminal symbol on an ChomskyGrammar.
     """
-    pass
+
+    def _len(self):
+        """
+            Represents a terminal symbol on an ChomskyGrammar.
+        """
+
+        for symbol in self.str:
+
+            if symbol != '&':
+                return 1
+
+        return 0
 
 
 # Standard/common symbols used

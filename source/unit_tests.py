@@ -1317,6 +1317,20 @@ class TestGrammarFirstAndFollow(TestingUtilities):
 
 class TestGrammarEpsilonConversion(TestingUtilities):
 
+    def test_grammarConvertToEpsilonFreeWithTerminalOnTheMiddle(self):
+        firstGrammar = ChomskyGrammar.load_from_text_lines( wrap_text(
+        r"""
+            S -> & | a A
+            A -> b | S b S
+        """ ) )
+        firstGrammar.convert_to_epsilon_free()
+
+        # self.assertTextEqual(
+        # r"""
+        # """, firstGrammar.get_operation_history() )
+
+        # self.assertTrue( firstGrammar.is_epsilon_free() )
+
     def test_grammarConvertToEpsilonFreeChapter4Item4Example1(self):
         firstGrammar = ChomskyGrammar.load_from_text_lines( wrap_text(
         r"""
@@ -1731,10 +1745,10 @@ class TestGrammarFertileSymbols(TestingUtilities):
             +  D -> c | d D d
         """, firstGrammar.get_operation_history() )
 
-    def test_grammarGetReachableChapter4Item1Example2(self):
+    def test_grammarGetReachableChapter4Item1Example2WithyEpsilon(self):
         firstGrammar = ChomskyGrammar.load_from_text_lines( wrap_text(
         r"""
-            S -> aSa | dDd
+            S -> aSa | dDd | &
             A -> aB | Cc | a
             B -> dD | bB | b
             C -> Aa | dD | c
@@ -1744,9 +1758,10 @@ class TestGrammarFertileSymbols(TestingUtilities):
 
         self.assertTextEqual(
         r"""
+            + Terminal locked: True, str: &, sequence: 1, len: 0;
             + Terminal locked: True, str: a, sequence: 1, len: 1;
             + Terminal locked: True, str: b, sequence: 1, len: 1;
-            + Terminal locked: True, str: bb, sequence: 1, len: 2;
+            + Terminal locked: True, str: bb, sequence: 1, len: 1;
             + Terminal locked: True, str: d, sequence: 1, len: 1;
             + NonTerminal locked: True, str: B, sequence: 2, len: 1;
             + NonTerminal locked: True, str: D, sequence: 2, len: 1;
@@ -2309,7 +2324,7 @@ class TestGrammarTreeTransformation(TestingUtilities):
             + , Tree(space, []), Tree(space, []), Tree(non_terminals, [Production locked: False, str: , symbols:
             + [Terminal locked: True, str: (, sequence: 1, len: 1;, NonTerminal locked: True, str: E, sequence: 2,
             + len: 1;, Terminal locked: True, str: ), sequence: 3, len: 1;], sequence: 3, len: 0;
-            + , Production locked: False, str: , symbols: [Terminal locked: True, str: id, sequence: 1, len: 2;],
+            + , Production locked: False, str: , symbols: [Terminal locked: True, str: id, sequence: 1, len: 1;],
             + sequence: 1, len: 0;
             + ])])
         """, wrap_text( firstGrammar, wrap=100 ) )
@@ -2338,12 +2353,12 @@ class TestGrammarTreeTransformation(TestingUtilities):
             + sequence: 1, len: 1;], sequence: 1, len: 0;
             + , Tree(space, []), Tree(non_terminals, [Production locked: False, str: , symbols: [Terminal locked:
             + True, str: a, sequence: 1, len: 1;, NonTerminal locked: True, str: AB, sequence: 2, len: 1;,
-            + Terminal locked: True, str: bb, sequence: 3, len: 2;, NonTerminal locked: True, str: CC, sequence:
-            + 4, len: 1;, Terminal locked: True, str: 1a, sequence: 5, len: 2;, NonTerminal locked: True, str: A,
+            + Terminal locked: True, str: bb, sequence: 3, len: 1;, NonTerminal locked: True, str: CC, sequence:
+            + 4, len: 1;, Terminal locked: True, str: 1a, sequence: 5, len: 1;, NonTerminal locked: True, str: A,
             + sequence: 6, len: 1;, Terminal locked: True, str: b, sequence: 7, len: 1;, NonTerminal locked: True,
             + str: A, sequence: 8, len: 1;, NonTerminal locked: True, str: BC, sequence: 9, len: 1;], sequence: 9,
             + len: 0;
-            + , Production locked: False, str: , symbols: [Terminal locked: True, str: ba, sequence: 1, len: 2;],
+            + , Production locked: False, str: , symbols: [Terminal locked: True, str: ba, sequence: 1, len: 1;],
             + sequence: 1, len: 0;
             + , Production locked: False, str: , symbols: [Terminal locked: True, str: c, sequence: 1, len: 1;],
             + sequence: 1, len: 0;
