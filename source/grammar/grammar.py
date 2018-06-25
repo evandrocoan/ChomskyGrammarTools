@@ -77,7 +77,7 @@ class ChomskyGrammar():
         // Forces them to appear in the tree as branches
         epsilon         : [] | "&"+
         end_symbol      : ";"* space* new_line ( new_line | space )*
-        terminal        : ( DIGIT | LCASE_LETTER | signs | parens )+
+        terminal        : ( DIGIT | LCASE_LETTER | signs | signs_extra | parens )+
         non_terminal    : UCASE_LETTER+ ( UCASE_LETTER | DIGIT | quote )*
         new_line        : NEWLINE
         quote           : "'"
@@ -95,6 +95,17 @@ class ChomskyGrammar():
         plus      : "+"
         slash     : "/"
         backslash : "\\"
+
+        ?signs_extra : question | double_quote | percentage | dollar | at_sign | sharp | exclamation | tick | backtick
+        sharp        : "#"
+        dollar       : "$"
+        question     : "?"
+        at_sign      : "@"
+        tick         : "´"
+        backtick     : "`"
+        percentage   : "%"
+        exclamation  : "!"
+        double_quote : "\""
 
         ?parens       : open_paren | close_paren | open_bracket | close_bracket | open_brace | close_brace
         open_bracket  : "["
@@ -1299,8 +1310,10 @@ class ChomskyGrammar():
                     self.remove_production( start_symbol, production )
 
         self._save_history( "Eliminating Simple Productions", IntermediateGrammar.END )
-        self._save_data( "Simple Non Terminals: %s", "; ".join( "%s -> %s" % ( key, element.keys() )
-               for key, element in simple_non_terminals.items() ) )
+
+        if sum( len( value ) for value in simple_non_terminals.values() ) != len( simple_non_terminals ):
+            self._save_data( "Simple Non Terminals: %s", "; ".join( "%s -> %s" % ( key, element.keys() )
+                   for key, element in simple_non_terminals.items() ) )
 
     def convert_to_proper(self):
         """

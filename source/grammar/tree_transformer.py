@@ -136,6 +136,60 @@ class ChomskyGrammarTreeTransformer(lark.Transformer):
         """
         return self._parse_symbol( _terminal, "." )
 
+    def double_quote(self, _terminal):
+        """
+            Converts the tree leaf '"' symbol into a Terminal ready to be used in the Chomsky Grammar.
+        """
+        return self._parse_symbol( _terminal, "\"" )
+
+    def percentage(self, _terminal):
+        """
+            Converts the tree leaf '%' symbol into a Terminal ready to be used in the Chomsky Grammar.
+        """
+        return self._parse_symbol( _terminal, "%" )
+
+    def dollar(self, _terminal):
+        """
+            Converts the tree leaf '$' symbol into a Terminal ready to be used in the Chomsky Grammar.
+        """
+        return self._parse_symbol( _terminal, "$" )
+
+    def at_sign(self, _terminal):
+        """
+            Converts the tree leaf '@' symbol into a Terminal ready to be used in the Chomsky Grammar.
+        """
+        return self._parse_symbol( _terminal, "@" )
+
+    def sharp(self, _terminal):
+        """
+            Converts the tree leaf '#' symbol into a Terminal ready to be used in the Chomsky Grammar.
+        """
+        return self._parse_symbol( _terminal, "#" )
+
+    def exclamation(self, _terminal):
+        """
+            Converts the tree leaf '!' symbol into a Terminal ready to be used in the Chomsky Grammar.
+        """
+        return self._parse_symbol( _terminal, "!" )
+
+    def backtick(self, _terminal):
+        """
+            Converts the tree leaf '`' symbol into a Terminal ready to be used in the Chomsky Grammar.
+        """
+        return self._parse_symbol( _terminal, "`" )
+
+    def tick(self, _terminal):
+        """
+            Converts the tree leaf '´' symbol into a Terminal ready to be used in the Chomsky Grammar.
+        """
+        return self._parse_symbol( _terminal, "´" )
+
+    def question(self, _terminal):
+        """
+            Converts the tree leaf '?' symbol into a Terminal ready to be used in the Chomsky Grammar.
+        """
+        return self._parse_symbol( _terminal, "?" )
+
     def equals(self, _terminal):
         """
             Converts the tree leaf '=' symbol into a Terminal ready to be used in the Chomsky Grammar.
