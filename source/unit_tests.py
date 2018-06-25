@@ -293,6 +293,35 @@ class TestGrammarFactoringAndRecursionSymbols(TestingUtilities):
             +  F -> f | f F
         """, firstGrammar.get_operation_history() )
 
+    def test_grammarEliminateNonTerminalSimpleSymbolsChapter4Item5Example2NoSimple(self):
+        firstGrammar = ChomskyGrammar.load_from_text_lines( wrap_text(
+        r"""
+            S -> a B c D e
+            B -> b B
+            D -> d D | d
+            E -> e E | e
+            F -> f F | f
+        """ ) )
+        firstGrammar.eliminate_simple_non_terminals()
+
+        self.assertTextEqual(
+        r"""
+            + # 1. Eliminating Simple Productions, Beginning
+            +  S -> a B c D e
+            +  B -> b B
+            +  D -> d | d D
+            +  E -> e | e E
+            +  F -> f | f F
+            +
+            + # 2. Converting to Epsilon Free, End
+            + #    No changes required/performed here.
+            +  S -> a B c D e
+            +  B -> b B
+            +  D -> d | d D
+            +  E -> e | e E
+            +  F -> f | f F
+        """, firstGrammar.get_operation_history() )
+
     def test_grammarEliminateLeftRecursionCalculationOfChapter5Item5Example1(self):
         firstGrammar = ChomskyGrammar.load_from_text_lines( wrap_text(
         r"""
