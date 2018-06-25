@@ -252,7 +252,7 @@ class ChomskyGrammar():
 
                     continue
 
-            if stage == IntermediateGrammar.END:
+            if stage == IntermediateGrammar.END or len( operations_history ) == 1:
 
                 if not operation.extra_text:
                     operation.extra_text.append( "No changes required/performed here." )

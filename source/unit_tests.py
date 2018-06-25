@@ -389,24 +389,49 @@ class TestGrammarFactoringAndRecursionSymbols(TestingUtilities):
             T -> T * F | F
             F -> ( E ) | id
         """ ) )
-        firstGrammar.eliminate_simple_non_terminals()
-
-        self.assertTextEqual(
-        r"""
-            + E -> id | ( E ) | E + T | T * F
-            + F -> id | ( E )
-            + T -> id | ( E ) | T * F
-        """, firstGrammar )
         firstGrammar.eliminate_left_recursion()
 
         self.assertTextEqual(
         r"""
-            +  E -> id E' | ( E ) E' | T * F E'
+            + # 1. Eliminating Left Recursion, Beginning
+            +  E -> T | E + T
             +  F -> id | ( E )
-            +  T -> id T' | ( E ) T'
-            + E' -> & | + T E'
-            + T' -> & | * F T'
-        """, firstGrammar )
+            +  T -> F | T * F
+            +
+            + # 2. Eliminating Infertile Symbols, End
+            + #    No changes required/performed here.
+            +  E -> T | E + T
+            +  F -> id | ( E )
+            +  T -> F | T * F
+            +
+            + # 3. Eliminating Unreachable Symbols, End
+            + #    No changes required/performed here.
+            +  E -> T | E + T
+            +  F -> id | ( E )
+            +  T -> F | T * F
+            +
+            + # 4. Eliminate direct left recursion
+            + #    Direct recursion for elimination: [E + T] -> [T E'] @ E' -> {+ T E', &}
+            +   E -> T E'
+            +   F -> id | ( E )
+            +   T -> F | T * F
+            +  E' -> & | + T E'
+            +
+            + # 5. Eliminate indirect left recursion
+            + #    Indirect recursion for elimination: [F] -> [( E ), id]
+            +   E -> T E'
+            +   F -> id | ( E )
+            +   T -> id | ( E ) | T * F
+            +  E' -> & | + T E'
+            +
+            + # 6. Eliminate direct left recursion
+            + #    Direct recursion for elimination: [T * F] -> [( E ) T', id T'] @ T' -> {* F T', &}
+            +   E -> T E'
+            +   F -> id | ( E )
+            +   T -> id T' | ( E ) T'
+            +  E' -> & | + T E'
+            +  T' -> & | * F T'
+        """, firstGrammar.get_operation_history() )
 
         self.assertFalse( firstGrammar.has_left_recursion() )
 
@@ -414,8 +439,8 @@ class TestGrammarFactoringAndRecursionSymbols(TestingUtilities):
         firstGrammar = ChomskyGrammar.load_from_text_lines( wrap_text(
         r"""
             E -> a E + T | T
-            T -> b T * T | F
             F -> ( E ) | id
+            T -> b T * T | F
         """ ) )
 
         self.assertFalse( firstGrammar.has_left_recursion() )
@@ -423,10 +448,12 @@ class TestGrammarFactoringAndRecursionSymbols(TestingUtilities):
 
         self.assertTextEqual(
         r"""
-            + E -> T | a E + T
-            + F -> id | ( E )
-            + T -> F | b T * T
-        """, firstGrammar )
+            + # 1. Eliminating Left Recursion, Beginning
+            + #    No changes required/performed here.
+            +  E -> T | a E + T
+            +  F -> id | ( E )
+            +  T -> F | b T * T
+        """, firstGrammar.get_operation_history() )
 
     def test_grammarHasLeftRecursionCalculationOfChapter5Item6Example1(self):
         firstGrammar = ChomskyGrammar.load_from_text_lines( wrap_text(
