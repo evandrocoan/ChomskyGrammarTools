@@ -2216,6 +2216,322 @@ class TestDynamicIterationDict(TestingUtilities):
             + '0'[0]: None, '2'[1]: None, '3'[2]: None, '4'[3]: None, '5'[4]: None, '6'[5]: None, '7'[6]: None, '8'[7]: None
         """, wrap_text( new_elements, wrap=0 ) )
 
+    def test_recursiveIterationCreation(self):
+        elements = DynamicIterationDict([0, 1, 2])
+        current_index1 = -1
+        iterated_elements = []
+
+        for element1 in elements:
+            current_index1 += 1
+            current_index2 = -1
+
+            for element2 in elements:
+                current_index2 += 1
+                iterated_elements.append( ( element1, element2, repr( elements ) ) )
+
+        self.assertTextEqual(
+        r"""
+            + (0, 0, 'DynamicIterationDict keys_list: [0, 1, 2], values_list: [None, None, None], empty_slots: set(),
+            +        filled_slots: set(), items_dictionary: {0: 0, 1: 1, 2: 2}, new_items_skip_count: -2,
+            +        new_items_skip_stack: [], maximum_iterable_index: [0];')
+            + (0, 1, 'DynamicIterationDict keys_list: [0, 1, 2], values_list: [None, None, None], empty_slots: set(),
+            +        filled_slots: set(), items_dictionary: {0: 0, 1: 1, 2: 2}, new_items_skip_count: -2,
+            +        new_items_skip_stack: [], maximum_iterable_index: [0];')
+            + (0, 2, 'DynamicIterationDict keys_list: [0, 1, 2], values_list: [None, None, None], empty_slots: set(),
+            +        filled_slots: set(), items_dictionary: {0: 0, 1: 1, 2: 2}, new_items_skip_count: -2,
+            +        new_items_skip_stack: [], maximum_iterable_index: [0];')
+            + (1, 0, 'DynamicIterationDict keys_list: [0, 1, 2], values_list: [None, None, None], empty_slots: set(),
+            +        filled_slots: set(), items_dictionary: {0: 0, 1: 1, 2: 2}, new_items_skip_count: -3,
+            +        new_items_skip_stack: [], maximum_iterable_index: [0];')
+            + (1, 1, 'DynamicIterationDict keys_list: [0, 1, 2], values_list: [None, None, None], empty_slots: set(),
+            +        filled_slots: set(), items_dictionary: {0: 0, 1: 1, 2: 2}, new_items_skip_count: -3,
+            +        new_items_skip_stack: [], maximum_iterable_index: [0];')
+            + (1, 2, 'DynamicIterationDict keys_list: [0, 1, 2], values_list: [None, None, None], empty_slots: set(),
+            +        filled_slots: set(), items_dictionary: {0: 0, 1: 1, 2: 2}, new_items_skip_count: -3,
+            +        new_items_skip_stack: [], maximum_iterable_index: [0];')
+            + (2, 0, 'DynamicIterationDict keys_list: [0, 1, 2], values_list: [None, None, None], empty_slots: set(),
+            +        filled_slots: set(), items_dictionary: {0: 0, 1: 1, 2: 2}, new_items_skip_count: -4,
+            +        new_items_skip_stack: [], maximum_iterable_index: [0];')
+            + (2, 1, 'DynamicIterationDict keys_list: [0, 1, 2], values_list: [None, None, None], empty_slots: set(),
+            +        filled_slots: set(), items_dictionary: {0: 0, 1: 1, 2: 2}, new_items_skip_count: -4,
+            +        new_items_skip_stack: [], maximum_iterable_index: [0];')
+            + (2, 2, 'DynamicIterationDict keys_list: [0, 1, 2], values_list: [None, None, None], empty_slots: set(),
+            +        filled_slots: set(), items_dictionary: {0: 0, 1: 1, 2: 2}, new_items_skip_count: -4,
+            +        new_items_skip_stack: [], maximum_iterable_index: [0];')
+        """, wrap_text( "".join( [str( item ) + "\n" for item in iterated_elements] ), wrap=105, indent="       " ) )
+
+    def test_recursiveIterationCreationDynamicItemsAddition(self):
+        elements = DynamicIterationDict([0, 1, 2])
+        current_index1 = -1
+        iterated_elements = []
+
+        for element1 in elements:
+            current_index1 += 1
+            current_index2 = -1
+
+            if current_index1 == 1:
+                elements.add( 3 )
+
+            for element2 in elements:
+                current_index2 += 1
+                iterated_elements.append( ( element1, element2, repr( elements ) ) )
+
+        self.assertTextEqual(
+        r"""
+            + (0, 0, 'DynamicIterationDict keys_list: [0, 1, 2], values_list: [None, None, None], empty_slots: set(),
+            +        filled_slots: set(), items_dictionary: {0: 0, 1: 1, 2: 2}, new_items_skip_count: -2,
+            +        new_items_skip_stack: [], maximum_iterable_index: [0];')
+            + (0, 1, 'DynamicIterationDict keys_list: [0, 1, 2], values_list: [None, None, None], empty_slots: set(),
+            +        filled_slots: set(), items_dictionary: {0: 0, 1: 1, 2: 2}, new_items_skip_count: -2,
+            +        new_items_skip_stack: [], maximum_iterable_index: [0];')
+            + (0, 2, 'DynamicIterationDict keys_list: [0, 1, 2], values_list: [None, None, None], empty_slots: set(),
+            +        filled_slots: set(), items_dictionary: {0: 0, 1: 1, 2: 2}, new_items_skip_count: -2,
+            +        new_items_skip_stack: [], maximum_iterable_index: [0];')
+            + (1, 0, 'DynamicIterationDict keys_list: [0, 1, 2, 3], values_list: [None, None, None, None], empty_slots:
+            +        set(), filled_slots: set(), items_dictionary: {0: 0, 1: 1, 2: 2, 3: 3}, new_items_skip_count: -3,
+            +        new_items_skip_stack: [], maximum_iterable_index: [0];')
+            + (1, 1, 'DynamicIterationDict keys_list: [0, 1, 2, 3], values_list: [None, None, None, None], empty_slots:
+            +        set(), filled_slots: set(), items_dictionary: {0: 0, 1: 1, 2: 2, 3: 3}, new_items_skip_count: -3,
+            +        new_items_skip_stack: [], maximum_iterable_index: [0];')
+            + (1, 2, 'DynamicIterationDict keys_list: [0, 1, 2, 3], values_list: [None, None, None, None], empty_slots:
+            +        set(), filled_slots: set(), items_dictionary: {0: 0, 1: 1, 2: 2, 3: 3}, new_items_skip_count: -3,
+            +        new_items_skip_stack: [], maximum_iterable_index: [0];')
+            + (1, 3, 'DynamicIterationDict keys_list: [0, 1, 2, 3], values_list: [None, None, None, None], empty_slots:
+            +        set(), filled_slots: set(), items_dictionary: {0: 0, 1: 1, 2: 2, 3: 3}, new_items_skip_count: -3,
+            +        new_items_skip_stack: [], maximum_iterable_index: [0];')
+            + (2, 0, 'DynamicIterationDict keys_list: [0, 1, 2, 3], values_list: [None, None, None, None], empty_slots:
+            +        set(), filled_slots: set(), items_dictionary: {0: 0, 1: 1, 2: 2, 3: 3}, new_items_skip_count: -4,
+            +        new_items_skip_stack: [], maximum_iterable_index: [0];')
+            + (2, 1, 'DynamicIterationDict keys_list: [0, 1, 2, 3], values_list: [None, None, None, None], empty_slots:
+            +        set(), filled_slots: set(), items_dictionary: {0: 0, 1: 1, 2: 2, 3: 3}, new_items_skip_count: -4,
+            +        new_items_skip_stack: [], maximum_iterable_index: [0];')
+            + (2, 2, 'DynamicIterationDict keys_list: [0, 1, 2, 3], values_list: [None, None, None, None], empty_slots:
+            +        set(), filled_slots: set(), items_dictionary: {0: 0, 1: 1, 2: 2, 3: 3}, new_items_skip_count: -4,
+            +        new_items_skip_stack: [], maximum_iterable_index: [0];')
+            + (2, 3, 'DynamicIterationDict keys_list: [0, 1, 2, 3], values_list: [None, None, None, None], empty_slots:
+            +        set(), filled_slots: set(), items_dictionary: {0: 0, 1: 1, 2: 2, 3: 3}, new_items_skip_count: -4,
+            +        new_items_skip_stack: [], maximum_iterable_index: [0];')
+            + (3, 0, 'DynamicIterationDict keys_list: [0, 1, 2, 3], values_list: [None, None, None, None], empty_slots:
+            +        set(), filled_slots: set(), items_dictionary: {0: 0, 1: 1, 2: 2, 3: 3}, new_items_skip_count: -5,
+            +        new_items_skip_stack: [], maximum_iterable_index: [0];')
+            + (3, 1, 'DynamicIterationDict keys_list: [0, 1, 2, 3], values_list: [None, None, None, None], empty_slots:
+            +        set(), filled_slots: set(), items_dictionary: {0: 0, 1: 1, 2: 2, 3: 3}, new_items_skip_count: -5,
+            +        new_items_skip_stack: [], maximum_iterable_index: [0];')
+            + (3, 2, 'DynamicIterationDict keys_list: [0, 1, 2, 3], values_list: [None, None, None, None], empty_slots:
+            +        set(), filled_slots: set(), items_dictionary: {0: 0, 1: 1, 2: 2, 3: 3}, new_items_skip_count: -5,
+            +        new_items_skip_stack: [], maximum_iterable_index: [0];')
+            + (3, 3, 'DynamicIterationDict keys_list: [0, 1, 2, 3], values_list: [None, None, None, None], empty_slots:
+            +        set(), filled_slots: set(), items_dictionary: {0: 0, 1: 1, 2: 2, 3: 3}, new_items_skip_count: -5,
+            +        new_items_skip_stack: [], maximum_iterable_index: [0];')
+        """, wrap_text( "".join( [str( item ) + "\n" for item in iterated_elements] ), wrap=105, indent="       " ) )
+
+    def test_recursiveIterationCreationDynamicItemsRemoval(self):
+        elements = DynamicIterationDict([0, 1, 2])
+        current_index1 = -1
+        iterated_elements = []
+
+        for element1 in elements:
+            current_index1 += 1
+            current_index2 = -1
+
+            if current_index1 == 1:
+                elements.remove( 0 )
+
+            if current_index1 == 2:
+                elements.add( 3 )
+
+            for element2 in elements:
+                current_index2 += 1
+                iterated_elements.append( ( element1, element2, repr( elements ) ) )
+
+        self.assertTextEqual(
+        r"""
+            + (0, 0, 'DynamicIterationDict keys_list: [0, 1, 2], values_list: [None, None, None], empty_slots: set(),
+            +        filled_slots: set(), items_dictionary: {0: 0, 1: 1, 2: 2}, new_items_skip_count: -2,
+            +        new_items_skip_stack: [], maximum_iterable_index: [0];')
+            + (0, 1, 'DynamicIterationDict keys_list: [0, 1, 2], values_list: [None, None, None], empty_slots: set(),
+            +        filled_slots: set(), items_dictionary: {0: 0, 1: 1, 2: 2}, new_items_skip_count: -2,
+            +        new_items_skip_stack: [], maximum_iterable_index: [0];')
+            + (0, 2, 'DynamicIterationDict keys_list: [0, 1, 2], values_list: [None, None, None], empty_slots: set(),
+            +        filled_slots: set(), items_dictionary: {0: 0, 1: 1, 2: 2}, new_items_skip_count: -2,
+            +        new_items_skip_stack: [], maximum_iterable_index: [0];')
+            + (1, 1, 'DynamicIterationDict keys_list: [0, 1, 2], values_list: [None, None, None], empty_slots: {0},
+            +        filled_slots: set(), items_dictionary: {1: 1, 2: 2}, new_items_skip_count: -3,
+            +        new_items_skip_stack: [], maximum_iterable_index: [0];')
+            + (1, 2, 'DynamicIterationDict keys_list: [0, 1, 2], values_list: [None, None, None], empty_slots: {0},
+            +        filled_slots: set(), items_dictionary: {1: 1, 2: 2}, new_items_skip_count: -3,
+            +        new_items_skip_stack: [], maximum_iterable_index: [0];')
+            + (2, 1, 'DynamicIterationDict keys_list: [0, 1, 2, 3], values_list: [None, None, None, None], empty_slots:
+            +        {0}, filled_slots: set(), items_dictionary: {1: 1, 2: 2, 3: 3}, new_items_skip_count: -4,
+            +        new_items_skip_stack: [], maximum_iterable_index: [0];')
+            + (2, 2, 'DynamicIterationDict keys_list: [0, 1, 2, 3], values_list: [None, None, None, None], empty_slots:
+            +        {0}, filled_slots: set(), items_dictionary: {1: 1, 2: 2, 3: 3}, new_items_skip_count: -4,
+            +        new_items_skip_stack: [], maximum_iterable_index: [0];')
+            + (2, 3, 'DynamicIterationDict keys_list: [0, 1, 2, 3], values_list: [None, None, None, None], empty_slots:
+            +        {0}, filled_slots: set(), items_dictionary: {1: 1, 2: 2, 3: 3}, new_items_skip_count: -4,
+            +        new_items_skip_stack: [], maximum_iterable_index: [0];')
+            + (3, 1, 'DynamicIterationDict keys_list: [0, 1, 2, 3], values_list: [None, None, None, None], empty_slots:
+            +        {0}, filled_slots: set(), items_dictionary: {1: 1, 2: 2, 3: 3}, new_items_skip_count: -5,
+            +        new_items_skip_stack: [], maximum_iterable_index: [0];')
+            + (3, 2, 'DynamicIterationDict keys_list: [0, 1, 2, 3], values_list: [None, None, None, None], empty_slots:
+            +        {0}, filled_slots: set(), items_dictionary: {1: 1, 2: 2, 3: 3}, new_items_skip_count: -5,
+            +        new_items_skip_stack: [], maximum_iterable_index: [0];')
+            + (3, 3, 'DynamicIterationDict keys_list: [0, 1, 2, 3], values_list: [None, None, None, None], empty_slots:
+            +        {0}, filled_slots: set(), items_dictionary: {1: 1, 2: 2, 3: 3}, new_items_skip_count: -5,
+            +        new_items_skip_stack: [], maximum_iterable_index: [0];')
+        """, wrap_text( "".join( [str( item ) + "\n" for item in iterated_elements] ), wrap=105, indent="       " ) )
+
+    def test_recursiveIterationCreationDynamicItemsRemovalDouble(self):
+        elements = DynamicIterationDict([0, 1, 2])
+        current_index1 = -1
+        iterated_elements = []
+
+        for element1 in elements:
+            current_index1 += 1
+            current_index2 = -1
+
+            for element2 in elements:
+                current_index2 += 1
+
+                if current_index2 == 1:
+                    elements.discard( 0 )
+
+                if current_index2 == 2:
+                    elements.add( 3 )
+
+                iterated_elements.append( ( element1, element2, repr( elements ) ) )
+
+        self.assertTextEqual(
+        r"""
+            + (0, 0, 'DynamicIterationDict keys_list: [0, 1, 2], values_list: [None, None, None], empty_slots: set(),
+            +        filled_slots: set(), items_dictionary: {0: 0, 1: 1, 2: 2}, new_items_skip_count: -2,
+            +        new_items_skip_stack: [], maximum_iterable_index: [0];')
+            + (0, 1, 'DynamicIterationDict keys_list: [0, 1, 2], values_list: [None, None, None], empty_slots: {0},
+            +        filled_slots: set(), items_dictionary: {1: 1, 2: 2}, new_items_skip_count: -2,
+            +        new_items_skip_stack: [], maximum_iterable_index: [0];')
+            + (0, 2, 'DynamicIterationDict keys_list: [0, 1, 2, 3], values_list: [None, None, None, None], empty_slots:
+            +        {0}, filled_slots: set(), items_dictionary: {1: 1, 2: 2, 3: 3}, new_items_skip_count: -2,
+            +        new_items_skip_stack: [], maximum_iterable_index: [0];')
+            + (0, 3, 'DynamicIterationDict keys_list: [0, 1, 2, 3], values_list: [None, None, None, None], empty_slots:
+            +        {0}, filled_slots: set(), items_dictionary: {1: 1, 2: 2, 3: 3}, new_items_skip_count: -2,
+            +        new_items_skip_stack: [], maximum_iterable_index: [0];')
+            + (1, 1, 'DynamicIterationDict keys_list: [0, 1, 2, 3], values_list: [None, None, None, None], empty_slots:
+            +        {0}, filled_slots: set(), items_dictionary: {1: 1, 2: 2, 3: 3}, new_items_skip_count: -3,
+            +        new_items_skip_stack: [], maximum_iterable_index: [0];')
+            + (1, 2, 'DynamicIterationDict keys_list: [0, 1, 2, 3], values_list: [None, None, None, None], empty_slots:
+            +        {0}, filled_slots: set(), items_dictionary: {1: 1, 2: 2, 3: 3}, new_items_skip_count: -3,
+            +        new_items_skip_stack: [], maximum_iterable_index: [0];')
+            + (1, 3, 'DynamicIterationDict keys_list: [0, 1, 2, 3], values_list: [None, None, None, None], empty_slots:
+            +        {0}, filled_slots: set(), items_dictionary: {1: 1, 2: 2, 3: 3}, new_items_skip_count: -3,
+            +        new_items_skip_stack: [], maximum_iterable_index: [0];')
+            + (2, 1, 'DynamicIterationDict keys_list: [0, 1, 2, 3], values_list: [None, None, None, None], empty_slots:
+            +        {0}, filled_slots: set(), items_dictionary: {1: 1, 2: 2, 3: 3}, new_items_skip_count: -4,
+            +        new_items_skip_stack: [], maximum_iterable_index: [0];')
+            + (2, 2, 'DynamicIterationDict keys_list: [0, 1, 2, 3], values_list: [None, None, None, None], empty_slots:
+            +        {0}, filled_slots: set(), items_dictionary: {1: 1, 2: 2, 3: 3}, new_items_skip_count: -4,
+            +        new_items_skip_stack: [], maximum_iterable_index: [0];')
+            + (2, 3, 'DynamicIterationDict keys_list: [0, 1, 2, 3], values_list: [None, None, None, None], empty_slots:
+            +        {0}, filled_slots: set(), items_dictionary: {1: 1, 2: 2, 3: 3}, new_items_skip_count: -4,
+            +        new_items_skip_stack: [], maximum_iterable_index: [0];')
+            + (3, 1, 'DynamicIterationDict keys_list: [0, 1, 2, 3], values_list: [None, None, None, None], empty_slots:
+            +        {0}, filled_slots: set(), items_dictionary: {1: 1, 2: 2, 3: 3}, new_items_skip_count: -5,
+            +        new_items_skip_stack: [], maximum_iterable_index: [0];')
+            + (3, 2, 'DynamicIterationDict keys_list: [0, 1, 2, 3], values_list: [None, None, None, None], empty_slots:
+            +        {0}, filled_slots: set(), items_dictionary: {1: 1, 2: 2, 3: 3}, new_items_skip_count: -5,
+            +        new_items_skip_stack: [], maximum_iterable_index: [0];')
+            + (3, 3, 'DynamicIterationDict keys_list: [0, 1, 2, 3], values_list: [None, None, None, None], empty_slots:
+            +        {0}, filled_slots: set(), items_dictionary: {1: 1, 2: 2, 3: 3}, new_items_skip_count: -5,
+            +        new_items_skip_stack: [], maximum_iterable_index: [0];')
+        """, wrap_text( "".join( [str( item ) + "\n" for item in iterated_elements] ), wrap=105, indent="       " ) )
+
+    def test_recursiveIterationCreationDynamicItemsIgnoring4NewItems(self):
+        elements = DynamicIterationDict([0, 1, 2])
+        current_index1 = -1
+        iterated_elements = []
+
+        for element1 in elements(4):
+            current_index1 += 1
+            current_index2 = -1
+
+            if current_index1 == 0:
+                elements.remove( 0 )
+
+            if current_index1 == 1:
+                elements.add( 3 )
+
+            for element2 in elements:
+                current_index2 += 1
+                iterated_elements.append( ( element1, element2, repr( elements ) ) )
+
+        self.assertTextEqual(
+        r"""
+            + (0, 1, 'DynamicIterationDict keys_list: [0, 1, 2], values_list: [None, None, None], empty_slots: {0},
+            +        filled_slots: set(), items_dictionary: {1: 1, 2: 2}, new_items_skip_count: 3,
+            +        new_items_skip_stack: [], maximum_iterable_index: [3];')
+            + (0, 2, 'DynamicIterationDict keys_list: [0, 1, 2], values_list: [None, None, None], empty_slots: {0},
+            +        filled_slots: set(), items_dictionary: {1: 1, 2: 2}, new_items_skip_count: 3,
+            +        new_items_skip_stack: [], maximum_iterable_index: [3];')
+            + (1, 1, 'DynamicIterationDict keys_list: [3, 1, 2], values_list: [None, None, None], empty_slots: set(),
+            +        filled_slots: {0}, items_dictionary: {1: 1, 2: 2, 3: 0}, new_items_skip_count: 2,
+            +        new_items_skip_stack: [], maximum_iterable_index: [3];')
+            + (1, 2, 'DynamicIterationDict keys_list: [3, 1, 2], values_list: [None, None, None], empty_slots: set(),
+            +        filled_slots: {0}, items_dictionary: {1: 1, 2: 2, 3: 0}, new_items_skip_count: 2,
+            +        new_items_skip_stack: [], maximum_iterable_index: [3];')
+            + (2, 1, 'DynamicIterationDict keys_list: [3, 1, 2], values_list: [None, None, None], empty_slots: set(),
+            +        filled_slots: {0}, items_dictionary: {1: 1, 2: 2, 3: 0}, new_items_skip_count: 1,
+            +        new_items_skip_stack: [], maximum_iterable_index: [3];')
+            + (2, 2, 'DynamicIterationDict keys_list: [3, 1, 2], values_list: [None, None, None], empty_slots: set(),
+            +        filled_slots: {0}, items_dictionary: {1: 1, 2: 2, 3: 0}, new_items_skip_count: 1,
+            +        new_items_skip_stack: [], maximum_iterable_index: [3];')
+        """, wrap_text( "".join( [str( item ) + "\n" for item in iterated_elements] ), wrap=105, indent="       " ) )
+
+    def test_recursiveIterationCreationDynamicItemsIgnoring1NewItems(self):
+        elements = DynamicIterationDict([0, 1, 2])
+        current_index1 = -1
+        iterated_elements = []
+
+        for element1 in elements(1):
+            current_index1 += 1
+            current_index2 = -1
+
+            if current_index1 == 0:
+                elements.remove( 0 )
+
+            if current_index1 == 1:
+                elements.add( 3 )
+
+            for element2 in elements(1):
+                current_index2 += 1
+                iterated_elements.append( ( element1, element2, repr( elements ) ) )
+
+        self.assertTextEqual(
+        r"""
+            + (0, 1, 'DynamicIterationDict keys_list: [0, 1, 2], values_list: [None, None, None], empty_slots: {0},
+            +        filled_slots: set(), items_dictionary: {1: 1, 2: 2}, new_items_skip_count: 1,
+            +        new_items_skip_stack: [], maximum_iterable_index: [3];')
+            + (0, 2, 'DynamicIterationDict keys_list: [0, 1, 2], values_list: [None, None, None], empty_slots: {0},
+            +        filled_slots: set(), items_dictionary: {1: 1, 2: 2}, new_items_skip_count: 1,
+            +        new_items_skip_stack: [], maximum_iterable_index: [3];')
+            + (1, 3, 'DynamicIterationDict keys_list: [3, 1, 2], values_list: [None, None, None], empty_slots: set(),
+            +        filled_slots: set(), items_dictionary: {1: 1, 2: 2, 3: 0}, new_items_skip_count: 1,
+            +        new_items_skip_stack: [], maximum_iterable_index: [3];')
+            + (1, 1, 'DynamicIterationDict keys_list: [3, 1, 2], values_list: [None, None, None], empty_slots: set(),
+            +        filled_slots: set(), items_dictionary: {1: 1, 2: 2, 3: 0}, new_items_skip_count: 1,
+            +        new_items_skip_stack: [], maximum_iterable_index: [3];')
+            + (1, 2, 'DynamicIterationDict keys_list: [3, 1, 2], values_list: [None, None, None], empty_slots: set(),
+            +        filled_slots: set(), items_dictionary: {1: 1, 2: 2, 3: 0}, new_items_skip_count: 1,
+            +        new_items_skip_stack: [], maximum_iterable_index: [3];')
+            + (2, 3, 'DynamicIterationDict keys_list: [3, 1, 2], values_list: [None, None, None], empty_slots: set(),
+            +        filled_slots: set(), items_dictionary: {1: 1, 2: 2, 3: 0}, new_items_skip_count: 1,
+            +        new_items_skip_stack: [], maximum_iterable_index: [3];')
+            + (2, 1, 'DynamicIterationDict keys_list: [3, 1, 2], values_list: [None, None, None], empty_slots: set(),
+            +        filled_slots: set(), items_dictionary: {1: 1, 2: 2, 3: 0}, new_items_skip_count: 1,
+            +        new_items_skip_stack: [], maximum_iterable_index: [3];')
+            + (2, 2, 'DynamicIterationDict keys_list: [3, 1, 2], values_list: [None, None, None], empty_slots: set(),
+            +        filled_slots: set(), items_dictionary: {1: 1, 2: 2, 3: 0}, new_items_skip_count: 1,
+            +        new_items_skip_stack: [], maximum_iterable_index: [3];')
+        """, wrap_text( "".join( [str( item ) + "\n" for item in iterated_elements] ), wrap=105, indent="       " ) )
+
 
 if __name__ == "__main__":
     unittest.main()

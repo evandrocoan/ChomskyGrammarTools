@@ -27,6 +27,7 @@ from contextlib import suppress
 from debug_tools import getLogger
 
 from .utilities import emquote_string
+from .utilities import get_representation
 
 # level 4 - Abstract Syntax Tree Parsing
 log = getLogger( 127-4, __name__ )
@@ -134,6 +135,9 @@ class DynamicIterationDict(object):
 
         ## Whether the iteration process is allowed to use new items added on the current iteration
         self.new_items_skip_count = 0
+
+        ## A stack of `new_items_skip_count` which is required when the current iterator is called recursively
+        self.new_items_skip_stack = []
 
         ## Holds the global maximum iterable index used when `new_items_skip_count` is set
         self.maximum_iterable_index = [0]
@@ -348,12 +352,22 @@ class DynamicIterationDict(object):
 
     def get_iterator(self, target_generation, how_many_times=-1):
         """
-            Get fully configured iterable given the `target_generation` function.
+            Get fully configured iterable given the getter `target_generation(index)` function.
 
             `how_many_times` is for how many iterations it should keep ignoring the new items.
         """
-        self.not_iterate_over_new_items( how_many_times )
         self.new_items_skip_count -= 1
+
+        if self.new_items_skip_count > 0:
+            self.not_iterate_over_new_items( how_many_times )
+
+        else:
+
+            if self.new_items_skip_stack:
+                self.new_items_skip_count, self.filled_slots, self.maximum_iterable_index = self.new_items_skip_stack.pop()
+
+            else:
+                self.not_iterate_over_new_items( how_many_times )
 
         if self.new_items_skip_count > 0:
             return DynamicIterable( target_generation, self.empty_slots, self.maximum_iterable_index, self.filled_slots )
@@ -368,14 +382,19 @@ class DynamicIterationDict(object):
             `how_many_times` is for how many iterations it should keep ignoring the new items.
         """
 
-        if how_many_times > -1:
-            self.filled_slots.clear()
-            self.new_items_skip_count = how_many_times + 1
+        if how_many_times > 0:
+
+            if self.new_items_skip_count > 0:
+                self.new_items_skip_stack.append( (self.new_items_skip_count, self.filled_slots, self.maximum_iterable_index) )
+
+            self.filled_slots = set()
+            self.new_items_skip_count = how_many_times
+            self.maximum_iterable_index = [0]
             self.maximum_iterable_index[0] = len( self.keys_list )
 
     def fromkeys(self, iterable):
         """
-            Initialize a dictionary with any default value, acting like a indexed set.
+            Initialize a dictionary with None default value, acting like a indexed set.
         """
 
         for key in iterable:
