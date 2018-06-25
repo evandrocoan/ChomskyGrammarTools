@@ -76,7 +76,7 @@ class IntegerInputDialog(QMainWindow):
         self.setCentralWidget( self.centralwidget )
 
         self.resize( 600, 400  )
-        self.setWindowTitle( "Entre com o tamanho das sentenças" )
+        self.setWindowTitle( "Input a Integer value" )
 
         # nice widget for editing the date
         self.textEditWidget = QPlainTextEdit( self )
@@ -94,7 +94,7 @@ class IntegerInputDialog(QMainWindow):
         self.textEditWidget.installEventFilter( self )
 
         # Set initial value of text
-        self.textEditWidget.document().setPlainText( "# Escreva o tamanho da sua sentença aqui abaixo\n\n5" )
+        self.textEditWidget.document().setPlainText( "# Write here bellow, an integer with the number of steps\n\n5" )
         self.textEditWidget.selectAll()
 
         # OK and Cancel buttons

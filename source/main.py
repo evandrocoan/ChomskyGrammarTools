@@ -404,12 +404,12 @@ class ProgramWindow(QtWidgets.QMainWindow):
             was_factored = firstGrammar.factor_it( maximumSteps )
 
             if was_factored:
-                results.append( "\n\n# Could be successfully factored in `%s` steps!" % firstGrammar.last_factoring_step )
+                results.append( "\n\n# It was be successfully factored in `%s` steps!" % firstGrammar.last_factoring_step )
                 results.append( "\n\n# The new factored grammar is:" )
 
             else:
                 factors = firstGrammar.factors()
-                results.append( "\n\n# Could not be successfully factored in `%s` steps!\n\n" % maximumSteps )
+                results.append( "\n\n# It could not be successfully factored in `%s` steps!\n\n" % maximumSteps )
                 results.append( "\n\n# Does still has the following factor/nondeterminism(s)\n" )
 
                 results.append( convert_to_text_lines( factors, sort=sort_correctly ) )
@@ -537,7 +537,7 @@ class ProgramWindow(QtWidgets.QMainWindow):
             results.append( "\n\n# It has the following Fertile Non Terminal's set (Nf):\n" )
             results.append( convert_to_text_lines( fertile ) )
 
-            results.append( "\n\n# It has the following Reachable Non Terminal's set (Vi):\n" )
+            results.append( "\n\n# It has the following Reachable Symbols' set (Vi):\n" )
             results.append( convert_to_text_lines( reachable ) )
 
             results.append( "\n\n# It has the following Simple Non Terminal's set (Na):\n" )
