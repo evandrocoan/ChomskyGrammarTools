@@ -188,9 +188,9 @@ class ChomskyGrammar():
             function. See that function documentation for the sorting order.
         """
         initial_symbol = self.initial_symbol
-        production_keys = sort_alphabetically_and_by_length( list( set( self.productions ) - {initial_symbol} ) )
-        production_keys.insert( 0, initial_symbol )
-        return production_keys
+        productions_keys = sort_alphabetically_and_by_length( list( set( self.productions ) - {initial_symbol} ) )
+        productions_keys.insert( 0, initial_symbol )
+        return productions_keys
 
     def __init__(self):
         """
@@ -436,10 +436,10 @@ class ChomskyGrammar():
             Checks whether the grammar uses non existent non terminal symbols as `S -> Aa | a` or if
             there is a empty start symbol `S ->`.
         """
-        production_keys = self.productions
-        start_non_terminals = self.symbols_composition( production_keys, NonTerminal )
+        productions_keys = self.productions
+        start_non_terminals = self.symbols_composition( productions_keys, NonTerminal )
 
-        for start_symbol in production_keys:
+        for start_symbol in productions_keys:
             non_terminals = self.non_terminals( start_symbol )
 
             for non_terminal in non_terminals:
@@ -447,7 +447,7 @@ class ChomskyGrammar():
                 if non_terminal not in start_non_terminals:
                     raise RuntimeError( "Invalid Non Terminal `%s` added to the grammar: \n%s" % ( non_terminal, self ) )
 
-        if self.initial_symbol not in production_keys:
+        if self.initial_symbol not in productions_keys:
             raise ValueError( "Error: The new initial symbol has not productions! %s" % repr( self.initial_symbol ) )
 
     def is_epsilon_free(self):
@@ -505,10 +505,10 @@ class ChomskyGrammar():
         old_counter = -1
         current_counter = 0
 
-        production_keys = self.productions
+        productions_keys = self.productions
         non_terminal_epsilon = DynamicIterationDict()
 
-        for start_symbol in production_keys:
+        for start_symbol in productions_keys:
 
             if self.has_production( start_symbol, epsilon_production ):
                 non_terminal_epsilon.add( start_symbol )
@@ -516,8 +516,8 @@ class ChomskyGrammar():
         while current_counter != old_counter:
             old_counter = current_counter
 
-            for start_symbol in production_keys:
-                productions = production_keys[start_symbol]
+            for start_symbol in productions_keys:
+                productions = productions_keys[start_symbol]
 
                 for production in productions:
                     # log( 1, "production: %s", production )
@@ -550,11 +550,11 @@ class ChomskyGrammar():
         self._save_history( "Converting to Epsilon Free", IntermediateGrammar.BEGINNING )
 
         initial_symbol = self.initial_symbol
-        production_keys = self.productions
+        productions_keys = self.productions
         non_terminal_epsilon = self.non_terminal_epsilon()
 
-        for start_symbol in production_keys:
-            start_production = production_keys[start_symbol]
+        for start_symbol in productions_keys:
+            start_production = productions_keys[start_symbol]
 
             for production in start_production(1):
 
@@ -600,11 +600,11 @@ class ChomskyGrammar():
 
             If `recursive` is True the `start_non_terminal` symbol will be removed everywhere it is mentioned.
         """
-        production_keys = self.productions
+        productions_keys = self.productions
 
         if recursive:
 
-            for start_symbol in production_keys(1):
+            for start_symbol in productions_keys(1):
                 # Do remove the productions from itself, because:
                 # 1. There is no need for it as everything is going to be removed anyway
                 # 2. It can cause a recursion with `remove_production()` which also call
@@ -612,7 +612,7 @@ class ChomskyGrammar():
                 if start_symbol == start_non_terminal:
                     continue
 
-                start_productions = production_keys[start_symbol]
+                start_productions = productions_keys[start_symbol]
 
                 for production in start_productions:
 
@@ -622,7 +622,7 @@ class ChomskyGrammar():
                             self.remove_production( start_symbol, production )
                             break
 
-        del production_keys[start_non_terminal]
+        del productions_keys[start_non_terminal]
         self.clean_initial_symbol( start_non_terminal )
 
     def clean_initial_symbol(self, start_symbol):
@@ -678,7 +678,7 @@ class ChomskyGrammar():
             raise RuntimeError( "The new_symbol `%s` has not length! (%s)\n%s" % ( new_symbol, repr( new_symbol ), self ) )
 
         clean_symbol = new_symbol
-        production_keys = self.productions
+        productions_keys = self.productions
 
         if use_digits:
             current_counter = 0
@@ -706,7 +706,7 @@ class ChomskyGrammar():
             push_next_symbol()
             new_symbol = NonTerminal( clean_symbol + str( current_counter ), lock=True )
 
-            if new_symbol not in production_keys:
+            if new_symbol not in productions_keys:
                 return Production( symbols=[new_symbol.new()], lock=True )
 
     def left_recursion(self):
@@ -716,24 +716,26 @@ class ChomskyGrammar():
             can be 'direct' or 'indirect'.
         """
         left_recursion = set()
-        production_keys = self.productions
+        productions_keys = self.productions
         first_non_terminals = self.first_non_terminals()
 
         for first in first_non_terminals.keys():
 
             if first in first_non_terminals[first]:
                 is_direct = False
+                is_indirect = True
 
-                for production in production_keys[first]:
+                for production in productions_keys[first]:
 
                     if production[0] == first:
                         is_direct = True
+                        is_indirect = False
                         break
 
                 if is_direct:
                     left_recursion.add( ( first, 'direct' ) )
 
-                else:
+                if is_indirect:
                     left_recursion.add( ( first, 'indirect' ) )
 
         return left_recursion
@@ -844,7 +846,10 @@ class ChomskyGrammar():
 
             log( 32, "self: \n%s", self )
             self._save_history( "Eliminate direct left recursion" )
-            self._save_data( "Direct recursion for elimination: %s -> %s", direct_recursions_list, direct_replacements )
+
+            if new_outter_start_symbol in productions_keys:
+                self._save_data( "Direct recursion for elimination: %s -> %s @ %s -> %s", direct_recursions_list, direct_replacements,
+                        new_outter_start_symbol, productions_keys[new_outter_start_symbol].keys() )
 
         self._save_history( "Eliminating Left Recursion", IntermediateGrammar.END )
 
@@ -852,10 +857,10 @@ class ChomskyGrammar():
         """
             Checks whether there are indirect factors on this grammar.
         """
-        production_keys = self.productions
+        productions_keys = self.productions
 
-        for start_symbol in production_keys:
-            start_productions = production_keys[start_symbol]
+        for start_symbol in productions_keys:
+            start_productions = productions_keys[start_symbol]
 
             for start_production in start_productions:
                 first_symbol = start_production[0]
@@ -876,10 +881,10 @@ class ChomskyGrammar():
         """
         factors = []
         first_terminals = self.first_terminals()
-        production_keys = self.productions
+        productions_keys = self.productions
 
-        for start_symbol in production_keys:
-            productions = production_keys[start_symbol]
+        for start_symbol in productions_keys:
+            productions = productions_keys[start_symbol]
 
             for production in productions:
                 first_from = self.first_from( production, first_terminals )
@@ -948,21 +953,21 @@ class ChomskyGrammar():
         old_counter = -1
         current_counter = 0
 
-        production_keys = self.productions
+        productions_keys = self.productions
         non_deterministic_factors_list = []
 
         while old_counter != current_counter:
             old_counter = current_counter
 
-            for start_symbol in production_keys:
-                start_productions = production_keys[start_symbol]
+            for start_symbol in productions_keys:
+                start_productions = productions_keys[start_symbol]
 
                 for start_production in start_productions(1):
                     first_symbol = start_production[0]
 
                     if type( first_symbol ) is NonTerminal:
                         remove_production = False
-                        first_symbol_productions = production_keys[first_symbol]
+                        first_symbol_productions = productions_keys[first_symbol]
                         non_deterministic_factors_list.append( ( start_production, first_symbol ) )
 
                         for first_symbol_production in first_symbol_productions:
@@ -983,19 +988,19 @@ class ChomskyGrammar():
             Converts all direct factors on this grammar to deterministic factors.
         """
         self._save_history( "Eliminating Direct Factors", IntermediateGrammar.BEGINNING )
-        production_keys = self.productions
+        productions_keys = self.productions
 
         non_deterministic_factors_list = sorted( get_duplicated_elements( self.factors() ) )
         non_deterministic_factors_dictionary = {}
 
-        for start_symbol in production_keys:
+        for start_symbol in productions_keys:
             non_deterministic_factors_dictionary[start_symbol]  = []
 
         self._save_data( "Direct factors for elimination: %s", non_deterministic_factors_list )
         for factor_symbol, factor_terminal in reversed( non_deterministic_factors_list ):
             non_deterministic_factors_dictionary[factor_symbol].append( factor_terminal )
 
-        for start_symbol in production_keys:
+        for start_symbol in productions_keys:
             start_productions = self.productions[start_symbol]
             log( 16, "start_symbol: %s", start_symbol )
             log( 16, "start_productions: %s", start_productions )
@@ -1056,13 +1061,13 @@ class ChomskyGrammar():
         """
         # log( 1, "self: \n%s", self )
         fertile = set()
-        production_keys = self.productions
+        productions_keys = self.productions
 
         old_counter = -1
         current_counter = 0
 
         # Create the initial fertile Non Terminal's sets
-        for start_symbol in production_keys:
+        for start_symbol in productions_keys:
             current_terminals = self.terminals_productions( start_symbol )
             # log( 1, "start_symbol: %s, current_terminals: %s", start_symbol, current_terminals )
 
@@ -1072,8 +1077,8 @@ class ChomskyGrammar():
         while old_counter != current_counter:
             old_counter = current_counter
 
-            for start_symbol in production_keys:
-                start_productions = production_keys[start_symbol]
+            for start_symbol in productions_keys:
+                start_productions = productions_keys[start_symbol]
 
                 for production in start_productions:
                     all_fertile = True
@@ -1105,10 +1110,10 @@ class ChomskyGrammar():
         self._save_history( "Eliminating Infertile Symbols", IntermediateGrammar.BEGINNING )
         fertile = self.fertile()
         infertile = list()
-        production_keys = self.productions
+        productions_keys = self.productions
 
-        for start_symbol in production_keys(1):
-            start_productions = production_keys[start_symbol]
+        for start_symbol in productions_keys(1):
+            start_productions = productions_keys[start_symbol]
 
             for production in start_productions(1):
                 all_fertile = True
@@ -1138,12 +1143,12 @@ class ChomskyGrammar():
         """
             Return a set with the reachable terminal's and non terminal's symbols.
         """
-        production_keys = self.productions
+        productions_keys = self.productions
         reachable_terminals = set()
         reachable_non_terminals = DynamicIterationDict( [self.initial_symbol.non_terminals(0)] )
 
         for start_symbol in reachable_non_terminals:
-            start_productions = production_keys[start_symbol]
+            start_productions = productions_keys[start_symbol]
 
             for production in start_productions:
 
@@ -1163,16 +1168,16 @@ class ChomskyGrammar():
         """
         self._save_history( "Eliminating Unreachable Symbols", IntermediateGrammar.BEGINNING )
         reachable = self.reachable()
-        production_keys = self.productions
+        productions_keys = self.productions
 
-        for start_symbol in production_keys(1):
-            # log( 1, "1. start_symbol: %s, production_keys: %s", start_symbol, production_keys )
+        for start_symbol in productions_keys(1):
+            # log( 1, "1. start_symbol: %s, productions_keys: %s", start_symbol, productions_keys )
 
             if start_symbol not in reachable:
                 self.remove_start_non_terminal( start_symbol )
                 continue
 
-            start_productions = production_keys[start_symbol]
+            start_productions = productions_keys[start_symbol]
             # log( 1, "2. start_productions: %s", start_productions )
 
             for production in start_productions:
@@ -1215,18 +1220,18 @@ class ChomskyGrammar():
         old_counter = -1
         current_counter = 0
 
-        production_keys = self.productions
+        productions_keys = self.productions
         simple_non_terminals = {}
 
         # Create the initial simple_non_terminals's sets within their own as elements
-        for symbol in production_keys:
+        for symbol in productions_keys:
             simple_non_terminals[symbol] = DynamicIterationDict([symbol])
 
         while old_counter != current_counter:
             old_counter = current_counter
 
-            for start_symbol in production_keys:
-                start_productions = production_keys[start_symbol]
+            for start_symbol in productions_keys:
+                start_productions = productions_keys[start_symbol]
 
                 for production in start_productions:
 
@@ -1246,13 +1251,13 @@ class ChomskyGrammar():
             Determines whether this grammar has direct cycle of simple non terminals `A +=> A` on
             any of its start non terminal's symbols.
         """
-        production_keys = self.productions
+        productions_keys = self.productions
 
-        for non_terminal_to_check in production_keys:
+        for non_terminal_to_check in productions_keys:
             recursive_terminals = DynamicIterationDict([non_terminal_to_check])
 
             for non_terminal in recursive_terminals:
-                productions = production_keys[non_terminal]
+                productions = productions_keys[non_terminal]
 
                 for production in productions:
                     # log( 1, "production: %s", production )
@@ -1278,15 +1283,15 @@ class ChomskyGrammar():
         """
         self._save_history( "Eliminating Simple Productions", IntermediateGrammar.BEGINNING )
         simple_non_terminals = self.simple_non_terminals()
-        production_keys = self.productions
+        productions_keys = self.productions
 
-        for start_symbol in production_keys:
+        for start_symbol in productions_keys:
 
             for production in simple_non_terminals[start_symbol]:
                 self.copy_productions_for_one_non_terminal( production, start_symbol )
 
-        for start_symbol in production_keys:
-            start_productions = production_keys[start_symbol]
+        for start_symbol in productions_keys:
+            start_productions = productions_keys[start_symbol]
 
             for production in start_productions:
 
@@ -1363,20 +1368,20 @@ class ChomskyGrammar():
             Calculates the start production symbols non terminal's FIRST set.
         """
         first = {}
-        production_keys = self.productions
+        productions_keys = self.productions
 
         old_counter = -1
         current_counter = 0
 
         # Create the initial FIRST Non Terminal's sets
-        for symbol in production_keys:
+        for symbol in productions_keys:
             first[symbol] = set()
 
         while old_counter != current_counter:
             old_counter = current_counter
 
-            for start_symbol in production_keys:
-                start_productions = production_keys[start_symbol]
+            for start_symbol in productions_keys:
+                start_productions = productions_keys[start_symbol]
 
                 for production in start_productions:
 
@@ -1414,20 +1419,20 @@ class ChomskyGrammar():
             @return a dictionary with the first for each non terminal start symbol
         """
         first_terminals = {}
-        production_keys = self.productions
+        productions_keys = self.productions
 
         old_counter = -1
         current_counter = 0
 
         # Create the initial FIRST's sets
-        for symbol in production_keys:
+        for symbol in productions_keys:
             first_terminals[symbol] = set()
 
         while old_counter != current_counter:
             old_counter = current_counter
 
-            for start_symbol in production_keys:
-                start_productions = production_keys[start_symbol]
+            for start_symbol in productions_keys:
+                start_productions = productions_keys[start_symbol]
 
                 for production in start_productions:
 
@@ -1499,7 +1504,7 @@ class ChomskyGrammar():
             @return a dictionary with the follow for each non terminal start symbol
         """
         follow_terminals = {}
-        production_keys = self.productions
+        productions_keys = self.productions
 
         old_counter = -1
         current_counter = 0
@@ -1508,7 +1513,7 @@ class ChomskyGrammar():
             first_terminals = self.first_terminals()
 
         # Create the initial FOLLOW's sets
-        for symbol in production_keys:
+        for symbol in productions_keys:
             follow_terminals[symbol] = set()
 
         # First put $ (the end of input marker) in Follow(S) (S is the start symbol)
@@ -1517,8 +1522,8 @@ class ChomskyGrammar():
         while old_counter != current_counter:
             old_counter = current_counter
 
-            for start_symbol in production_keys:
-                start_productions = production_keys[start_symbol]
+            for start_symbol in productions_keys:
+                start_productions = productions_keys[start_symbol]
 
                 for production in start_productions:
 

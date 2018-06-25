@@ -223,44 +223,6 @@ class TestChomskyGrammar(TestingUtilities):
 
 class TestGrammarFactoringAndRecursionSymbols(TestingUtilities):
 
-    def test_grammarGetNonTerminalSimpleSymbolsChapter4Item5Example1(self):
-        firstGrammar = ChomskyGrammar.load_from_text_lines( wrap_text(
-        r"""
-            S -> F G H
-            F -> G | a
-            G -> dG | H | a
-            H -> c
-        """ ) )
-        simple_non_terminals = firstGrammar.simple_non_terminals()
-
-        self.assertTextEqual(
-        r"""
-            + S: S
-            + F: F G H
-            + G: G H
-            + H: H
-        """, dictionary_to_string( simple_non_terminals ) )
-
-    def test_grammarGetNonTerminalSimpleSymbolsChapter4Item5Example2(self):
-        firstGrammar = ChomskyGrammar.load_from_text_lines( wrap_text(
-        r"""
-            S -> a B c D e
-            B -> b B | E | F
-            D -> d D | F | d
-            E -> e E | e
-            F -> f F | f
-        """ ) )
-        simple_non_terminals = firstGrammar.simple_non_terminals()
-
-        self.assertTextEqual(
-        r"""
-            + S: S
-            + B: B E F
-            + D: D F
-            + E: E
-            + F: F
-        """, dictionary_to_string( simple_non_terminals ) )
-
     def test_grammarEliminateNonTerminalSimpleSymbolsChapter4Item5Example1(self):
         firstGrammar = ChomskyGrammar.load_from_text_lines( wrap_text(
         r"""
@@ -307,23 +269,29 @@ class TestGrammarFactoringAndRecursionSymbols(TestingUtilities):
 
         self.assertTextEqual(
         r"""
-            + S -> a B c D e
-            + B -> e | f | b B | e E | f F
-            + D -> d | f | d D | f F
-            + E -> e | e E
-            + F -> f | f F
-        """, firstGrammar )
-
-    def test_grammarHasLeftRecursionCalculationOfChapter5Item5Example1(self):
-        firstGrammar = ChomskyGrammar.load_from_text_lines( wrap_text(
-        r"""
-            S -> Sa | b
-        """ ) )
-
-        self.assertTextEqual(
-        r"""
-            + (S, 'direct')
-        """, convert_to_text_lines( firstGrammar.left_recursion() ) )
+            + # 1. Eliminating Simple Productions, Beginning
+            +  S -> a B c D e
+            +  B -> E | F | b B
+            +  D -> d | F | d D
+            +  E -> e | e E
+            +  F -> f | f F
+            +
+            + # 2. Converting to Epsilon Free, End
+            + #    No changes required/performed here.
+            +  S -> a B c D e
+            +  B -> E | F | b B
+            +  D -> d | F | d D
+            +  E -> e | e E
+            +  F -> f | f F
+            +
+            + # 3. Eliminating Simple Productions, End
+            + #    Simple Non Terminals: S -> {S}; B -> {B, E, F}; D -> {D, F}; E -> {E}; F -> {F}
+            +  S -> a B c D e
+            +  B -> e | f | b B | e E | f F
+            +  D -> d | f | d D | f F
+            +  E -> e | e E
+            +  F -> f | f F
+        """, firstGrammar.get_operation_history() )
 
     def test_grammarEliminateLeftRecursionCalculationOfChapter5Item5Example1(self):
         firstGrammar = ChomskyGrammar.load_from_text_lines( wrap_text(
@@ -334,9 +302,22 @@ class TestGrammarFactoringAndRecursionSymbols(TestingUtilities):
 
         self.assertTextEqual(
         r"""
-            +  S -> b S'
-            + S' -> & | a S'
-        """, firstGrammar )
+            + # 1. Eliminating Left Recursion, Beginning
+            +  S -> b | S a
+            +
+            + # 2. Eliminating Infertile Symbols, End
+            + #    No changes required/performed here.
+            +  S -> b | S a
+            +
+            + # 3. Eliminating Unreachable Symbols, End
+            + #    No changes required/performed here.
+            +  S -> b | S a
+            +
+            + # 4. Eliminate direct left recursion
+            + #    Direct recursion for elimination: [S a] -> [b S'] @ S' -> {a S', &}
+            +   S -> b S'
+            +  S' -> & | a S'
+        """, firstGrammar.get_operation_history() )
 
     def test_grammarHasLeftRecursionCalculationOfChapter5Item5Example1Mutated(self):
         firstGrammar = ChomskyGrammar.load_from_text_lines( wrap_text(
@@ -346,22 +327,6 @@ class TestGrammarFactoringAndRecursionSymbols(TestingUtilities):
 
         self.assertFalse( firstGrammar.has_left_recursion() )
 
-    def test_grammarHasLeftRecursionCalculationOfChapter5Item5Example2(self):
-        firstGrammar = ChomskyGrammar.load_from_text_lines( wrap_text(
-        r"""
-            E -> E + T | T
-            T -> T * F | F
-            F -> ( E ) | id
-        """ ) )
-
-        self.assertTextEqual(
-        r"""
-            + (E, 'direct')
-            + (T, 'direct')
-        """, convert_to_text_lines( firstGrammar.left_recursion() ) )
-
-        self.assertTrue( firstGrammar.has_left_recursion() )
-
     def test_historyEliminateLeftRecursionCalculationOfChapter5Item5Example2(self):
         firstGrammar = ChomskyGrammar.load_from_text_lines( wrap_text(
         r"""
@@ -369,6 +334,8 @@ class TestGrammarFactoringAndRecursionSymbols(TestingUtilities):
             F -> ( E ) | id
             T -> T * F | F
         """ ) )
+
+        self.assertTrue( firstGrammar.has_left_recursion() )
         firstGrammar.eliminate_left_recursion()
 
         self.assertTextEqual(
@@ -391,7 +358,7 @@ class TestGrammarFactoringAndRecursionSymbols(TestingUtilities):
             +  T -> F | T * F
             +
             + # 4. Eliminate direct left recursion
-            + #    Direct recursion for elimination: [E + T] -> [T E']
+            + #    Direct recursion for elimination: [E + T] -> [T E'] @ E' -> {+ T E', &}
             +   E -> T E'
             +   F -> id | ( E )
             +   T -> F | T * F
@@ -405,7 +372,7 @@ class TestGrammarFactoringAndRecursionSymbols(TestingUtilities):
             +  E' -> & | + T E'
             +
             + # 6. Eliminate direct left recursion
-            + #    Direct recursion for elimination: [T * F] -> [( E ) T', id T']
+            + #    Direct recursion for elimination: [T * F] -> [( E ) T', id T'] @ T' -> {* F T', &}
             +   E -> T E'
             +   F -> id | ( E )
             +   T -> id T' | ( E ) T'
