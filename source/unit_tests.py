@@ -1328,10 +1328,17 @@ class TestGrammarEpsilonConversion(TestingUtilities):
 
         self.assertTextEqual(
         r"""
-            + S -> & | A | B | A B
-            + A -> a | a A
-            + B -> b | b B
-        """, firstGrammar )
+            + # 1. Converting to Epsilon Free, Beginning
+            +  S -> A B
+            +  A -> & | a A
+            +  B -> & | b B
+            +
+            + # 2. Converting to Epsilon Free, End
+            + #    Non Terminal's Deriving Epsilon: A -> &; B -> &; S -> &
+            +  S -> & | A | B | A B
+            +  A -> a | a A
+            +  B -> b | b B
+        """, firstGrammar.get_operation_history() )
 
         self.assertTrue( firstGrammar.is_epsilon_free() )
 
@@ -1346,11 +1353,43 @@ class TestGrammarEpsilonConversion(TestingUtilities):
 
         self.assertTextEqual(
         r"""
-            + S' -> & | A | B | A B | S S
+            + # 1. Converting to Epsilon Free, Beginning
+            +  S -> A B | S S
+            +  A -> & | a A
+            +  B -> & | b B
+            +
+            + # 2. Converting to Epsilon Free, End
+            + #    Non Terminal's Deriving Epsilon: A -> &; B -> &; S -> &
+            +  S' -> & | A | B | A B | S S
+            +   A -> a | a A
+            +   B -> b | b B
+            +   S -> A | B | A B | S S
+        """, firstGrammar.get_operation_history() )
+
+        self.assertTrue( firstGrammar.is_epsilon_free() )
+
+    def test_grammarConvertToEpsilonFreeChapter4Item4Example1EmptyLanguage(self):
+        firstGrammar = ChomskyGrammar.load_from_text_lines( wrap_text(
+        r"""
+            S -> A B S | S S
+            A -> aA | &
+            B -> bB | &
+        """ ) )
+        firstGrammar.convert_to_epsilon_free()
+
+        self.assertTextEqual(
+        r"""
+            + # 1. Converting to Epsilon Free, Beginning
+            +  S -> S S | A B S
+            +  A -> & | a A
+            +  B -> & | b B
+            +
+            + # 2. Converting to Epsilon Free, End
+            + #    Non Terminal's Deriving Epsilon: A -> &; B -> &
+            +  S -> S | A S | B S | S S | A B S
             +  A -> a | a A
             +  B -> b | b B
-            +  S -> A | B | A B | S S
-        """, firstGrammar )
+        """, firstGrammar.get_operation_history() )
 
         self.assertTrue( firstGrammar.is_epsilon_free() )
 
@@ -1366,11 +1405,19 @@ class TestGrammarEpsilonConversion(TestingUtilities):
 
         self.assertTextEqual(
         r"""
-            + S -> a | B a | c S c
-            + A -> a | C | a A | A C | B C | A B C
-            + B -> b | C | b B | C A
-            + C -> S | A S | c C c
-        """, firstGrammar )
+            + # 1. Converting to Epsilon Free, Beginning
+            +  S -> B a | c S c
+            +  A -> & | a A | A B C
+            +  B -> & | b B | C A
+            +  C -> A S | c C c
+            +
+            + # 2. Converting to Epsilon Free, End
+            + #    Non Terminal's Deriving Epsilon: A -> &; B -> &
+            +  S -> a | B a | c S c
+            +  A -> a | C | a A | A C | B C | A B C
+            +  B -> b | C | b B | C A
+            +  C -> S | A S | c C c
+        """, firstGrammar.get_operation_history() )
 
         self.assertTrue( firstGrammar.is_epsilon_free() )
 
@@ -1385,10 +1432,17 @@ class TestGrammarEpsilonConversion(TestingUtilities):
 
         self.assertTextEqual(
         r"""
-            + S -> b | c | A b | A c | B c | A B c
-            + A -> a | a A
-            + B -> b | d | A d | b B
-        """, firstGrammar )
+            + # 1. Converting to Epsilon Free, Beginning
+            +  S -> A b | A B c
+            +  A -> & | a A
+            +  B -> & | A d | b B
+            +
+            + # 2. Converting to Epsilon Free, End
+            + #    Non Terminal's Deriving Epsilon: A -> &; B -> &
+            +  S -> b | c | A b | A c | B c | A B c
+            +  A -> a | a A
+            +  B -> b | d | A d | b B
+        """, firstGrammar.get_operation_history() )
 
         self.assertTrue( firstGrammar.is_epsilon_free() )
 
@@ -1403,11 +1457,18 @@ class TestGrammarEpsilonConversion(TestingUtilities):
 
         self.assertTextEqual(
         r"""
-            + S' -> & | b | c | A | B | S | A b | A c | B c | A B | A S | B S | A B c | A B S
-            +  A -> a | a A
-            +  B -> b | d | A d | b B
-            +  S -> b | c | A | B | S | A b | A c | B c | A B | A S | B S | A B c | A B S
-        """, firstGrammar )
+            + # 1. Converting to Epsilon Free, Beginning
+            +  S -> & | A b | A B c | A B S
+            +  A -> & | a A
+            +  B -> & | A d | b B
+            +
+            + # 2. Converting to Epsilon Free, End
+            + #    Non Terminal's Deriving Epsilon: S -> &; A -> &; B -> &
+            +  S' -> & | b | c | A | B | S | A b | A c | B c | A B | A S | B S | A B c | A B S
+            +   A -> a | a A
+            +   B -> b | d | A d | b B
+            +   S -> b | c | A | B | S | A b | A c | B c | A B | A S | B S | A B c | A B S
+        """, firstGrammar.get_operation_history() )
 
         self.assertTrue( firstGrammar.is_epsilon_free() )
 
@@ -1422,10 +1483,17 @@ class TestGrammarEpsilonConversion(TestingUtilities):
 
         self.assertTextEqual(
         r"""
-            + S -> b | c | S | A b | A c | B c | A S | B S | A B c | A B S
-            + A -> a | a A
-            + B -> b | d | A d | b B
-        """, firstGrammar )
+            + # 1. Converting to Epsilon Free, Beginning
+            +  S -> A b | A B c | A B S
+            +  A -> & | a A
+            +  B -> & | A d | b B
+            +
+            + # 2. Converting to Epsilon Free, End
+            + #    Non Terminal's Deriving Epsilon: A -> &; B -> &
+            +  S -> b | c | S | A b | A c | B c | A S | B S | A B c | A B S
+            +  A -> a | a A
+            +  B -> b | d | A d | b B
+        """, firstGrammar.get_operation_history() )
 
         self.assertTrue( firstGrammar.is_epsilon_free() )
 
@@ -1440,10 +1508,27 @@ class TestGrammarEpsilonConversion(TestingUtilities):
 
         self.assertTextEqual(
         r"""
-            + S -> & | b | c | A | B | A b | A c | B c | A B | A B c
-            + A -> a | a A
-            + B -> b | d | A d | b B
-        """, firstGrammar )
+            + # 1. Converting to Epsilon Free, Beginning
+            +  S -> A b | A B | A B c
+            +  A -> & | a A
+            +  B -> & | A d | b B
+            +
+            + # 2. Converting to Epsilon Free, End
+            + #    Non Terminal's Deriving Epsilon: A -> &; B -> &; S -> &
+            +  S -> & | b | c | A | B | A b | A c | B c | A B | A B c
+            +  A -> a | a A
+            +  B -> b | d | A d | b B
+        """, firstGrammar.get_operation_history() )
+
+        self.assertTrue( firstGrammar.is_epsilon_free() )
+
+    def test_grammarIsEpsilonFreeChapter5Example1FirstEpsilonFreed(self):
+        firstGrammar = ChomskyGrammar.load_from_text_lines( wrap_text(
+        r"""
+            S -> Ab | A Bc | &
+            A -> aA | a
+            B -> bB | Ad
+        """ ) )
 
         self.assertTrue( firstGrammar.is_epsilon_free() )
 
@@ -1455,6 +1540,7 @@ class TestGrammarEpsilonConversion(TestingUtilities):
             A -> aA | &
             B -> bB | Ad | &
         """ ) )
+        self.assertFalse( firstGrammar.is_epsilon_free() )
 
         self.assertTextEqual(
         r"""
@@ -1484,26 +1570,6 @@ class TestGrammarEpsilonConversion(TestingUtilities):
             + 1;], sequence: 1, len: 1;
             + ]
         """, wrap_text( sort_alphabetically_and_by_length( firstGrammar.non_terminal_epsilon() ), wrap=100 ) )
-
-    def test_grammarIsNotEpsilonFreeChapter5Example1First(self):
-        firstGrammar = ChomskyGrammar.load_from_text_lines( wrap_text(
-        r"""
-            S -> Ab | A Bc
-            A -> aA | &
-            B -> bB | Ad | &
-        """ ) )
-
-        self.assertFalse( firstGrammar.is_epsilon_free() )
-
-    def test_grammarIsEpsilonFreeChapter5Example1FirstEpsilonFreed(self):
-        firstGrammar = ChomskyGrammar.load_from_text_lines( wrap_text(
-        r"""
-            S -> Ab | A Bc | &
-            A -> aA | a
-            B -> bB | Ad
-        """ ) )
-
-        self.assertTrue( firstGrammar.is_epsilon_free() )
 
 
 class TestGrammarFertileSymbols(TestingUtilities):
