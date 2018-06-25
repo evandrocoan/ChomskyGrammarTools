@@ -179,12 +179,12 @@ class Production(LockableType):
         # log( 1, "self: %s", self )
         combinations = set()
 
-        non_terminals = self.non_terminals()
+        non_terminals = self.non_terminals( position=True )
         non_terminals_count = len( non_terminals )
 
         for permutation_size in range( 0, non_terminals_count ):
-            # log( 1, "permutation_size: %s", permutation_size )
             n_items_permutation = list( itertools.permutations( non_terminals, permutation_size ) )
+            # log( 1, "permutation_size: %s, n_items_permutation: %s", permutation_size, n_items_permutation )
 
             for permutation in n_items_permutation:
                 new_production = self.new()
@@ -193,13 +193,12 @@ class Production(LockableType):
                     new_production.filter_non_terminals( non_terminal_epsilon, permutation )
 
                 except RuntimeError as error:
-                    error = str( error )
 
                     if error.startswith( "Invalid production creation! Production with no length: [&]" ):
                         new_production = epsilon_production.new()
 
                     else:
-                        raise RuntimeError( error )
+                        raise
 
                 # log( 1, "new_production: %s (%s)", new_production, repr( new_production ) )
                 combinations.add( new_production )
@@ -218,7 +217,7 @@ class Production(LockableType):
 
             if type( symbol ) is NonTerminal:
 
-                if symbol in non_terminal_epsilon and symbol not in non_terminals_to_keep:
+                if symbol in non_terminal_epsilon and (symbol, symbol.sequence) not in non_terminals_to_keep:
                     self.symbols[symbol.sequence - 1] = epsilon_terminal
 
         if not len( self ):
@@ -407,22 +406,29 @@ class Production(LockableType):
         """
         return self._get_symbols( Terminal, index )
 
-    def non_terminals(self, index=-1):
+    def non_terminals(self, index=-1, position=False):
         """
             Get all NonTerminal's this symbol is composed by, on their respective sequence/ordering.
 
             If `index` is provided greater than `-1`, instead of returning a list, return the list
             nth element. If the `index` is out of range, then an empty set will be returned.
-        """
-        return self._get_symbols( NonTerminal, index )
 
-    def _get_symbols(self, symbol_type, index=-1):
+            If `position`, list with tuples with (symbol, position) in the production.
+        """
+        return self._get_symbols( NonTerminal, index, position )
+
+    def _get_symbols(self, symbol_type, index=-1, position=False):
         symbols = []
 
         for symbol in self.symbols:
 
             if type( symbol ) is symbol_type:
-                symbols.append( symbol )
+
+                if position:
+                    symbols.append( ( symbol, symbol.sequence ) )
+
+                else:
+                    symbols.append( symbol )
 
         if index > -1:
 

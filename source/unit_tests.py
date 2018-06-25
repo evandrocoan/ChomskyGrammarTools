@@ -1325,11 +1325,20 @@ class TestGrammarEpsilonConversion(TestingUtilities):
         """ ) )
         firstGrammar.convert_to_epsilon_free()
 
-        # self.assertTextEqual(
-        # r"""
-        # """, firstGrammar.get_operation_history() )
+        self.assertTextEqual(
+        r"""
+            + # 1. Converting to Epsilon Free, Beginning
+            +  S -> & | a A
+            +  A -> b | S b S
+            +
+            + # 2. Converting to Epsilon Free, End
+            + #    Non Terminal's Deriving Epsilon: S -> &
+            +  S' -> & | a A
+            +   A -> b | b S | S b | S b S
+            +   S -> a A
+        """, firstGrammar.get_operation_history() )
 
-        # self.assertTrue( firstGrammar.is_epsilon_free() )
+        self.assertTrue( firstGrammar.is_epsilon_free() )
 
     def test_grammarConvertToEpsilonFreeChapter4Item4Example1(self):
         firstGrammar = ChomskyGrammar.load_from_text_lines( wrap_text(
@@ -1374,10 +1383,10 @@ class TestGrammarEpsilonConversion(TestingUtilities):
             +
             + # 2. Converting to Epsilon Free, End
             + #    Non Terminal's Deriving Epsilon: A -> &; B -> &; S -> &
-            +  S' -> & | A | B | A B | S S
+            +  S' -> & | A | B | S | A B | S S
             +   A -> a | a A
             +   B -> b | b B
-            +   S -> A | B | A B | S S
+            +   S -> A | B | S | A B | S S
         """, firstGrammar.get_operation_history() )
 
         self.assertTrue( firstGrammar.is_epsilon_free() )
