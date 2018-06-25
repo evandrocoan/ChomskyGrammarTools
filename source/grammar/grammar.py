@@ -252,6 +252,11 @@ class ChomskyGrammar():
 
                     continue
 
+            if stage == IntermediateGrammar.END:
+
+                if not operation.extra_text:
+                    operation.extra_text.append( "No changes required/performed here." )
+
             counter += 1
             history_list.append( "# %s. %s" % ( counter, operation ) )
 
@@ -569,6 +574,8 @@ class ChomskyGrammar():
             self.add_production( self.initial_symbol, epsilon_production )
 
         self._save_history( "Converting to Epsilon Free", IntermediateGrammar.END )
+        self._save_data( "Non Terminal's Deriving Epsilon: %s", "; ".join( "%s -> &" % ( key )
+               for key, element in non_terminal_epsilon.items() ) )
 
     def remove_production(self, start_symbol, production, recursive=True):
         """
@@ -1213,7 +1220,7 @@ class ChomskyGrammar():
 
         # Create the initial simple_non_terminals's sets within their own as elements
         for symbol in production_keys:
-            simple_non_terminals[symbol] = set([symbol])
+            simple_non_terminals[symbol] = DynamicIterationDict([symbol])
 
         while old_counter != current_counter:
             old_counter = current_counter
@@ -1287,6 +1294,8 @@ class ChomskyGrammar():
                     self.remove_production( start_symbol, production )
 
         self._save_history( "Eliminating Simple Productions", IntermediateGrammar.END )
+        self._save_data( "Simple Non Terminals: %s", "; ".join( "%s -> %s" % ( key, element.keys() )
+               for key, element in simple_non_terminals.items() ) )
 
     def convert_to_proper(self):
         """

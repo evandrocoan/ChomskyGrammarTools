@@ -65,6 +65,13 @@ class DynamicIterable(object):
         else:
             self.iterable_access = iterable_access
 
+    def __iter__(self):
+        """
+            Resets the current index and return a copy if itself for iteration.
+        """
+        self.current_index = -1
+        return self
+
     def __next__(self):
         """
             Called by Python automatically when iterating over this set and python wants to know the
@@ -95,12 +102,16 @@ class DynamicIterable(object):
         """
         raise StopIteration
 
-    def __iter__(self):
+    def __str__(self):
         """
-            Resets the current index and return a copy if itself for iteration.
+            Return a nice string representation of this iterable.
         """
-        self.current_index = -1
-        return self
+        representation = []
+
+        for item in self:
+            representation.append( "%s" % item )
+
+        return "{%s}" % ( ", ".join( representation ) )
 
 
 class DynamicIterationDict(object):
@@ -161,10 +172,7 @@ class DynamicIterationDict(object):
 
     def __str__(self):
         """
-            Return a nice string representation of this set.
-
-            On the first part is showed all already iterated elements, followed by the not yet
-            iterated. When the iteration process is not running, it shows the last state registered.
+            Return a nice string representation of this collection.
         """
         keys_list = self.keys_list
         values_list = self.values_list

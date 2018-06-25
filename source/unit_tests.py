@@ -273,11 +273,26 @@ class TestGrammarFactoringAndRecursionSymbols(TestingUtilities):
 
         self.assertTextEqual(
         r"""
-            + S -> F G H
-            + F -> a | c | d G
-            + G -> a | c | d G
-            + H -> c
-        """, firstGrammar )
+            + # 1. Eliminating Simple Productions, Beginning
+            +  S -> F G H
+            +  F -> a | G
+            +  G -> a | H | d G
+            +  H -> c
+            +
+            + # 2. Converting to Epsilon Free, End
+            + #    No changes required/performed here.
+            +  S -> F G H
+            +  F -> a | G
+            +  G -> a | H | d G
+            +  H -> c
+            +
+            + # 3. Eliminating Simple Productions, End
+            + #    Simple Non Terminals: S -> {S}; F -> {F, G, H}; G -> {G, H}; H -> {H}
+            +  S -> F G H
+            +  F -> a | c | d G
+            +  G -> a | c | d G
+            +  H -> c
+        """, firstGrammar.get_operation_history() )
 
     def test_grammarEliminateNonTerminalSimpleSymbolsChapter4Item5Example2(self):
         firstGrammar = ChomskyGrammar.load_from_text_lines( wrap_text(
@@ -364,11 +379,13 @@ class TestGrammarFactoringAndRecursionSymbols(TestingUtilities):
             +  T -> F | T * F
             +
             + # 2. Eliminating Infertile Symbols, End
+            + #    No changes required/performed here.
             +  E -> T | E + T
             +  F -> id | ( E )
             +  T -> F | T * F
             +
             + # 3. Eliminating Unreachable Symbols, End
+            + #    No changes required/performed here.
             +  E -> T | E + T
             +  F -> id | ( E )
             +  T -> F | T * F
