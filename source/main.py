@@ -333,7 +333,7 @@ class ProgramWindow(QtWidgets.QMainWindow):
 
         target_function.results = ""
         target_function.isToStop = isToStop
-        run_function_async( target_function, results_dialog, initial_message )
+        self.qtUpdateThread = run_function_async( target_function, results_dialog, initial_message )
 
     @ignore_exceptions
     def handleCalculateFirstAndFollow(self, qt_decorator_bug):

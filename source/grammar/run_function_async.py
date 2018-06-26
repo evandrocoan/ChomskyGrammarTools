@@ -164,5 +164,6 @@ def run_function_async(function, results_dialog, initial_message):
     # https://stackoverflow.com/questions/22410663/block-qmainwindow-while-child-widget-is-alive-pyqt
     results_dialog.setWindowModality( Qt.ApplicationModal )
     results_dialog.show()
+
     return qtUpdateThread
 
