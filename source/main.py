@@ -294,7 +294,7 @@ class ProgramWindow(QtWidgets.QMainWindow):
         """
 
     @ignore_exceptions
-    def handleSaveGrammar(self):
+    def handleSaveGrammar(self, qt_decorator_bug):
         options = self._getFileDialogOptions()
         fileName, _ = QFileDialog.getSaveFileName( self, "Choose a name for your grammar", "","Grammar Files (*.grammar)", options=options )
 
@@ -304,7 +304,7 @@ class ProgramWindow(QtWidgets.QMainWindow):
                 file.write( self.grammarTextEditWidget.toPlainText() )
 
     @ignore_exceptions
-    def handleOpenGrammar(self):
+    def handleOpenGrammar(self, qt_decorator_bug):
         inputGrammar = self._openGrammar()
         setTextWithoutCleaningHistory( self.grammarTextEditWidget, inputGrammar )
 
