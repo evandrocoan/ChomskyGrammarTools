@@ -110,7 +110,10 @@ class RunFunctionAsyncThread(QtCore.QThread):
 
         while self.process_thread.isRunning() or force_first_run:
             force_first_run = False
+
+            set_scroll_to_maximum( self.results_dialog.textEditWidget, True )
             self.waiting( self )
+
             self.has_showed_waiting = True
 
             if self.function.isToStop[0]:
@@ -122,14 +125,14 @@ class RunFunctionAsyncThread(QtCore.QThread):
         # If it was not stopped by the close event setting isToStop, then append the success message
         self.process_thread.wait()
 
-        if not self.function.isToStop[0]:
-            self.disable_stop_button_signal.emit()
+        if self.has_showed_waiting:
+            self.send_string_signal.emit("")
 
-            if self.has_showed_waiting:
-                self.send_string_signal.emit("")
+        self.disable_stop_button_signal.emit()
+        self.send_string_signal.emit( self.function.results )
 
-            self.send_string_signal.emit( self.function.results )
-            set_scroll_to_maximum( self.results_dialog.textEditWidget )
+        self.msleep( 300 )
+        set_scroll_to_maximum( self.results_dialog.textEditWidget )
 
 
 @ignore_exceptions
@@ -154,18 +157,22 @@ def run_function_async(function, results_dialog):
 
 
 @ignore_exceptions
-def set_scroll_to_maximum(textEdit):
+def set_scroll_to_maximum(textEdit, to_bottom=False):
     """
         Given a text edit area, set its scrolling completely to the bottom.
     """
+
     # Autoscroll PyQT QTextWidget
     # https://stackoverflow.com/questions/7778726/autoscroll-pyqt-qtextwidget
-    textEdit.moveCursor( QtGui.QTextCursor.End )
+
+    if to_bottom:
+        textEdit.moveCursor( QtGui.QTextCursor.End )
+
+        verticalScrollBar = textEdit.verticalScrollBar()
+        horizontalScrollBar = textEdit.horizontalScrollBar()
+        verticalScrollBar.setValue( horizontalScrollBar.minimum() )
+        horizontalScrollBar.setValue( horizontalScrollBar.minimum() )
+
     textEdit.moveCursor( QtGui.QTextCursor.StartOfLine )
     textEdit.ensureCursorVisible()
-
-    verticalScrollBar = textEdit.verticalScrollBar()
-    horizontalScrollBar = textEdit.horizontalScrollBar()
-    verticalScrollBar.setValue( horizontalScrollBar.maximum() )
-    horizontalScrollBar.setValue( horizontalScrollBar.minimum() )
 
