@@ -379,12 +379,8 @@ class DynamicIterationDict(object):
         if not self.new_items_skip_count > 0:
 
             # Unwind the stack until a valid item is found
-            while self.new_items_skip_stack:
-                self.new_items_skip_count, self.filled_slots, self.maximum_iterable_index = self.new_items_skip_stack.pop()
-                self.new_items_skip_count -= 1
-
-                if self.new_items_skip_count > 0:
-                    break
+            if self.new_items_skip_stack:
+                self.new_items_skip_count = self.new_items_skip_stack.pop()
 
         self.not_iterate_over_new_items( how_many_times )
 
@@ -404,7 +400,7 @@ class DynamicIterationDict(object):
         if how_many_times > 0:
 
             if self.new_items_skip_count > 0:
-                self.new_items_skip_stack.append( (self.new_items_skip_count, self.filled_slots, self.maximum_iterable_index) )
+                self.new_items_skip_stack.append( self.new_items_skip_count )
 
             self.filled_slots = set()
             self.new_items_skip_count = how_many_times
