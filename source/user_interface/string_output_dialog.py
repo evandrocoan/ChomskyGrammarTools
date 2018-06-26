@@ -28,6 +28,7 @@ from PyQt5.QtGui import QKeySequence
 
 from PyQt5.QtCore import Qt
 from PyQt5.QtCore import QDateTime
+from PyQt5.QtCore import QCoreApplication
 
 from PyQt5.QtWidgets import QDialog
 from PyQt5.QtWidgets import QWidget
@@ -123,6 +124,8 @@ class StringOutputDialog(QMainWindow):
 
     def appendText(self, textToAppend):
         self.textEditWidget.appendPlainText( textToAppend )
+        self.textEditWidget.repaint()
+        QCoreApplication.processEvents()
 
     def saveCursorPosition(self):
         textEditWidget = self.textEditWidget

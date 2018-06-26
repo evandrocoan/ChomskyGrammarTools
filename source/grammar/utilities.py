@@ -260,6 +260,9 @@ def set_scroll_to_maximum(textEditWidget, to_bottom=False):
     textEditWidget.moveCursor( QtGui.QTextCursor.StartOfLine )
     textEditWidget.ensureCursorVisible()
 
+    textEditWidget.repaint()
+    QCoreApplication.processEvents()
+
 
 def setTextWithoutCleaningHistory(textEditWidget, textToSet):
     """
