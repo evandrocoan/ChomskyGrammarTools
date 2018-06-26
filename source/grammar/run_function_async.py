@@ -46,7 +46,16 @@ class RunFunctionAsyncThread(QtCore.QThread):
     ## Disables the `results_dialog` window stop button when the function has finished it given task
     disable_stop_button_signal = QtCore.pyqtSignal()
 
-    def __init__(self, function, results_dialog):
+    ## Save the current caret/cursor position to restore it later
+    save_cursor_position_signal = QtCore.pyqtSignal()
+
+    ## Restore the saved cursor/caret position by `save_cursor_position_signal`
+    restore_cursor_position_signal = QtCore.pyqtSignal()
+
+    ## Restore the saved cursor/caret position by `save_cursor_position_signal`
+    set_scroll_to_maximum_signal = QtCore.pyqtSignal()
+
+    def __init__(self, function, initial_message):
         """
             Qt- What is the difference between new QThread(this) and new QThread()?
             https://stackoverflow.com/questions/46293674/qt-what-is-the-difference-between-new-qthreadthis-and-new-qthread
@@ -56,11 +65,11 @@ class RunFunctionAsyncThread(QtCore.QThread):
         ## The function which will run asynchronously on this background thread
         self.function = function
 
+        ## The initial message to display right after the the computation is finished
+        self.initial_message = initial_message
+
         ## The thread which will continually running the given `function`
         self.process_thread = None
-
-        ## A `QWindow` object which will display the function results while it is computing and after if has finished
-        self.results_dialog = results_dialog
 
         ## Determines whether the waiting message was displayed one or not
         self.has_showed_waiting = False
@@ -110,11 +119,10 @@ class RunFunctionAsyncThread(QtCore.QThread):
 
         while self.process_thread.isRunning() or force_first_run:
             force_first_run = False
-
-            set_scroll_to_maximum( self.results_dialog.textEditWidget, True )
-            self.waiting( self )
-
             self.has_showed_waiting = True
+
+            self.set_scroll_to_maximum_signal.emit()
+            self.waiting( self )
 
             if self.function.isToStop[0]:
                 self.sleep( 1 )
@@ -124,55 +132,37 @@ class RunFunctionAsyncThread(QtCore.QThread):
 
         # If it was not stopped by the close event setting isToStop, then append the success message
         self.process_thread.wait()
+        self.send_string_signal.emit( self.initial_message )
 
         if self.has_showed_waiting:
             self.send_string_signal.emit("")
 
-        self.disable_stop_button_signal.emit()
+        self.save_cursor_position_signal.emit()
         self.send_string_signal.emit( self.function.results )
-
         self.msleep( 300 )
-        set_scroll_to_maximum( self.results_dialog.textEditWidget )
+
+        self.disable_stop_button_signal.emit()
+        self.restore_cursor_position_signal.emit()
 
 
 @ignore_exceptions
-def run_function_async(function, results_dialog):
+def run_function_async(function, results_dialog, initial_message):
     """
         Create the updating thread and connect
         it's received signal to append
         every received chunk of data/text will be appended to the text
     """
-    qtUpdateThread = RunFunctionAsyncThread( function, results_dialog )
+    qtUpdateThread = RunFunctionAsyncThread( function, initial_message )
     qtUpdateThread.send_string_signal.connect( results_dialog.appendText )
     qtUpdateThread.disable_stop_button_signal.connect( results_dialog.disableStopButton )
+    qtUpdateThread.save_cursor_position_signal.connect( results_dialog.saveCursorPosition )
+    qtUpdateThread.restore_cursor_position_signal.connect( results_dialog.restoreCursorPosition )
+    qtUpdateThread.set_scroll_to_maximum_signal.connect( results_dialog.setScrollToMaximum )
     qtUpdateThread.start()
 
     # Block QMainWindow while child widget is alive, pyqt
     # https://stackoverflow.com/questions/22410663/block-qmainwindow-while-child-widget-is-alive-pyqt
     results_dialog.setWindowModality( Qt.ApplicationModal )
     results_dialog.show()
-
-    set_scroll_to_maximum( results_dialog.textEditWidget )
     return qtUpdateThread
-
-
-@ignore_exceptions
-def set_scroll_to_maximum(textEdit, to_bottom=False):
-    """
-        Given a text edit area, set its scrolling completely to the bottom.
-    """
-
-    # Autoscroll PyQT QTextWidget
-    # https://stackoverflow.com/questions/7778726/autoscroll-pyqt-qtextwidget
-
-    if to_bottom:
-        textEdit.moveCursor( QtGui.QTextCursor.End )
-
-        verticalScrollBar = textEdit.verticalScrollBar()
-        horizontalScrollBar = textEdit.horizontalScrollBar()
-        verticalScrollBar.setValue( horizontalScrollBar.minimum() )
-        horizontalScrollBar.setValue( horizontalScrollBar.minimum() )
-
-    textEdit.moveCursor( QtGui.QTextCursor.StartOfLine )
-    textEdit.ensureCursorVisible()
 

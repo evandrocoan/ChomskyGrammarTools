@@ -31,13 +31,13 @@ import PyQt5
 import textwrap
 
 from PyQt5 import QtWidgets
+from PyQt5 import QtGui
 from PyQt5.QtCore import QCoreApplication
 
 from natsort import natsorted
 from debug_tools import getLogger
 
-# level 4 - Abstract Syntax Tree Parsing
-log = getLogger( 127-4, __name__ )
+log = getLogger( 127, __name__ )
 
 # An unique identifier for any created object
 initial_hash = random.getrandbits( 32 )
@@ -242,7 +242,26 @@ def ignore_exceptions(function_to_decorate):
     return wrapper
 
 
-def setTextWithoutCleaningHistory(editTextWidget, textToSet):
+def set_scroll_to_maximum(textEditWidget, to_bottom=False):
+    """
+        Given a text edit area, set its scrolling completely to the bottom.
+    """
+
+    # Autoscroll PyQT QTextWidget
+    # https://stackoverflow.com/questions/7778726/autoscroll-pyqt-qtextwidget
+    verticalScrollBar = textEditWidget.verticalScrollBar()
+    horizontalScrollBar = textEditWidget.horizontalScrollBar()
+
+    if to_bottom:
+        textEditWidget.moveCursor( QtGui.QTextCursor.End )
+        verticalScrollBar.setValue( verticalScrollBar.maximum() )
+        horizontalScrollBar.setValue( horizontalScrollBar.minimum() )
+
+    textEditWidget.moveCursor( QtGui.QTextCursor.StartOfLine )
+    textEditWidget.ensureCursorVisible()
+
+
+def setTextWithoutCleaningHistory(textEditWidget, textToSet):
     """
         Making changes to a QTextEdit without adding an undo command to the undo stack
         https://stackoverflow.com/questions/27113262/making-changes-to-a-qtextedit-without-adding-an-undo-command-to-the-undo-stack
@@ -251,12 +270,8 @@ def setTextWithoutCleaningHistory(editTextWidget, textToSet):
         http://doc.qt.io/qt-5/qtextdocument.html#clearUndoRedoStacks
         http://www.qtcentre.org/threads/43268-Setting-Text-in-QPlainTextEdit-without-Clearing-Undo-Redo-History
     """
-    textCursor = editTextWidget.textCursor()
-
-    # Autoscroll PyQT QTextWidget
-    # https://stackoverflow.com/questions/7778726/autoscroll-pyqt-qtextwidget
-    verticalScrollBar = editTextWidget.verticalScrollBar()
-    horizontalScrollBar = editTextWidget.horizontalScrollBar()
+    textCursor = textEditWidget.textCursor()
+    position = textCursor.position()
 
     textCursor.beginEditBlock()
     textCursor.select( PyQt5.QtGui.QTextCursor.Document );
@@ -264,12 +279,12 @@ def setTextWithoutCleaningHistory(editTextWidget, textToSet):
     textCursor.insertText( textToSet );
     textCursor.endEditBlock()
 
-    verticalScrollBar.setValue( horizontalScrollBar.maximum() )
-    horizontalScrollBar.setValue( horizontalScrollBar.minimum() )
+    # textCursor.setPosition( position );
+    # textEditWidget.setTextCursor( textCursor )
 
     # PyQT force update textEdit before calling other function
     # https://stackoverflow.com/questions/47654327/pyqt-force-update-textedit-before-calling-other-function
-    editTextWidget.repaint()
+    textEditWidget.repaint()
     QCoreApplication.processEvents()
 
 

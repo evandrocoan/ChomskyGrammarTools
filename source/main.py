@@ -329,13 +329,11 @@ class ProgramWindow(QtWidgets.QMainWindow):
     @ignore_exceptions
     def _handleFunctionAsync(self, target_function, initial_message):
         isToStop = [False]
-
         results_dialog = StringOutputDialog( self, self.getMainFontOptions(), self._getFileDialogOptions(), isToStop )
-        results_dialog.appendText( initial_message )
 
         target_function.results = ""
         target_function.isToStop = isToStop
-        run_function_async( target_function, results_dialog )
+        run_function_async( target_function, results_dialog, initial_message )
 
     @ignore_exceptions
     def handleCalculateFirstAndFollow(self, qt_decorator_bug):

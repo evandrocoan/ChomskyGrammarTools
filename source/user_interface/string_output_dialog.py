@@ -54,6 +54,7 @@ log( 1, "Importing " + __name__ )
 from grammar.utilities import wrap_text
 from grammar.utilities import ignore_exceptions
 from grammar.utilities import setTextWithoutCleaningHistory
+from grammar.utilities import set_scroll_to_maximum
 
 
 class StringOutputDialog(QMainWindow):
@@ -122,6 +123,22 @@ class StringOutputDialog(QMainWindow):
 
     def appendText(self, textToAppend):
         self.textEditWidget.appendPlainText( textToAppend )
+
+    def saveCursorPosition(self):
+        textEditWidget = self.textEditWidget
+        self.textCursor = textEditWidget.textCursor()
+        self.cursorPosition = self.textCursor.position()
+
+    def restoreCursorPosition(self):
+        textCursor = self.textCursor
+        textEditWidget = self.textEditWidget
+        textCursor.setPosition( self.cursorPosition )
+        textEditWidget.setTextCursor( textCursor )
+        set_scroll_to_maximum( textEditWidget )
+
+    def setScrollToMaximum(self):
+        textEditWidget = self.textEditWidget
+        set_scroll_to_maximum( textEditWidget, True )
 
     def disableStopButton(self):
         self.stopButton.setEnabled( False )
