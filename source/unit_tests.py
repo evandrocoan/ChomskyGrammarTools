@@ -246,10 +246,6 @@ class TestGrammarFactoringAndRecursionSymbols(TestingUtilities):
             +
             + # 2. Converting to Epsilon Free, End
             + #    No changes required/performed here.
-            +  S -> F G H
-            +  F -> a | G
-            +  G -> a | H | d G
-            +  H -> c
             +
             + # 3. Eliminating Simple Productions, End
             + #    Simple Non Terminals: S -> {S}; F -> {F, G, H}; G -> {G, H}; H -> {H}
@@ -281,11 +277,6 @@ class TestGrammarFactoringAndRecursionSymbols(TestingUtilities):
             +
             + # 2. Converting to Epsilon Free, End
             + #    No changes required/performed here.
-            +  S -> a B c D e
-            +  B -> E | F | b B
-            +  D -> d | F | d D
-            +  E -> e | e E
-            +  F -> f | f F
             +
             + # 3. Eliminating Simple Productions, End
             + #    Simple Non Terminals: S -> {S}; B -> {B, E, F}; D -> {D, F}; E -> {E}; F -> {F}
@@ -318,11 +309,6 @@ class TestGrammarFactoringAndRecursionSymbols(TestingUtilities):
             +
             + # 2. Converting to Epsilon Free, End
             + #    No changes required/performed here.
-            +  S -> a B c D e
-            +  B -> b B
-            +  D -> d | d D
-            +  E -> e | e E
-            +  F -> f | f F
         """, firstGrammar.get_operation_history() )
 
     def test_grammarEliminateLeftRecursionCalculationOfChapter5Item5Example1(self):
@@ -339,11 +325,9 @@ class TestGrammarFactoringAndRecursionSymbols(TestingUtilities):
             +
             + # 2. Eliminating Infertile Symbols, End
             + #    No changes required/performed here.
-            +  S -> b | S a
             +
             + # 3. Eliminating Unreachable Symbols, End
             + #    No changes required/performed here.
-            +  S -> b | S a
             +
             + # 4. Eliminate direct left recursion
             + #    Direct recursion for elimination: {S a} -> {b S'} @ S' -> {a S', &}
@@ -379,15 +363,9 @@ class TestGrammarFactoringAndRecursionSymbols(TestingUtilities):
             +
             + # 2. Eliminating Infertile Symbols, End
             + #    No changes required/performed here.
-            +  E -> T | E + T
-            +  F -> id | ( E )
-            +  T -> F | T * F
             +
             + # 3. Eliminating Unreachable Symbols, End
             + #    No changes required/performed here.
-            +  E -> T | E + T
-            +  F -> id | ( E )
-            +  T -> F | T * F
             +
             + # 4. Eliminate direct left recursion
             + #    Direct recursion for elimination: {E + T} -> {T E'} @ E' -> {+ T E', &}
@@ -454,13 +432,9 @@ class TestGrammarFactoringAndRecursionSymbols(TestingUtilities):
             +
             + # 2. Eliminating Infertile Symbols, End
             + #    No changes required/performed here.
-            +  S -> A a | S b
-            +  A -> d | S c
             +
             + # 3. Eliminating Unreachable Symbols, End
             + #    No changes required/performed here.
-            +  S -> A a | S b
-            +  A -> d | S c
             +
             + # 4. Eliminate direct left recursion
             + #    Direct recursion for elimination: {S b} -> {A a S'} @ S' -> {b S', &}
@@ -579,15 +553,9 @@ class TestGrammarFactoringAndRecursionSymbols(TestingUtilities):
             +
             + # 2. Eliminating Infertile Symbols, End
             + #    No changes required/performed here.
-            +  S -> A b | a S
-            +  A -> a | A b | B c
-            +  B -> e | B d | S a
             +
             + # 3. Eliminating Unreachable Symbols, End
             + #    No changes required/performed here.
-            +  S -> A b | a S
-            +  A -> a | A b | B c
-            +  B -> e | B d | S a
             +
             + # 4. Eliminate direct left recursion
             + #    Direct recursion for elimination: {A b} -> {B c A', a A'} @ A' -> {b A', &}
@@ -661,17 +629,9 @@ class TestGrammarFactoringAndRecursionSymbols(TestingUtilities):
             +
             + # 3. Eliminating Infertile Symbols, End
             + #    No changes required/performed here.
-            +  S' -> & | B d
-            +   A -> a | S a
-            +   B -> b | A b | B c
-            +   S -> B d
             +
             + # 4. Eliminating Unreachable Symbols, End
             + #    No changes required/performed here.
-            +  S' -> & | B d
-            +   A -> a | S a
-            +   B -> b | A b | B c
-            +   S -> B d
             +
             + # 5. Eliminate indirect left recursion
             + #    Indirect recursion for elimination: {A b} -> {S a, a}
@@ -741,21 +701,9 @@ class TestGrammarFactoringAndRecursionSymbols(TestingUtilities):
             +
             + # 3. Eliminating Infertile Symbols, End
             + #    No changes required/performed here.
-            +  P -> & | L | D L
-            +  C -> V = exp | id ( E )
-            +  D -> d | d D
-            +  E -> exp | exp , E
-            +  L -> C | L ; C
-            +  V -> id | id [ E ]
             +
             + # 4. Eliminating Unreachable Symbols, End
             + #    No changes required/performed here.
-            +  P -> & | L | D L
-            +  C -> V = exp | id ( E )
-            +  D -> d | d D
-            +  E -> exp | exp , E
-            +  L -> C | L ; C
-            +  V -> id | id [ E ]
             +
             + # 5. Eliminate indirect left recursion
             + #    Indirect recursion for elimination: {C} -> {V = exp, id ( E )}

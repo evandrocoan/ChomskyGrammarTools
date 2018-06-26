@@ -39,7 +39,7 @@ from .production import Production
 from .production import epsilon_production
 from .production import end_of_string_terminal
 
-from .utilities import IntermediateGrammar
+from .intermediate_grammar import IntermediateGrammar
 
 from .utilities import getCleanSpaces
 from .utilities import dictionary_to_string
