@@ -1495,12 +1495,14 @@ class ChomskyGrammar():
             Given a list of `symbols` get their FIRST symbols set.
         """
         following_first = set()
+        # log( 1, "symbols: %s", symbols )
 
         if not first_terminals:
             first_terminals = self.first_terminals()
 
         for symbol in symbols:
             symbol_type = type( symbol )
+            # log( 1, "symbol: %s, symbol_type: %s", symbol, symbol_type )
 
             if symbol_type is NonTerminal:
                 first_set = first_terminals[symbol]
@@ -1554,9 +1556,11 @@ class ChomskyGrammar():
 
                         if type( current_symbol ) is NonTerminal:
                             next_symbol = production.peek_next()
+                            # log( 1, "0. current_symbol: %s, next_symbol: %s", current_symbol, next_symbol )
 
                             if next_symbol:
                                 following_first = self.first_from( production.following_symbols(), first_terminals )
+                                # log( 1, "following_first: %s", following_first )
 
                                 if Production.copy_productions_except_epsilon( following_first, follow_terminals[current_symbol] ):
                                     # log( 1, "1. start_symbol: %s, current_symbol: %s, next_symbol: %-4s, Adding: %s", start_symbol, current_symbol, next_symbol, following_first )

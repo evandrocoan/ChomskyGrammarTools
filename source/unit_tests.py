@@ -1079,6 +1079,24 @@ class TestGrammarFirstAndFollow(TestingUtilities):
             + C: $ d
         """, dictionary_to_string( follow ) )
 
+    def test_grammarFollowCalculationOfExerciseList4Item6(self):
+        firstGrammar = ChomskyGrammar.load_from_text_lines( wrap_text(
+        r"""
+            C -> com C'
+            C' -> ; V := exp C' | &
+            V -> id V'
+            V' -> [ exp ] | &
+        """ ) )
+        follow = firstGrammar.follow_terminals()
+
+        self.assertTextEqual(
+        r"""
+            +  C: $
+            + C': $
+            +  V: :=
+            + V': :=
+        """, dictionary_to_string( follow ) )
+
     def test_grammarFirstCalculationOfChapter5FollowExample2(self):
         firstGrammar = ChomskyGrammar.load_from_text_lines( wrap_text(
         r"""
