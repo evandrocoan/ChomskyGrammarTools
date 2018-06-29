@@ -1388,7 +1388,7 @@ class ChomskyGrammar():
         """
             Calculates the start production symbols non terminal's FIRST set.
         """
-        first = {}
+        first_non_terminals = {}
         productions_keys = self.productions
 
         old_counter = -1
@@ -1396,7 +1396,7 @@ class ChomskyGrammar():
 
         # Create the initial FIRST Non Terminal's sets
         for symbol in productions_keys:
-            first[symbol] = set()
+            first_non_terminals[symbol] = set()
 
         while old_counter != current_counter:
             old_counter = current_counter
@@ -1405,30 +1405,44 @@ class ChomskyGrammar():
                 start_productions = productions_keys[start_symbol]
 
                 for production in start_productions:
+                    following_first = first_non_terminals[start_symbol]
+                    old_length = len( following_first )
 
-                    # If there is a production X → Y1Y2..Yk then add first(Y1Y2..Yk) to first(X)
-                    for symbol in production:
+                    if old_length != len( self.first_non_terminals_from( production, first_non_terminals, following_first ) ):
+                        current_counter += 1
 
-                        if type( symbol ) is NonTerminal:
+        return first_non_terminals
 
-                            if symbol not in first[start_symbol]:
-                                first[start_symbol].add( symbol )
-                                current_counter += 1
+    def first_non_terminals_from(self, production, first_non_terminals, following_first=None):
+        """
+            Given a `production` and a `first_non_terminals` set, get their Non Terminal's FIRST symbols set.
 
-                            if Production.copy_productions_except_epsilon( first[symbol], first[start_symbol] ):
-                                current_counter += 1
+            If `following_first` set is provided, then it contents will be updated with the first
+            terminal's, otherwise a new set will be created, populated and returned.
+        """
+        # log( 1, "%s", production )
 
-                            # log( 1, "symbol: %s, production: %-6s, first: %s", symbol, production, first[symbol] )
-                            if self.has_production( symbol, epsilon_production ):
-                                continue
+        if following_first is None:
+            following_first = set()
 
-                            else:
-                                break
+        # If there is a production X → Y1Y2..Yk then add first(Y1Y2..Yk) to first(X)
+        for symbol in production:
 
-                        else:
-                            break
+            if type( symbol ) is NonTerminal and symbol:
+                following_first.add( symbol )
+                following_first.update( first_non_terminals[symbol] )
 
-        return first
+                # log( 1, "symbol: %s, production: %-6s, first: %s", symbol, production, first[symbol] )
+                if self.has_production( symbol, epsilon_production ):
+                    continue
+
+                else:
+                    break
+
+            else:
+                break
+
+        return following_first
 
     def first_terminals(self):
         """
@@ -1458,9 +1472,8 @@ class ChomskyGrammar():
                 for production in start_productions:
                     following_first = first_terminals[start_symbol]
                     old_length = len( following_first )
-                    self.first_terminals_from( production, first_terminals, following_first )
 
-                    if old_length != len( following_first ):
+                    if old_length != len( self.first_terminals_from( production, first_terminals, following_first ) ):
                         current_counter += 1
 
         return first_terminals
