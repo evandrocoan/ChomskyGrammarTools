@@ -227,12 +227,19 @@ class Production(LockableType):
         self.lock()
         # log( 1, "self: \n%s", self )
 
-    def remove_everything(self, index):
+    def remove_everything_after(self, index):
         """
-            Given an index starting from 0, removes all the symbols after it.
+            Given an index starting from 0, removes all the symbols after it, including the 0 nth symbol.
         """
         self.trim_epsilons()
         self.symbols = self.symbols[:index+1]
+
+    def remove_everything_before(self, index):
+        """
+            Given an index starting from 0, removes all the symbols before it excluding 0 nth symbol.
+        """
+        self.trim_epsilons()
+        self.symbols = self.symbols[index:]
 
     def remove(self, index):
         """
@@ -346,15 +353,10 @@ class Production(LockableType):
             Similar to `peek_next()` but get all the following symbols until the end of the
             production. Return an empty list when there are not remaining symbols.
         """
-        index = self._index + 1
-        remaining_count = len( self.symbols )
-        following_symbols = []
-
-        while index < remaining_count:
-            following_symbols.append( self.symbols[index] )
-            index += 1
-
-        return following_symbols
+        self = self.new()
+        self.remove_everything_before( self._index + 1 )
+        self.lock()
+        return self
 
     def add(self, symbol):
         """
@@ -453,22 +455,18 @@ class Production(LockableType):
     @staticmethod
     def copy_productions_except_epsilon(source, destine):
         """
-            Copy all productions from one productions set to another, except the epsilon_terminal.
+            Copy all productions from one productions set to another, except the `epsilon_production`.
 
-            Return `True` when the item was added in the destine, `False` when is already exists on
-            destine.
+            Return `True` when the item was added in the destine, `False` when is already exists on destine.
         """
-        is_copied = False
+        old_length = len( destine )
 
         for production in source:
 
             if production != epsilon_production:
+                destine.add( production )
 
-                if production not in destine:
-                    destine.add( production )
-                    is_copied = True
-
-        return is_copied
+        return old_length != len( destine )
 
 
 # Standard/common symbols used

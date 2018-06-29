@@ -62,11 +62,11 @@ class DynamicIterable(object):
         self.data_container = data_container
 
         ## The iterable access method to get the next item given a index
-        if end_index:
-            self.iterable_access = lambda index: iterable_access( index ) if index < end_index[0] else self.stop_iteration( index )
+        if end_index is None:
+            self.iterable_access = iterable_access
 
         else:
-            self.iterable_access = iterable_access
+            self.iterable_access = lambda index: iterable_access( index ) if index < end_index[0] else self.stop_iteration( index )
 
     def __len__(self):
         """

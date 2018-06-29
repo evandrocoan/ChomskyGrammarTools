@@ -131,9 +131,13 @@ class LockableType(object):
     def _len(self):
         raise TypeError( "object of type '%s' has no len()" % self.__class__.__name__ )
 
-    def unlock(self):
+    def _unlock(self):
         """
             Unblock the object changes allowing its attributes to be freely set.
+
+            Do not call it if this object is inside a hashtable as list or set, because an object
+            cannot have its hash changed while they are inside it. Otherwise, the hashmap will not
+            get updated and the new version of the object will point as non existent.
         """
 
         if not self.locked:
@@ -172,7 +176,7 @@ class LockableType(object):
         # log( 1, "new_copy: %s", new_copy )
 
         if unlocked:
-            new_copy.unlock()
+            new_copy._unlock()
 
         else:
             new_copy.lock()

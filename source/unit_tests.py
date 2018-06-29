@@ -1011,6 +1011,22 @@ class TestGrammarFirstAndFollow(TestingUtilities):
             + B: & a b d
         """, dictionary_to_string( first ) )
 
+    def test_grammarFirstCalculationOfChapter5Example1FirstMutated(self):
+        firstGrammar = ChomskyGrammar.load_from_text_lines( wrap_text(
+        r"""
+            S -> Ab | A B
+            A -> aA | &
+            B -> bB | Ad | &
+        """ ) )
+        first = firstGrammar.first_terminals()
+
+        self.assertTextEqual(
+        r"""
+            + S: & a b d
+            + A: & a
+            + B: & a b d
+        """, dictionary_to_string( first ) )
+
     def test_grammarFollowCalculationOfChapter5Example1First(self):
         firstGrammar = ChomskyGrammar.load_from_text_lines( wrap_text(
         r"""
@@ -1023,7 +1039,7 @@ class TestGrammarFirstAndFollow(TestingUtilities):
         self.assertTextEqual(
         r"""
             + S: $
-            + A: $ a b c d
+            + A: a b c d
             + B: c
         """, dictionary_to_string( follow ) )
 
@@ -1076,7 +1092,7 @@ class TestGrammarFirstAndFollow(TestingUtilities):
         self.assertTextEqual(
         r"""
             + S: $
-            + A: $ a b c d
+            + A: a b c d
             + B: $ c
             + C: $ d
         """, dictionary_to_string( follow ) )

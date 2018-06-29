@@ -208,7 +208,7 @@ def convert_to_text_lines(iterable, use_repr=True, new_line=True, sort=None):
     if isinstance( iterable, dict):
         return dictionary_to_string( iterable )
 
-    if not len( iterable ):
+    if not iterable:
         return " No elements found."
 
     strings = []
