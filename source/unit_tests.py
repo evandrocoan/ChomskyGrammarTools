@@ -98,7 +98,9 @@ class TestChomskyGrammar(TestingUtilities):
             self.fail( "Epsilon terminal did evaluate to `True`" )
 
         if Production( symbols=[Terminal( "&" )], lock=True ):
-            self.fail( "Recent created Epsilon Production did not evaluate to `True`" )
+            self.fail( "Recent created Epsilon Production did evaluate to `True`" )
+
+    def test_grammarEpsilonProductionEvalutesNotTrueOnIf(self):
 
         if not Terminal( "a", lock=True ):
             self.fail( "Terminal did not evaluate to `True`" )
