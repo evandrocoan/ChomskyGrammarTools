@@ -975,13 +975,18 @@ class ChomskyGrammar():
             Creates a dictionary with the non deterministic factors and returns it with
             (dictionary, True) if it is composed only with NonTerminal's, otherwise (dictionary, False).
         """
-        is_non_terminal_factored = False
         duplicated_elements = get_duplicated_elements( self.factors() )
-        non_deterministic_factors_list = sorted( duplicated_elements, key= lambda item: item[1][0].__class__.__name__ )
+        is_non_terminal_factored = False
+        non_deterministic_factors_list = []
 
-        if type( non_deterministic_factors_list[0][1][0] ) is NonTerminal:
-            is_non_terminal_factored = True
-            non_deterministic_factors_list = [item for item in non_deterministic_factors_list if type( item[1][0] ) is NonTerminal]
+        for item in duplicated_elements:
+
+            if type( item[1][0] ) is NonTerminal:
+                is_non_terminal_factored = True
+                non_deterministic_factors_list.append( item )
+
+        if not is_non_terminal_factored:
+            non_deterministic_factors_list = duplicated_elements
 
         productions_keys = self.productions
         non_deterministic_factors_dictionary = {}
