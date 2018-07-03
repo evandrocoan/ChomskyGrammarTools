@@ -331,8 +331,8 @@ class TestGrammarFactoringAndRecursionSymbols(TestingUtilities):
             + # 3. Eliminating Unreachable Symbols, End
             + #    No changes required/performed here.
             +
-            + # 4. Eliminate direct left recursion
-            + #    Direct recursion for elimination: {S a} -> {b S'} @ S' -> {a S', &}
+            + # 4. Eliminating Left Recursion, End
+            + #    Direct recursion eliminated: {S a} -> {b S'} @ S' -> {a S', &}
             +   S -> b S'
             +  S' -> & | a S'
         """, firstGrammar.get_operation_history() )
@@ -369,25 +369,12 @@ class TestGrammarFactoringAndRecursionSymbols(TestingUtilities):
             + # 3. Eliminating Unreachable Symbols, End
             + #    No changes required/performed here.
             +
-            + # 4. Eliminate direct left recursion
-            + #    Direct recursion for elimination: {E + T} -> {T E'} @ E' -> {+ T E', &}
+            + # 4. Eliminating Left Recursion, End
+            + #    Direct recursion eliminated: {E + T} -> {T E'} @ E' -> {+ T E', &}
+            + #    Direct recursion eliminated: {T * F} -> {F T'} @ T' -> {* F T', &}
             +   E -> T E'
             +   F -> id | ( E )
-            +   T -> F | T * F
-            +  E' -> & | + T E'
-            +
-            + # 5. Eliminate indirect left recursion
-            + #    Indirect recursion for elimination: 'F'[0]: [( E ), id]
-            +   E -> T E'
-            +   F -> id | ( E )
-            +   T -> id | ( E ) | T * F
-            +  E' -> & | + T E'
-            +
-            + # 6. Eliminate direct left recursion
-            + #    Direct recursion for elimination: {T * F} -> {( E ) T', id T'} @ T' -> {* F T', &}
-            +   E -> T E'
-            +   F -> id | ( E )
-            +   T -> id T' | ( E ) T'
+            +   T -> F T'
             +  E' -> & | + T E'
             +  T' -> & | * F T'
         """, firstGrammar.get_operation_history() )
@@ -436,22 +423,18 @@ class TestGrammarFactoringAndRecursionSymbols(TestingUtilities):
             + #    No changes required/performed here.
             +
             + # 3. Eliminating Unreachable Symbols, End
-            + #    No changes required/performed here.
+            + #    Direct recursion eliminated: {S b} -> {A a S'} @ S' -> {b S', &}
+            +  S -> A a | S b
+            +  A -> d | S c
             +
-            + # 4. Eliminate direct left recursion
-            + #    Direct recursion for elimination: {S b} -> {A a S'} @ S' -> {b S', &}
-            +   S -> A a S'
-            +   A -> d | S c
-            +  S' -> & | b S'
-            +
-            + # 5. Eliminate indirect left recursion
-            + #    Indirect recursion for elimination: 'S c'[0]: [A a S']
+            + # 4. Eliminate indirect left recursion
+            + #    Indirect recursion eliminated: [A: {(A a S' >> S c => A a S' c)}]
             +   S -> A a S'
             +   A -> d | A a S' c
             +  S' -> & | b S'
             +
-            + # 6. Eliminate direct left recursion
-            + #    Direct recursion for elimination: {A a S' c} -> {d A'} @ A' -> {a S' c A', &}
+            + # 5. Eliminate direct left recursion
+            + #    Direct recursion eliminated: {A a S' c} -> {d A'} @ A' -> {a S' c A', &}
             +   S -> A a S'
             +   A -> d A'
             +  A' -> & | a S' c A'
@@ -502,13 +485,13 @@ class TestGrammarFactoringAndRecursionSymbols(TestingUtilities):
             +   S -> b | A a | S b
             +
             + # 5. Eliminate indirect left recursion
-            + #    Indirect recursion for elimination: 'A a'[0]: [S c, d, c]
+            + #    Indirect recursion eliminated: [S: {(S c >> A a => S c a), (d >> A a => d a), (c >> A a => c a)}]
             +  S' -> & | b | A a | S b
             +   A -> c | d | S c
             +   S -> b | c a | d a | S b | S c a
             +
             + # 6. Eliminate direct left recursion
-            + #    Direct recursion for elimination: {S b, S c a} -> {b S'', d a S'', c a S''} @ S'' -> {b S'', c a S'', &}
+            + #    Direct recursion eliminated: {S b, S c a} -> {b S'', d a S'', c a S''} @ S'' -> {b S'', c a S'', &}
             +   S' -> & | b | A a | S b
             +    A -> c | d | S c
             +    S -> b S'' | c a S'' | d a S''
@@ -559,24 +542,20 @@ class TestGrammarFactoringAndRecursionSymbols(TestingUtilities):
             + #    No changes required/performed here.
             +
             + # 3. Eliminating Unreachable Symbols, End
-            + #    No changes required/performed here.
+            + #    Direct recursion eliminated: {A b} -> {B c A', a A'} @ A' -> {b A', &}
+            +  S -> A b | a S
+            +  A -> a | A b | B c
+            +  B -> e | B d | S a
             +
-            + # 4. Eliminate direct left recursion
-            + #    Direct recursion for elimination: {A b} -> {B c A', a A'} @ A' -> {b A', &}
-            +   S -> A b | a S
-            +   A -> a A' | B c A'
-            +   B -> e | B d | S a
-            +  A' -> & | b A'
-            +
-            + # 5. Eliminate indirect left recursion
-            + #    Indirect recursion for elimination: 'S a'[0]: [a S, A b], 'A b a'[1]: [B c A', a A']
+            + # 4. Eliminate indirect left recursion
+            + #    Indirect recursion eliminated: [B: {(B c A' >> A b a => B c A' b a), (a A' >> A b a => a A' b a)}]
             +   S -> A b | a S
             +   A -> a A' | B c A'
             +   B -> e | B d | a S a | a A' b a | B c A' b a
             +  A' -> & | b A'
             +
-            + # 6. Eliminate direct left recursion
-            + #    Direct recursion for elimination: {B d, B c A' b a} -> {e B', a S a B', a A' b a B'} @ B' -> {d B', c A' b a B', &}
+            + # 5. Eliminate direct left recursion
+            + #    Direct recursion eliminated: {B d, B c A' b a} -> {e B', a S a B', a A' b a B'} @ B' -> {d B', c A' b a B', &}
             +   S -> A b | a S
             +   A -> a A' | B c A'
             +   B -> e B' | a S a B' | a A' b a B'
@@ -638,14 +617,14 @@ class TestGrammarFactoringAndRecursionSymbols(TestingUtilities):
             + #    No changes required/performed here.
             +
             + # 5. Eliminate indirect left recursion
-            + #    Indirect recursion for elimination: 'A b'[0]: [S a, a]
+            + #    Indirect recursion eliminated: [B: {(S a >> A b => S a b), (a >> A b => a b)}]
             +  S' -> & | B d
             +   A -> a | S a
             +   B -> b | a b | B c | S a b
             +   S -> B d
             +
             + # 6. Eliminate direct left recursion
-            + #    Direct recursion for elimination: {B c} -> {b B', S a b B', a b B'} @ B' -> {c B', &}
+            + #    Direct recursion eliminated: {B c} -> {b B', S a b B', a b B'} @ B' -> {c B', &}
             +  S' -> & | B d
             +   A -> a | S a
             +   B -> b B' | a b B' | S a b B'
@@ -653,7 +632,7 @@ class TestGrammarFactoringAndRecursionSymbols(TestingUtilities):
             +  B' -> & | c B'
             +
             + # 7. Eliminate indirect left recursion
-            + #    Indirect recursion for elimination: 'B d'[0]: [b B', S a b B', a b B']
+            + #    Indirect recursion eliminated: [S: {(b B' >> B d => b B' d), (S a b B' >> B d => S a b B' d), (a b B' >> B d => a b B' d)}]
             +  S' -> & | B d
             +   A -> a | S a
             +   B -> b B' | a b B' | S a b B'
@@ -661,7 +640,7 @@ class TestGrammarFactoringAndRecursionSymbols(TestingUtilities):
             +  B' -> & | c B'
             +
             + # 8. Eliminate direct left recursion
-            + #    Direct recursion for elimination: {S a b B' d} -> {b B' d S'', a b B' d S''} @ S'' -> {a b B' d S'', &}
+            + #    Direct recursion eliminated: {S a b B' d} -> {b B' d S'', a b B' d S''} @ S'' -> {a b B' d S'', &}
             +   S' -> & | B d
             +    A -> a | S a
             +    B -> b B' | a b B' | S a b B'
@@ -709,22 +688,13 @@ class TestGrammarFactoringAndRecursionSymbols(TestingUtilities):
             + # 4. Eliminating Unreachable Symbols, End
             + #    No changes required/performed here.
             +
-            + # 5. Eliminate indirect left recursion
-            + #    Indirect recursion for elimination: 'C'[0]: [V = exp, id ( E )]
-            +  P -> & | L | D L
-            +  C -> V = exp | id ( E )
-            +  D -> d | d D
-            +  E -> exp | exp , E
-            +  L -> L ; C | V = exp | id ( E )
-            +  V -> id | id [ E ]
-            +
-            + # 6. Eliminate direct left recursion
-            + #    Direct recursion for elimination: {L ; C} -> {V = exp L', id ( E ) L'} @ L' -> {; C L', &}
+            + # 5. Eliminating Left Recursion, End
+            + #    Direct recursion eliminated: {L ; C} -> {C L'} @ L' -> {; C L', &}
             +   P -> & | L | D L
             +   C -> V = exp | id ( E )
             +   D -> d | d D
             +   E -> exp | exp , E
-            +   L -> V = exp L' | id ( E ) L'
+            +   L -> C L'
             +   V -> id | id [ E ]
             +  L' -> & | ; C L'
         """, firstGrammar.get_operation_history() )
@@ -792,21 +762,24 @@ class TestGrammarFactoringAndRecursionSymbols(TestingUtilities):
             +  B -> & | A d | b B
             +
             + # 2. Eliminating Direct Factors, End
-            + #    Direct factors for elimination: {S -> [A]}
+            + #    Direct factors eliminated: {S -> [A]}
             +   S -> A S1
             +   A -> & | a A
             +   B -> & | A d | b B
             +  S1 -> b | B c
             +
-            + # 3. Eliminating Indirect Factors, End
-            + #    Indirect factors for elimination: {S1 => B c, S1 => A d c}
+            + # 3. Eliminating Direct Factors, End
+            + #    No changes required/performed here.
+            +
+            + # 4. Eliminating Indirect Factors, End
+            + #    Indirect factors eliminated: {S1 => B c, S1 => A d c}
             +   S -> A S1
             +   A -> & | a A
             +   B -> & | A d | b B
             +  S1 -> b | c | d c | b B c | a A d c
             +
-            + # 4. Eliminating Direct Factors, End
-            + #    Direct factors for elimination: {S1 -> [b]}
+            + # 5. Eliminating Direct Factors, End
+            + #    Direct factors eliminated: {S1 -> [b]}
             +   S -> A S1
             +   A -> & | a A
             +   B -> & | A d | b B
@@ -867,28 +840,44 @@ class TestGrammarFactoringAndRecursionSymbols(TestingUtilities):
             +   V -> id | id [ E ]
             +  L' -> & | ; C L'
             +
-            + # 2. Eliminating Indirect Factors, End
-            + #    Indirect factors for elimination: {C => V = exp, L => V = exp L'}
+            + # 2. Eliminating Direct Factors, End
+            + #    Direct factors eliminated: {C -> [id], D -> [d], E -> [exp], L -> [id], V -> [id]}
             +   P -> & | L | D L
-            +   C -> id ( E ) | id = exp | id [ E ] = exp
-            +   D -> d | d D
-            +   E -> exp | exp , E
-            +   L -> id ( E ) L' | id = exp L' | id [ E ] = exp L'
-            +   V -> id | id [ E ]
+            +   C -> V = exp | id ( E )
+            +   D -> d D1
+            +   E -> exp E1
+            +   L -> V = exp L' | id ( E ) L'
+            +   V -> id V1
+            +  D1 -> & | D
+            +  E1 -> & | , E
             +  L' -> & | ; C L'
+            +  V1 -> & | [ E ]
             +
-            + # 3. Eliminating Direct Factors, End
-            + #    Direct factors for elimination: {C -> [id], D -> [d], E -> [exp], L -> [id], V -> [id]}
+            + # 3. Eliminating Indirect Factors, End
+            + #    Indirect factors eliminated: {C => V = exp, L => V = exp L'}
+            +   P -> & | L | D L
+            +   C -> id ( E ) | id V1 = exp
+            +   D -> d D1
+            +   E -> exp E1
+            +   L -> id ( E ) L' | id V1 = exp L'
+            +   V -> id V1
+            +  D1 -> & | D
+            +  E1 -> & | , E
+            +  L' -> & | ; C L'
+            +  V1 -> & | [ E ]
+            +
+            + # 4. Eliminating Direct Factors, End
+            + #    Direct factors eliminated: {C -> [id], L -> [id]}
             +   P -> & | L | D L
             +   C -> id C1
             +   D -> d D1
             +   E -> exp E1
             +   L -> id L1
             +   V -> id V1
-            +  C1 -> = exp | ( E ) | [ E ] = exp
+            +  C1 -> ( E ) | V1 = exp
             +  D1 -> & | D
             +  E1 -> & | , E
-            +  L1 -> = exp L' | ( E ) L' | [ E ] = exp L'
+            +  L1 -> ( E ) L' | V1 = exp L'
             +  L' -> & | ; C L'
             +  V1 -> & | [ E ]
         """, firstGrammar.get_operation_history() )
@@ -924,28 +913,44 @@ class TestGrammarFactoringAndRecursionSymbols(TestingUtilities):
             +   V -> i | id | id [ E ]
             +  L' -> & | ; C L'
             +
-            + # 2. Eliminating Indirect Factors, End
-            + #    Indirect factors for elimination: {C => V = exp, L => V = exp L'}
+            + # 2. Eliminating Direct Factors, End
+            + #    Direct factors eliminated: {C -> [id], D -> [d], E -> [exp], L -> [id], V -> [id]}
             +   P -> & | L | D L
-            +   C -> i = exp | id ( E ) | id = exp | id [ E ] = exp
-            +   D -> d | d D
-            +   E -> exp | exp , E
-            +   L -> i = exp L' | id ( E ) L' | id = exp L' | id [ E ] = exp L'
-            +   V -> i | id | id [ E ]
+            +   C -> V = exp | id ( E )
+            +   D -> d D1
+            +   E -> exp E1
+            +   L -> V = exp L' | id ( E ) L'
+            +   V -> i | id V1
+            +  D1 -> & | D
+            +  E1 -> & | , E
             +  L' -> & | ; C L'
+            +  V1 -> & | [ E ]
             +
-            + # 3. Eliminating Direct Factors, End
-            + #    Direct factors for elimination: {C -> [id], D -> [d], E -> [exp], L -> [id], V -> [id]}
+            + # 3. Eliminating Indirect Factors, End
+            + #    Indirect factors eliminated: {C => V = exp, L => V = exp L'}
+            +   P -> & | L | D L
+            +   C -> i = exp | id ( E ) | id V1 = exp
+            +   D -> d D1
+            +   E -> exp E1
+            +   L -> i = exp L' | id ( E ) L' | id V1 = exp L'
+            +   V -> i | id V1
+            +  D1 -> & | D
+            +  E1 -> & | , E
+            +  L' -> & | ; C L'
+            +  V1 -> & | [ E ]
+            +
+            + # 4. Eliminating Direct Factors, End
+            + #    Direct factors eliminated: {C -> [id], L -> [id]}
             +   P -> & | L | D L
             +   C -> id C1 | i = exp
             +   D -> d D1
             +   E -> exp E1
             +   L -> id L1 | i = exp L'
             +   V -> i | id V1
-            +  C1 -> = exp | ( E ) | [ E ] = exp
+            +  C1 -> ( E ) | V1 = exp
             +  D1 -> & | D
             +  E1 -> & | , E
-            +  L1 -> = exp L' | ( E ) L' | [ E ] = exp L'
+            +  L1 -> ( E ) L' | V1 = exp L'
             +  L' -> & | ; C L'
             +  V1 -> & | [ E ]
         """, firstGrammar.get_operation_history() )
@@ -981,11 +986,25 @@ class TestGrammarFactoringAndRecursionSymbols(TestingUtilities):
             +  M -> & | m
             +
             + # 2. Eliminating Direct Factors, End
-            + #    Direct factors for elimination: {S -> [M]}
+            + #    Direct factors eliminated: {S -> [M]}
             +   S -> M S1
             +   M -> & | m
             +  S1 -> & | m
         """, firstGrammar.get_operation_history() )
+
+    def test_getDirectAndIndirectLeftRecursion(self):
+        firstGrammar = ChomskyGrammar.load_from_text_lines( wrap_text(
+        r"""
+            P -> P a | &
+            M -> P M | M a
+        """ ) )
+
+        self.assertTextEqual(
+        r"""
+            + (M, 'direct')
+            + (P, 'direct')
+            + (M, 'indirect')
+        """, convert_to_text_lines( firstGrammar.left_recursion() ) )
 
     def test_historyFactoringOfComplexNonTerminalsFactors(self):
         firstGrammar = ChomskyGrammar.load_from_text_lines( wrap_text(
@@ -997,99 +1016,103 @@ class TestGrammarFactoringAndRecursionSymbols(TestingUtilities):
             E -> E + id | id
         """ ) )
 
-        factor_it = firstGrammar.factor_it(15)
+        factor_it = firstGrammar.factor_it(5)
         self.assertTextEqual(
         r"""
-            +   S' -> & | b S'5 | d S'2 | m S'7 | # S'3 | ; S'4 | id S'6
+            + # 1. Factoring, Beginning
+            +  P -> d P | M L
+            +  C -> & | b P e | C # id | id = E | id ( E )
+            +  E -> id | E + id
+            +  L -> & | C ; L a
+            +  M -> & | m ; M
+            +
+            + # 2. Converting to Epsilon Free, End
+            + #    Non Terminal's Deriving Epsilon: M -> &; L -> &; C -> &; P -> &
+            +  S' -> & | d | L | M | d P | M L
+            +   C -> b e | # id | b P e | C # id | id = E | id ( E )
+            +   E -> id | E + id
+            +   L -> ; a | ; L a | C ; a | C ; L a
+            +   M -> m ; | m ; M
+            +   P -> d | L | M | d P | M L
+            +
+            + # 3. Eliminating Infertile Symbols, End
+            + #    No changes required/performed here.
+            +
+            + # 4. Eliminating Unreachable Symbols, End
+            + #    No changes required/performed here.
+            +
+            + # 5. Eliminating Left Recursion, End
+            + #    Direct recursion eliminated: {C # id} -> {id ( E ) C', id = E C', b P e C', b e C', # id C'} @ C' -> {# id C', &}
+            + #    Direct recursion eliminated: {E + id} -> {id E'} @ E' -> {+ id E', &}
+            +  S' -> & | d | L | M | d P | M L
+            +   C -> b e C' | # id C' | b P e C' | id = E C' | id ( E ) C'
+            +   E -> id E'
+            +   L -> ; a | ; L a | C ; a | C ; L a
+            +   M -> m ; | m ; M
+            +   P -> d | L | M | d P | M L
+            +  C' -> & | # id C'
+            +  E' -> & | + id E'
+            +
+            + # 6. Eliminating Direct Factors, End
+            + #    Direct factors eliminated: {P -> [M], L -> [C], S' -> [M]}
+            +   S' -> & | d | L | d P | M S'1
+            +    C -> b e C' | # id C' | b P e C' | id = E C' | id ( E ) C'
+            +    E -> id E'
+            +    L -> ; a | C L1 | ; L a
+            +    M -> m ; | m ; M
+            +    P -> d | L | d P | M P1
+            +   C' -> & | # id C'
+            +   E' -> & | + id E'
+            +   L1 -> ; a | ; L a
+            +   P1 -> & | L
+            +  S'1 -> & | L
+            +
+            + # 7. Eliminating Direct Factors, End
+            + #    Direct factors eliminated: {P -> [d], M -> [m], L -> [;], C -> [id, b], S' -> [d], L1 -> [;]}
+            +   S' -> & | L | d S'2 | M S'1
             +    C -> b C1 | id C2 | # id C'
             +    E -> id E'
-            +    L -> b L3 | # L1 | ; L2 | id L4
+            +    L -> ; L2 | C L1
             +    M -> m M1
-            +    P -> b P3 | d P4 | m P6 | # P1 | ; P2 | id P5
+            +    P -> L | d P2 | M P1
             +   C1 -> e C' | P e C'
             +   C2 -> = E C' | ( E ) C'
             +   C' -> & | # id C'
             +   E' -> & | + id E'
-            +   L1 -> id L6
+            +   L1 -> ; L3
             +   L2 -> a | L a
-            +   L3 -> e L7 | b P3 L5 | d P4 L5 | m P6 L5 | # P1 L5 | ; P2 L5 | id P5 L5
-            +   L4 -> ( L8 | = L9
-            +   L5 -> e L10
-            +   L6 -> C' L11
-            +   L7 -> C' L12
-            +   L8 -> E L13
-            +   L9 -> E L14
-            +   M1 -> ; M2
-            +   M2 -> & | M
-            +   P1 -> id P8
-            +   P2 -> a | L a
-            +   P3 -> e P9 | b P3 P7 | d P4 P7 | m P6 P7 | # P1 P7 | ; P2 P7 | id P5 P7
-            +   P4 -> & | P
-            +   P5 -> ( P10 | = P11
-            +   P6 -> ; P12
-            +   P7 -> e P13
-            +   P8 -> C' P14
-            +   P9 -> C' P15
-            +  L10 -> C' L15
-            +  L11 -> ; L17
-            +  L12 -> ; L18
-            +  L13 -> ) L19
-            +  L14 -> C' L16
-            +  L15 -> ; L20
-            +  L16 -> ; L21
-            +  L17 -> a | L a
-            +  L18 -> a | L a
-            +  L19 -> C' L22
-            +  L20 -> a | L a
-            +  L21 -> a | L a
-            +  L22 -> ; L23
-            +  L23 -> a | L a
-            +  P10 -> E P16
-            +  P11 -> E P17
-            +  P12 -> & | L | M P18
-            +  P13 -> C' P19
-            +  P14 -> ; P21
-            +  P15 -> ; P22
-            +  P16 -> ) P23
-            +  P17 -> C' P20
-            +  P18 -> & | L
-            +  P19 -> ; P24
-            +  P20 -> ; P25
-            +  P21 -> a | L a
-            +  P22 -> a | L a
-            +  P23 -> C' P26
-            +  P24 -> a | L a
-            +  P25 -> a | L a
-            +  P26 -> ; P27
-            +  P27 -> a | L a
+            +   L3 -> a | L a
+            +   M1 -> ; | ; M
+            +   P1 -> & | L
+            +   P2 -> & | P
             +  S'1 -> & | L
             +  S'2 -> & | P
-            +  S'3 -> id S'9
-            +  S'4 -> a | L a
-            +  S'5 -> e S'10 | b P3 S'8 | d P4 S'8 | m P6 S'8 | # P1 S'8 | ; P2 S'8 | id P5 S'8
-            +  S'6 -> ( S'11 | = S'12
-            +  S'7 -> ; S'13
-            +  S'8 -> e S'14
-            +  S'9 -> C' S'15
-            + S'10 -> C' S'16
-            + S'11 -> E S'17
-            + S'12 -> E S'18
-            + S'13 -> S'1 | M S'1
-            + S'14 -> C' S'19
-            + S'15 -> ; S'21
-            + S'16 -> ; S'22
-            + S'17 -> ) S'23
-            + S'18 -> C' S'20
-            + S'19 -> ; S'24
-            + S'20 -> ; S'25
-            + S'21 -> a | L a
-            + S'22 -> a | L a
-            + S'23 -> C' S'26
-            + S'24 -> a | L a
-            + S'25 -> a | L a
-            + S'26 -> ; S'27
-            + S'27 -> a | L a
-        """, firstGrammar )
+            +
+            + # 8. Eliminating Indirect Factors, End
+            + #    No changes required/performed here.
+            +
+            + # 9. Eliminating Direct Factors, End
+            + #    Direct factors eliminated: {M1 -> [;]}
+            +   S' -> & | L | d S'2 | M S'1
+            +    C -> b C1 | id C2 | # id C'
+            +    E -> id E'
+            +    L -> ; L2 | C L1
+            +    M -> m M1
+            +    P -> L | d P2 | M P1
+            +   C1 -> e C' | P e C'
+            +   C2 -> = E C' | ( E ) C'
+            +   C' -> & | # id C'
+            +   E' -> & | + id E'
+            +   L1 -> ; L3
+            +   L2 -> a | L a
+            +   L3 -> a | L a
+            +   M1 -> ; M2
+            +   M2 -> & | M
+            +   P1 -> & | L
+            +   P2 -> & | P
+            +  S'1 -> & | L
+            +  S'2 -> & | P
+        """, firstGrammar.get_operation_history() )
 
         self.assertTrue( factor_it )
         self.assertTrue( firstGrammar.is_factored() )
@@ -2663,7 +2686,7 @@ class TestProduction(TestingUtilities):
 class TestDynamicIterationDict(TestingUtilities):
 
     def test_removalAtBeginingWithIterationAtEnd(self):
-        elements = DynamicIterationDict([0, 1, 2, 3, 4, 5, 6, 7])
+        elements = DynamicIterationDict([0, 1, 2, 3, 4, 5, 6, 7], index=True)
         current_index = -1
         iterated_elements = []
 
@@ -2680,7 +2703,7 @@ class TestDynamicIterationDict(TestingUtilities):
 
         self.assertTextEqual(
         r"""
-            + '0'[0]: None, '2'[2]: None, '3'[3]: None, '4'[4]: None, '5'[5]: None, '6'[6]: None, '7'[7]: None, '8'[8]: None
+            + [0, 0: None, 2, 2: None, 3, 3: None, 4, 4: None, 5, 5: None, 6, 6: None, 7, 7: None, 8, 8: None]
         """, wrap_text( elements, wrap=0 ) )
 
         self.assertTextEqual(
@@ -2694,12 +2717,12 @@ class TestDynamicIterationDict(TestingUtilities):
 
         self.assertTextEqual(
         r"""
-            + '0'[0]: None, '8'[1]: None, '2'[2]: None, '3'[3]: None, '4'[4]: None, '5'[5]: None, '6'[6]: None, '7'[7]: None
+            + [0, 0: None, 8, 1: None, 2, 2: None, 3, 3: None, 4, 4: None, 5, 5: None, 6, 6: None, 7, 7: None]
         """, wrap_text( elements, wrap=0 ) )
 
         self.assertTextEqual(
         r"""
-            + '0'[0]: None, '2'[1]: None, '3'[2]: None, '4'[3]: None, '5'[4]: None, '6'[5]: None, '7'[6]: None, '8'[7]: None
+            + [0, 0: None, 2, 1: None, 3, 2: None, 4, 3: None, 5, 4: None, 6, 5: None, 7, 6: None, 8, 7: None]
         """, wrap_text( new_elements, wrap=0 ) )
 
     def test_recursiveIterationCreation(self):

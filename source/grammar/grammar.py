@@ -383,7 +383,7 @@ class ChomskyGrammar():
         production.lock()
 
         if start_symbol not in self.productions:
-            self.productions[start_symbol] = DynamicIterationDict()
+            self.productions[start_symbol] = DynamicIterationDict( is_set=True )
 
         log( 58, "   %s -> %s", start_symbol, production )
         self.productions[start_symbol].add( production )
@@ -731,24 +731,28 @@ class ChomskyGrammar():
         productions_keys = self.productions
         first_non_terminals = self.first_non_terminals()
 
-        for first in first_non_terminals.keys():
+        for start_symbol in productions_keys:
 
-            if first in first_non_terminals[first]:
+            if start_symbol in first_non_terminals[start_symbol]:
                 is_direct = False
-                is_indirect = True
+                is_indirect = False
 
-                for production in productions_keys[first]:
+                for production in productions_keys[start_symbol]:
 
-                    if production[0] == first:
+                    if production[0] == start_symbol:
                         is_direct = True
-                        is_indirect = False
-                        break
+
+                    else:
+                        following_first = self.first_non_terminals_from( production, first_non_terminals )
+
+                        if start_symbol in following_first:
+                            is_indirect = True
 
                 if is_direct:
-                    left_recursion.add( ( first, 'direct' ) )
+                    left_recursion.add( ( start_symbol, 'direct' ) )
 
                 if is_indirect:
-                    left_recursion.add( ( first, 'indirect' ) )
+                    left_recursion.add( ( start_symbol, 'indirect' ) )
 
         return left_recursion
 
@@ -776,8 +780,23 @@ class ChomskyGrammar():
             return
 
         productions_keys = self.productions
+        first_non_terminals = self.first_non_terminals()
+
         production_keys_list = self.initial_symbol_as_first()
         non_terminals_count = len( production_keys_list )
+        eliminated_direct_recursions = DynamicIterationDict( is_set=True )
+
+        def _flush_left_recursion_history(is_forced=False):
+
+            if indirect_recursions or is_forced:
+
+                if not is_forced:
+                    self._save_history( "Eliminate direct left recursion" )
+
+                for history in eliminated_direct_recursions.keys():
+                    self._save_data( "%s", history )
+
+                eliminated_direct_recursions.clear()
 
         for maximum_index in range( 0, non_terminals_count ):
             indirect_recursions = DynamicIterationDict()
@@ -801,23 +820,32 @@ class ChomskyGrammar():
                     outter_production_first_symbol = outter_production[0]
 
                     if type( outter_production_first_symbol ) is NonTerminal:
+                        following_first = self.first_non_terminals_from( outter_production, first_non_terminals )
 
-                        if outter_production_first_symbol == inner_start_symbol:
-                            indirect_recursions[outter_production] = []
+                        if outter_start_symbol in following_first:
 
-                            for inner_production in inner_productions(1):
-                                remove_outter_production = True
-                                new_production = outter_production.replace( 0, inner_production )
+                            if outter_production_first_symbol == inner_start_symbol:
+                                indirect_recursions[outter_start_symbol] = DynamicIterationDict( is_set=True )
 
-                                self.add_production( outter_start_symbol, new_production )
-                                indirect_recursions[outter_production].append( inner_production )
+                                for inner_production in inner_productions(1):
+                                    remove_outter_production = True
+                                    new_production = outter_production.replace( 0, inner_production )
 
-                    if remove_outter_production:
-                        self.remove_production( outter_start_symbol, outter_production, False )
+                                    self.add_production( outter_start_symbol, new_production )
+                                    indirect_recursions[outter_start_symbol].append( "(%s >> %s => %s)" % (
+                                            inner_production, outter_production, new_production ) )
+
+                        if remove_outter_production:
+                            self.remove_production( outter_start_symbol, outter_production, False )
+
+            if indirect_recursions:
+                _flush_left_recursion_history( True )
+                self._save_history( "Eliminate indirect left recursion" )
+                self._save_data( "Indirect recursion eliminated: %s", indirect_recursions )
 
             direct_recursions = set()
-            direct_recursions_list = DynamicIterationDict()
-            direct_replacements = DynamicIterationDict()
+            direct_recursions_list = DynamicIterationDict( is_set=True )
+            direct_replacements = DynamicIterationDict( is_set=True )
             new_outter_start_symbol = self.new_symbol( outter_start_symbol )
 
             for outter_production in outter_productions:
@@ -831,8 +859,6 @@ class ChomskyGrammar():
             log( 32, "self: \n%s", self )
             log( 32, "2. new_outter_start_symbol: %s", new_outter_start_symbol )
             log( 32, "2. direct_recursions: %s", direct_recursions )
-            self._save_history( "Eliminate indirect left recursion" )
-            self._save_data( "Indirect recursion for elimination: %s", indirect_recursions )
 
             if direct_recursions:
 
@@ -855,15 +881,16 @@ class ChomskyGrammar():
 
                 self.add_production( new_outter_start_symbol, epsilon_production.new() )
 
-            log( 32, "self: \n%s", self )
-            self._save_history( "Eliminate direct left recursion" )
-
             if new_outter_start_symbol in productions_keys:
-                self._save_data( "Direct recursion for elimination: %s -> %s @ %s -> %s",
-                        direct_recursions_list.keys(), direct_replacements.keys(),
-                        new_outter_start_symbol, productions_keys[new_outter_start_symbol].keys() )
+                eliminated_direct_recursions.append( "Direct recursion eliminated: %s -> %s @ %s -> %s" % (
+                        direct_recursions_list, direct_replacements,
+                        new_outter_start_symbol, productions_keys[new_outter_start_symbol] ) )
+
+            log( 32, "self: \n%s", self )
+            _flush_left_recursion_history()
 
         self._save_history( "Eliminating Left Recursion", IntermediateGrammar.END )
+        _flush_left_recursion_history( True )
 
     def has_indirect_factors(self):
         """
@@ -963,9 +990,18 @@ class ChomskyGrammar():
             if is_non_terminal_factored:
                 self.eliminate_direct_factors( non_deterministic_factors_dictionary )
 
+                non_deterministic_factors_dictionary, _ = self.get_factoring_duplicated_elements()
+
+                if non_deterministic_factors_dictionary:
+                    self.eliminate_direct_factors( non_deterministic_factors_dictionary )
+
             else:
-                self.eliminate_indirect_factors( non_deterministic_factors_dictionary )
                 self.eliminate_direct_factors( non_deterministic_factors_dictionary )
+
+            non_deterministic_factors_dictionary, _ = self.get_factoring_duplicated_elements()
+
+            if non_deterministic_factors_dictionary:
+                self.eliminate_indirect_factors( non_deterministic_factors_dictionary )
 
         self._save_history( "Factoring", IntermediateGrammar.END )
         return was_factored
@@ -977,7 +1013,12 @@ class ChomskyGrammar():
         """
         duplicated_elements = get_duplicated_elements( self.factors() )
         is_non_terminal_factored = False
+
         non_deterministic_factors_list = []
+        non_deterministic_factors_dictionary = {}
+
+        if not duplicated_elements:
+            return non_deterministic_factors_dictionary, is_non_terminal_factored
 
         for item in duplicated_elements:
 
@@ -989,15 +1030,14 @@ class ChomskyGrammar():
             non_deterministic_factors_list = duplicated_elements
 
         productions_keys = self.productions
-        non_deterministic_factors_dictionary = {}
 
         for start_symbol in productions_keys:
             non_deterministic_factors_dictionary[start_symbol]  = []
 
-        for factor_symbol, factor_terminal in reversed( sorted( non_deterministic_factors_list ) ):
+        for factor_symbol, factor_terminal in sorted( non_deterministic_factors_list, reverse=True ) :
             non_deterministic_factors_dictionary[factor_symbol].append( factor_terminal )
 
-        return ( non_deterministic_factors_dictionary, is_non_terminal_factored )
+        return non_deterministic_factors_dictionary, is_non_terminal_factored
 
     def eliminate_indirect_factors(self, non_deterministic_factors_dictionary):
         """
@@ -1037,7 +1077,7 @@ class ChomskyGrammar():
                             self.remove_production( start_symbol, start_production )
 
         self._save_history( "Eliminating Indirect Factors", IntermediateGrammar.END )
-        self._save_data( "Indirect factors for elimination: %s", _save_data_factors_list.keys() )
+        self._save_data( "Indirect factors eliminated: %s", _save_data_factors_list.keys() )
         log( 16, "exiting: \n%s", self )
 
     def eliminate_direct_factors(self, non_deterministic_factors_dictionary):
@@ -1045,6 +1085,7 @@ class ChomskyGrammar():
             Converts all direct factors on this grammar to deterministic factors.
         """
         self._save_history( "Eliminating Direct Factors", IntermediateGrammar.BEGINNING )
+        has_eliminated_any_factor = False
         productions_keys = self.productions
         non_deterministic_factors_eliminated = DynamicIterationDict()
 
@@ -1073,18 +1114,21 @@ class ChomskyGrammar():
 
                     new_factor_start_symbol = self.new_symbol( start_symbol, True )
                     direct_factors_productions = {}
+                    direct_factors_count = 0
                     log( 16, "non_deterministic_factor: %s", non_deterministic_factor )
                     log( 16, "new_factor_start_symbol: %s", new_factor_start_symbol )
 
                     for start_production in start_productions:
 
                             if start_production[0] == non_deterministic_factor[0]:
+                                direct_factors_count += 1
                                 direct_factors_productions[start_production] = non_deterministic_factor
 
                     direct_factors_productions = direct_factors_productions
                     log( 16, "direct_factors_productions: %s", direct_factors_productions )
 
-                    if direct_factors_productions:
+                    if direct_factors_count > 1:
+                        has_eliminated_any_factor = True
                         has_added_first_production = False
 
                         for start_production in start_productions(1):
@@ -1104,7 +1148,10 @@ class ChomskyGrammar():
                                 self.remove_production( start_symbol, start_production )
 
         self._save_history( "Eliminating Direct Factors", IntermediateGrammar.END )
-        self._save_data( "Direct factors for elimination: %s", non_deterministic_factors_eliminated.keys() )
+
+        if has_eliminated_any_factor:
+            self._save_data( "Direct factors eliminated: %s", non_deterministic_factors_eliminated.keys() )
+
         log( 16, "exiting: \n%s", self )
 
     def fertile(self):

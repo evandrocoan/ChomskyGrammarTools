@@ -118,7 +118,7 @@ class DynamicIterable(object):
         representation = []
 
         for item in self:
-            representation.append( "%s" % item )
+            representation.append( str( item ) )
 
         return "{%s}" % ( ", ".join( representation ) )
 
@@ -132,17 +132,27 @@ class DynamicIterationDict(object):
         https://stackoverflow.com/questions/4014621/a-python-class-that-acts-like-dict
     """
 
-    def __init__(self, initial=None):
+    def __init__(self, initial=None, is_set=False, emquote=False, index=False):
         """
             Fully initializes and create a new dictionary.
 
             @param `initial` is a dictionary used to initialize it with new values.
         """
+
+        ## Whether this collection elements are going to be used as a list, instead of dictionary
+        self._is_set = is_set
+
         ## The list with the keys of this collection elements
         self.keys_list = list()
 
         ## The list with the elements of this collection
         self.values_list = list()
+
+        ## Whether the keys of this dictionary should be emquoted when creating a string representation
+        self._emquote_keys = emquote
+
+        ## Whether the string representation of this collection will have item index attached to it
+        self._add_index = index
 
         ## List the empty free spots for old items, used globally before the iteration starts
         self.empty_slots = set()
@@ -184,18 +194,35 @@ class DynamicIterationDict(object):
             Return a nice string representation of this collection.
         """
         keys_list = self.keys_list
-        values_list = self.values_list
         empty_slots = self.empty_slots
-        items_dictionary = self.items_dictionary
         representation = []
 
-        for index in range( 0, len( keys_list ) ):
+        if self._emquote_keys:
+            get_key = lambda: emquote_string( key )
 
-            if index not in empty_slots:
-                key = keys_list[index]
-                representation.append( "%s[%s]: %s" % ( emquote_string( key ), items_dictionary[key], values_list[index] ) )
+        else:
+            get_key = lambda: key
 
-        return ", ".join( representation )
+        if self._add_index:
+            get_index = lambda: "{}, {}".format( get_key(), index )
+
+        else:
+            get_index = lambda: get_key()
+
+        if self._is_set:
+            return str( self.keys() )
+
+        else:
+            values_list = self.values_list
+            items_dictionary = self.items_dictionary
+
+            for index in range( 0, len( keys_list ) ):
+
+                if index not in empty_slots:
+                    key = keys_list[index]
+                    representation.append( "%s: %s" % ( get_index(), values_list[index] ) )
+
+        return "[%s]" % ", ".join( representation )
 
     def __contains__(self, key):
         """
