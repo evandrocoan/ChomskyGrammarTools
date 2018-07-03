@@ -23,37 +23,35 @@
             "env": {"PYTHONIOENCODING": "utf8"},
             "syntax": "Packages/Text/Plain text.tmLanguage",
             "target": "exec",
-            "working_dir": "$project_path/source"
-        },
-        {
-            "cmd":
+            "working_dir": "$project_path/source",
+            "variants":
             [
-                "pylint", "--disable=I,E,R,W,C,F", "--enable=E0102", "--reports=no", "-sn", "unit_tests.py", "&&", "python", "unit_tests.py", "-f"
-                // "python", "unit_tests.py", "TestProduction",
-                // "python", "unit_tests.py", "TestChomskyGrammar.test_grammarChapter5FollowExample1IsTheSameAsFirstExample2",
-            ],
-            "file_regex": "^[ ]*File \"(...*?)\", line ([0-9]*)",
-            "name": "Run Project Tests",
-            "quiet": true,
-            "shell": true,
-            "env": {"PYTHONIOENCODING": "utf8"},
-            "syntax": "Packages/Text/Plain text.tmLanguage",
-            "target": "exec",
-            "working_dir": "$project_path/source"
+                {
+                    "name": "Tests",
+                    "cmd":
+                    [
+                        "pylint", "--disable=I,E,R,W,C,F", "--enable=E0102", "--reports=no", "-sn", "unit_tests.py", "&&", "python", "unit_tests.py", "-f"
+                        // "python", "unit_tests.py", "TestProduction",
+                        // "python", "unit_tests.py", "TestChomskyGrammar.test_grammarChapter5FollowExample1IsTheSameAsFirstExample2",
+                    ],
+                },
+                {
+                    "name": "Single Test",
+                    "target": "run_python_tests",
+                    "cmd":
+                    [
+                        "python", "unit_tests.py", "-v", "{test_class}.{test_func}", "-f",
+                    ],
+                },
+                {
+                    "name": "Single Test Class",
+                    "target": "run_python_tests",
+                    "cmd":
+                    [
+                        "python", "unit_tests.py", "-v", "{test_class}", "-f",
+                    ],
+                }
+            ]
         },
-        {
-            "cmd":
-            [
-                "python", "unit_tests.py", "-v", "{test_class}.{test_func}",
-            ],
-            "file_regex": "^[ ]*File \"(...*?)\", line ([0-9]*)",
-            "name": "Run Single Test",
-            "quiet": true,
-            "shell": true,
-            "env": {"PYTHONIOENCODING": "utf8"},
-            "syntax": "Packages/Text/Plain text.tmLanguage",
-            "target": "run_python_tests",
-            "working_dir": "$project_path/source"
-        }
     ],
 }
