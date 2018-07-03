@@ -229,14 +229,14 @@ class Production(LockableType):
 
     def remove_everything_after(self, index):
         """
-            Given an index starting from 0, removes all the symbols after it, including the 0 nth symbol.
+            Given an index starting from 0 nth, removes all the symbols after it, excluding the 0 nth symbol.
         """
         self.trim_epsilons()
         self.symbols = self.symbols[:index+1]
 
     def remove_everything_before(self, index):
         """
-            Given an index starting from 0, removes all the symbols before it excluding 0 nth symbol.
+            Given an index starting from 0 nth, removes all the symbols before it excluding 0 nth symbol.
         """
         self.trim_epsilons()
         self.symbols = self.symbols[index:]

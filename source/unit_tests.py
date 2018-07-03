@@ -377,7 +377,7 @@ class TestGrammarFactoringAndRecursionSymbols(TestingUtilities):
             +  E' -> & | + T E'
             +
             + # 5. Eliminate indirect left recursion
-            + #    Indirect recursion for elimination: {F} -> {( E ), id}
+            + #    Indirect recursion for elimination: 'F'[0]: [( E ), id]
             +   E -> T E'
             +   F -> id | ( E )
             +   T -> id | ( E ) | T * F
@@ -445,7 +445,7 @@ class TestGrammarFactoringAndRecursionSymbols(TestingUtilities):
             +  S' -> & | b S'
             +
             + # 5. Eliminate indirect left recursion
-            + #    Indirect recursion for elimination: {S c} -> {A a S'}
+            + #    Indirect recursion for elimination: 'S c'[0]: [A a S']
             +   S -> A a S'
             +   A -> d | A a S' c
             +  S' -> & | b S'
@@ -502,7 +502,7 @@ class TestGrammarFactoringAndRecursionSymbols(TestingUtilities):
             +   S -> b | A a | S b
             +
             + # 5. Eliminate indirect left recursion
-            + #    Indirect recursion for elimination: {A a} -> {S c, d, c}
+            + #    Indirect recursion for elimination: 'A a'[0]: [S c, d, c]
             +  S' -> & | b | A a | S b
             +   A -> c | d | S c
             +   S -> b | c a | d a | S b | S c a
@@ -529,9 +529,11 @@ class TestGrammarFactoringAndRecursionSymbols(TestingUtilities):
 
         self.assertTextEqual(
         r"""
-            + S -> a A a | b S b
-            + A -> d | S c
-        """, firstGrammar )
+            + # 1. Eliminating Left Recursion, Beginning
+            + #    No changes required/performed here.
+            +  S -> a A a | b S b
+            +  A -> d | S c
+        """, firstGrammar.get_operation_history() )
 
         self.assertFalse( firstGrammar.has_left_recursion() )
 
@@ -567,7 +569,7 @@ class TestGrammarFactoringAndRecursionSymbols(TestingUtilities):
             +  A' -> & | b A'
             +
             + # 5. Eliminate indirect left recursion
-            + #    Indirect recursion for elimination: {S a, A b a} -> {a S, A b, B c A', a A'}
+            + #    Indirect recursion for elimination: 'S a'[0]: [a S, A b], 'A b a'[1]: [B c A', a A']
             +   S -> A b | a S
             +   A -> a A' | B c A'
             +   B -> e | B d | a S a | a A' b a | B c A' b a
@@ -636,7 +638,7 @@ class TestGrammarFactoringAndRecursionSymbols(TestingUtilities):
             + #    No changes required/performed here.
             +
             + # 5. Eliminate indirect left recursion
-            + #    Indirect recursion for elimination: {A b} -> {S a, a}
+            + #    Indirect recursion for elimination: 'A b'[0]: [S a, a]
             +  S' -> & | B d
             +   A -> a | S a
             +   B -> b | a b | B c | S a b
@@ -651,7 +653,7 @@ class TestGrammarFactoringAndRecursionSymbols(TestingUtilities):
             +  B' -> & | c B'
             +
             + # 7. Eliminate indirect left recursion
-            + #    Indirect recursion for elimination: {B d} -> {b B', S a b B', a b B'}
+            + #    Indirect recursion for elimination: 'B d'[0]: [b B', S a b B', a b B']
             +  S' -> & | B d
             +   A -> a | S a
             +   B -> b B' | a b B' | S a b B'
@@ -708,7 +710,7 @@ class TestGrammarFactoringAndRecursionSymbols(TestingUtilities):
             + #    No changes required/performed here.
             +
             + # 5. Eliminate indirect left recursion
-            + #    Indirect recursion for elimination: {C} -> {V = exp, id ( E )}
+            + #    Indirect recursion for elimination: 'C'[0]: [V = exp, id ( E )]
             +  P -> & | L | D L
             +  C -> V = exp | id ( E )
             +  D -> d | d D
@@ -775,6 +777,9 @@ class TestGrammarFactoringAndRecursionSymbols(TestingUtilities):
             + (S, b)
             + (S, c)
             + (S, d)
+            + (B, A)
+            + (S, A)
+            + (S, A)
         """, convert_to_text_lines( firstGrammar.factors(), sort=sort_correctly ) )
 
         factor_it = firstGrammar.factor_it(3)
@@ -786,70 +791,36 @@ class TestGrammarFactoringAndRecursionSymbols(TestingUtilities):
             +  A -> & | a A
             +  B -> & | A d | b B
             +
-            + # 2. Eliminating Indirect Factors, End
-            + #    Indirect factors for elimination: {S => A b, S => A B c, B => A d, S => B c}
-            +  S -> b | c | d c | a A b | b B c | a A B c | a A d c
-            +  A -> & | a A
-            +  B -> & | d | b B | a A d
-            +
-            + # 3. Eliminating Direct Factors, End
-            + #    Direct factors for elimination: [(S, a), (S, b)]
-            +   S -> c | d c | a S1 | b S2
+            + # 2. Eliminating Direct Factors, End
+            + #    Direct factors for elimination: {S -> [A]}
+            +   S -> A S1
             +   A -> & | a A
-            +   B -> & | d | b B | a A d
-            +  S1 -> A b | A B c | A d c
+            +   B -> & | A d | b B
+            +  S1 -> b | B c
+            +
+            + # 3. Eliminating Indirect Factors, End
+            + #    Indirect factors for elimination: {S1 => B c, S1 => A d c}
+            +   S -> A S1
+            +   A -> & | a A
+            +   B -> & | A d | b B
+            +  S1 -> b | c | d c | b B c | a A d c
+            +
+            + # 4. Eliminating Direct Factors, End
+            + #    Direct factors for elimination: {S1 -> [b]}
+            +   S -> A S1
+            +   A -> & | a A
+            +   B -> & | A d | b B
+            +  S1 -> c | d c | b S2 | a A d c
             +  S2 -> & | B c
-            +
-            + # 4. Eliminating Indirect Factors, End
-            + #    Indirect factors for elimination: {S1 => A B c, S1 => A b, S1 => A d c, S2 => B c, S1 => B c}
-            +   S -> c | d c | a S1 | b S2
-            +   A -> & | a A
-            +   B -> & | d | b B | a A d
-            +  S1 -> b | c | d c | a A b | b B c | a A B c | a A d c
-            +  S2 -> & | c | d c | b B c | a A d c
-            +
-            + # 5. Eliminating Direct Factors, End
-            + #    Direct factors for elimination: [(S1, a), (S1, b)]
-            +   S -> c | d c | a S1 | b S2
-            +   A -> & | a A
-            +   B -> & | d | b B | a A d
-            +  S1 -> c | d c | a S3 | b S4
-            +  S2 -> & | c | d c | b B c | a A d c
-            +  S3 -> A b | A B c | A d c
-            +  S4 -> & | B c
-            +
-            + # 6. Eliminating Indirect Factors, End
-            + #    Indirect factors for elimination: {S3 => A b, S3 => A d c, S3 => A B c, S4 => B c, S3 => B c}
-            +   S -> c | d c | a S1 | b S2
-            +   A -> & | a A
-            +   B -> & | d | b B | a A d
-            +  S1 -> c | d c | a S3 | b S4
-            +  S2 -> & | c | d c | b B c | a A d c
-            +  S3 -> b | c | d c | a A b | b B c | a A B c | a A d c
-            +  S4 -> & | c | d c | b B c | a A d c
-            +
-            + # 7. Eliminating Direct Factors, End
-            + #    Direct factors for elimination: [(S3, a), (S3, b)]
-            +   S -> c | d c | a S1 | b S2
-            +   A -> & | a A
-            +   B -> & | d | b B | a A d
-            +  S1 -> c | d c | a S3 | b S4
-            +  S2 -> & | c | d c | b B c | a A d c
-            +  S3 -> c | d c | a S5 | b S6
-            +  S4 -> & | c | d c | b B c | a A d c
-            +  S5 -> A b | A B c | A d c
-            +  S6 -> & | B c
         """, wrap_text( firstGrammar.get_operation_history(), wrap=0, indent="     " ) )
 
         self.assertTextEqual(
         r"""
-            + (S5, a)
-            + (S5, b)
-            + (S5, d)
+            + No elements found.
         """, convert_to_text_lines( get_duplicated_elements( firstGrammar.factors() ) ) )
 
-        self.assertFalse( factor_it )
-        self.assertFalse( firstGrammar.is_factored() )
+        self.assertTrue( factor_it )
+        self.assertTrue( firstGrammar.is_factored() )
 
     def test_grammarFactoringOfList3Exercice7ItemA(self):
         firstGrammar = ChomskyGrammar.load_from_text_lines( wrap_text(
@@ -877,10 +848,14 @@ class TestGrammarFactoringAndRecursionSymbols(TestingUtilities):
             + (P, id)
             + (V, id)
             + (V, id)
+            + (C, V)
             + (L', ;)
+            + (L, V)
+            + (P, D)
+            + (P, L)
         """, convert_to_text_lines( firstGrammar.factors(), sort=sort_correctly ) )
 
-        factor_it = firstGrammar.factor_it(5)
+        factor_it = firstGrammar.factor_it(10)
         self.assertTextEqual(
         r"""
             + # 1. Factoring, Beginning
@@ -893,8 +868,8 @@ class TestGrammarFactoringAndRecursionSymbols(TestingUtilities):
             +  L' -> & | ; C L'
             +
             + # 2. Eliminating Indirect Factors, End
-            + #    Indirect factors for elimination: {P => L, P => D L, C => V = exp, L => V = exp L', P => V = exp L'}
-            +   P -> & | d L | d D L | id ( E ) L' | id = exp L' | id [ E ] = exp L'
+            + #    Indirect factors for elimination: {C => V = exp, L => V = exp L'}
+            +   P -> & | L | D L
             +   C -> id ( E ) | id = exp | id [ E ] = exp
             +   D -> d | d D
             +   E -> exp | exp , E
@@ -903,8 +878,8 @@ class TestGrammarFactoringAndRecursionSymbols(TestingUtilities):
             +  L' -> & | ; C L'
             +
             + # 3. Eliminating Direct Factors, End
-            + #    Direct factors for elimination: [(C, id), (D, d), (E, exp), (L, id), (P, d), (P, id), (V, id)]
-            +   P -> & | d P1 | id P2
+            + #    Direct factors for elimination: {C -> [id], D -> [d], E -> [exp], L -> [id], V -> [id]}
+            +   P -> & | L | D L
             +   C -> id C1
             +   D -> d D1
             +   E -> exp E1
@@ -915,14 +890,15 @@ class TestGrammarFactoringAndRecursionSymbols(TestingUtilities):
             +  E1 -> & | , E
             +  L1 -> = exp L' | ( E ) L' | [ E ] = exp L'
             +  L' -> & | ; C L'
-            +  P1 -> L | D L
-            +  P2 -> = exp L' | ( E ) L' | [ E ] = exp L'
             +  V1 -> & | [ E ]
         """, firstGrammar.get_operation_history() )
 
         self.assertTrue( factor_it )
         self.assertTrue( firstGrammar.is_factored() )
-        self.assertTextEqual( " No elements found.", convert_to_text_lines( get_duplicated_elements( firstGrammar.factors() ) ) )
+        self.assertTextEqual(
+        r"""
+            + No elements found.
+        """, convert_to_text_lines( get_duplicated_elements( firstGrammar.factors() ) ) )
 
     def test_historyFactoringOfList3Exercice7ItemAMutated(self):
         firstGrammar = ChomskyGrammar.load_from_text_lines( wrap_text(
@@ -949,8 +925,8 @@ class TestGrammarFactoringAndRecursionSymbols(TestingUtilities):
             +  L' -> & | ; C L'
             +
             + # 2. Eliminating Indirect Factors, End
-            + #    Indirect factors for elimination: {P => L, P => D L, C => V = exp, L => V = exp L', P => V = exp L'}
-            +   P -> & | d L | d D L | i = exp L' | id ( E ) L' | id = exp L' | id [ E ] = exp L'
+            + #    Indirect factors for elimination: {C => V = exp, L => V = exp L'}
+            +   P -> & | L | D L
             +   C -> i = exp | id ( E ) | id = exp | id [ E ] = exp
             +   D -> d | d D
             +   E -> exp | exp , E
@@ -959,8 +935,8 @@ class TestGrammarFactoringAndRecursionSymbols(TestingUtilities):
             +  L' -> & | ; C L'
             +
             + # 3. Eliminating Direct Factors, End
-            + #    Direct factors for elimination: [(C, id), (D, d), (E, exp), (L, id), (P, d), (P, id), (V, id)]
-            +   P -> & | d P1 | id P2 | i = exp L'
+            + #    Direct factors for elimination: {C -> [id], D -> [d], E -> [exp], L -> [id], V -> [id]}
+            +   P -> & | L | D L
             +   C -> id C1 | i = exp
             +   D -> d D1
             +   E -> exp E1
@@ -971,11 +947,156 @@ class TestGrammarFactoringAndRecursionSymbols(TestingUtilities):
             +  E1 -> & | , E
             +  L1 -> = exp L' | ( E ) L' | [ E ] = exp L'
             +  L' -> & | ; C L'
-            +  P1 -> L | D L
-            +  P2 -> = exp L' | ( E ) L' | [ E ] = exp L'
             +  V1 -> & | [ E ]
         """, firstGrammar.get_operation_history() )
 
+        self.assertTrue( factor_it )
+        self.assertTrue( firstGrammar.is_factored() )
+        self.assertTextEqual(
+        r"""
+            + No elements found.
+        """, convert_to_text_lines( get_duplicated_elements( firstGrammar.factors() ) ) )
+
+    def test_historyFactoringOfSimpleNonTerminalsFactors(self):
+        firstGrammar = ChomskyGrammar.load_from_text_lines( wrap_text(
+        r"""
+            S -> M | M m
+            M -> m | &
+        """ ) )
+
+        self.assertTextEqual(
+        r"""
+            + (M, m)
+            + (S, m)
+            + (S, m)
+            + (S, M)
+            + (S, M)
+        """, convert_to_text_lines( firstGrammar.factors(), sort=sort_correctly ) )
+
+        factor_it = firstGrammar.factor_it(2)
+        self.assertTextEqual(
+        r"""
+            + # 1. Factoring, Beginning
+            +  S -> M | M m
+            +  M -> & | m
+            +
+            + # 2. Eliminating Direct Factors, End
+            + #    Direct factors for elimination: {S -> [M]}
+            +   S -> M S1
+            +   M -> & | m
+            +  S1 -> & | m
+        """, firstGrammar.get_operation_history() )
+
+    def test_historyFactoringOfComplexNonTerminalsFactors(self):
+        firstGrammar = ChomskyGrammar.load_from_text_lines( wrap_text(
+        r"""
+            P -> d P | M L
+            M -> m ; M | &
+            L -> C ; L a | &
+            C -> id ( E ) | id = E | b P e | C # id | &
+            E -> E + id | id
+        """ ) )
+
+        factor_it = firstGrammar.factor_it(15)
+        self.assertTextEqual(
+        r"""
+            +   S' -> & | b S'5 | d S'2 | m S'7 | # S'3 | ; S'4 | id S'6
+            +    C -> b C1 | id C2 | # id C'
+            +    E -> id E'
+            +    L -> b L3 | # L1 | ; L2 | id L4
+            +    M -> m M1
+            +    P -> b P3 | d P4 | m P6 | # P1 | ; P2 | id P5
+            +   C1 -> e C' | P e C'
+            +   C2 -> = E C' | ( E ) C'
+            +   C' -> & | # id C'
+            +   E' -> & | + id E'
+            +   L1 -> id L6
+            +   L2 -> a | L a
+            +   L3 -> e L7 | b P3 L5 | d P4 L5 | m P6 L5 | # P1 L5 | ; P2 L5 | id P5 L5
+            +   L4 -> ( L8 | = L9
+            +   L5 -> e L10
+            +   L6 -> C' L11
+            +   L7 -> C' L12
+            +   L8 -> E L13
+            +   L9 -> E L14
+            +   M1 -> ; M2
+            +   M2 -> & | M
+            +   P1 -> id P8
+            +   P2 -> a | L a
+            +   P3 -> e P9 | b P3 P7 | d P4 P7 | m P6 P7 | # P1 P7 | ; P2 P7 | id P5 P7
+            +   P4 -> & | P
+            +   P5 -> ( P10 | = P11
+            +   P6 -> ; P12
+            +   P7 -> e P13
+            +   P8 -> C' P14
+            +   P9 -> C' P15
+            +  L10 -> C' L15
+            +  L11 -> ; L17
+            +  L12 -> ; L18
+            +  L13 -> ) L19
+            +  L14 -> C' L16
+            +  L15 -> ; L20
+            +  L16 -> ; L21
+            +  L17 -> a | L a
+            +  L18 -> a | L a
+            +  L19 -> C' L22
+            +  L20 -> a | L a
+            +  L21 -> a | L a
+            +  L22 -> ; L23
+            +  L23 -> a | L a
+            +  P10 -> E P16
+            +  P11 -> E P17
+            +  P12 -> & | L | M P18
+            +  P13 -> C' P19
+            +  P14 -> ; P21
+            +  P15 -> ; P22
+            +  P16 -> ) P23
+            +  P17 -> C' P20
+            +  P18 -> & | L
+            +  P19 -> ; P24
+            +  P20 -> ; P25
+            +  P21 -> a | L a
+            +  P22 -> a | L a
+            +  P23 -> C' P26
+            +  P24 -> a | L a
+            +  P25 -> a | L a
+            +  P26 -> ; P27
+            +  P27 -> a | L a
+            +  S'1 -> & | L
+            +  S'2 -> & | P
+            +  S'3 -> id S'9
+            +  S'4 -> a | L a
+            +  S'5 -> e S'10 | b P3 S'8 | d P4 S'8 | m P6 S'8 | # P1 S'8 | ; P2 S'8 | id P5 S'8
+            +  S'6 -> ( S'11 | = S'12
+            +  S'7 -> ; S'13
+            +  S'8 -> e S'14
+            +  S'9 -> C' S'15
+            + S'10 -> C' S'16
+            + S'11 -> E S'17
+            + S'12 -> E S'18
+            + S'13 -> S'1 | M S'1
+            + S'14 -> C' S'19
+            + S'15 -> ; S'21
+            + S'16 -> ; S'22
+            + S'17 -> ) S'23
+            + S'18 -> C' S'20
+            + S'19 -> ; S'24
+            + S'20 -> ; S'25
+            + S'21 -> a | L a
+            + S'22 -> a | L a
+            + S'23 -> C' S'26
+            + S'24 -> a | L a
+            + S'25 -> a | L a
+            + S'26 -> ; S'27
+            + S'27 -> a | L a
+        """, firstGrammar )
+
+        self.assertTrue( factor_it )
+        self.assertTrue( firstGrammar.is_factored() )
+        self.assertTextEqual(
+        r"""
+            + No elements found.
+        """, convert_to_text_lines( get_duplicated_elements( firstGrammar.factors() ) ) )
 
 class TestGrammarFirstAndFollow(TestingUtilities):
 
