@@ -23,7 +23,7 @@ for the JavaScript code in this file
 */
 var NAVTREE =
 [
-  [ "Trabalho 2 Formais", "index.html", [
+  [ "Chomsky Grammar Tools for Context Free Grammars (CFG)", "index.html", [
     [ "Classes", "annotated.html", [
       [ "Class List", "annotated.html", "annotated_dup" ],
       [ "Class Index", "classes.html", null ],
@@ -33,6 +33,9 @@ var NAVTREE =
         [ "Functions", "functions_func.html", null ],
         [ "Variables", "functions_vars.html", null ]
       ] ]
+    ] ],
+    [ "Files", "files.html", [
+      [ "File List", "files.html", "files_dup" ]
     ] ]
   ] ]
 ];
@@ -40,7 +43,7 @@ var NAVTREE =
 var NAVTREEINDEX =
 [
 ".html",
-"functions_m.html"
+"functions_i.html"
 ];
 
 var SYNCONMSG = 'click to disable panel synchronisation';

@@ -1,15 +1,15 @@
 <map id="simple_non_terminals" name="simple_non_terminals">
-<area shape="rect" id="node2" href="$classgrammar_1_1grammar_1_1_chomsky_grammar.html#a5feb73e9071cd41b82cf70c72e862b3f" title="convert_to_epsilon_free" alt="" coords="201,183,359,209"/>
-<area shape="rect" id="node3" href="$classgrammar_1_1grammar_1_1_chomsky_grammar.html#a1f14d402cda38312e43661b545546dc7" title="_save_history" alt="" coords="431,5,532,32"/>
-<area shape="rect" id="node4" href="$classgrammar_1_1grammar_1_1_chomsky_grammar.html#a20ece576a14e13d9d640b1d385ceedc9" title="non_terminal_epsilon" alt="" coords="409,56,553,83"/>
-<area shape="rect" id="node6" href="$classgrammar_1_1grammar_1_1_chomsky_grammar.html#ab7e00ef2cb9a892b0806817bd377a7d1" title="add_production" alt="" coords="1023,165,1133,192"/>
-<area shape="rect" id="node8" href="$classgrammar_1_1grammar_1_1_chomsky_grammar.html#a70324b9568d6c5955608e00619778160" title="remove_production" alt="" coords="416,208,547,235"/>
-<area shape="rect" id="node11" href="$classgrammar_1_1grammar_1_1_chomsky_grammar.html#aeb0f19c94bae8eb9606a31661525cad2" title="new_symbol" alt="" coords="1031,275,1125,301"/>
-<area shape="rect" id="node12" href="$classgrammar_1_1grammar_1_1_chomsky_grammar.html#abbe77507f09e79bbc087dc46640afcf6" title="has_recursion_on_the\l_non_terminal" alt="" coords="407,259,556,301"/>
-<area shape="rect" id="node13" href="$classgrammar_1_1grammar_1_1_chomsky_grammar.html#abc4bbdcbb8ab537c2066608032901d6a" title="copy_productions_for\l_one_non_terminal" alt="" coords="829,158,975,199"/>
-<area shape="rect" id="node14" href="$classgrammar_1_1grammar_1_1_chomsky_grammar.html#a5fbe0726942531405664aa998b46e964" title="_save_data" alt="" coords="438,376,525,403"/>
-<area shape="rect" id="node5" href="$classgrammar_1_1grammar_1_1_chomsky_grammar.html#a831b963e2931277a3202b98de51e914d" title="has_production" alt="" coords="637,56,748,83"/>
-<area shape="rect" id="node7" href="$classgrammar_1_1grammar_1_1_chomsky_grammar.html#aad4d6876f422fea3c14b8c608c99cabe" title="assure_correct_start\l_symbol" alt="" coords="1181,158,1323,199"/>
-<area shape="rect" id="node9" href="$classgrammar_1_1grammar_1_1_chomsky_grammar.html#ab0d293ff70fd25981ab6bae03fc0e385" title="remove_start_non_terminal" alt="" coords="604,208,781,235"/>
-<area shape="rect" id="node10" href="$classgrammar_1_1grammar_1_1_chomsky_grammar.html#acfbbeb75485ca87c4bfce1b41932d69f" title="clean_initial_symbol" alt="" coords="833,224,971,251"/>
+<area shape="rect" id="node2" href="$classgrammar_1_1grammar_1_1_chomsky_grammar.html#a5feb73e9071cd41b82cf70c72e862b3f" title="convert_to_epsilon_free" alt="" coords="201,187,359,213"/>
+<area shape="rect" id="node3" href="$classgrammar_1_1grammar_1_1_chomsky_grammar.html#a5fbe0726942531405664aa998b46e964" title="_save_data" alt="" coords="438,5,525,32"/>
+<area shape="rect" id="node4" href="$classgrammar_1_1grammar_1_1_chomsky_grammar.html#a1f14d402cda38312e43661b545546dc7" title="_save_history" alt="" coords="431,56,532,83"/>
+<area shape="rect" id="node5" href="$classgrammar_1_1grammar_1_1_chomsky_grammar.html#ab7e00ef2cb9a892b0806817bd377a7d1" title="add_production" alt="" coords="1023,165,1133,192"/>
+<area shape="rect" id="node7" href="$classgrammar_1_1grammar_1_1_chomsky_grammar.html#abc4bbdcbb8ab537c2066608032901d6a" title="copy_productions_for\l_one_non_terminal" alt="" coords="829,158,975,199"/>
+<area shape="rect" id="node8" href="$classgrammar_1_1grammar_1_1_chomsky_grammar.html#abbe77507f09e79bbc087dc46640afcf6" title="has_recursion_on_the\l_non_terminal" alt="" coords="407,209,556,250"/>
+<area shape="rect" id="node9" href="$classgrammar_1_1grammar_1_1_chomsky_grammar.html#aeb0f19c94bae8eb9606a31661525cad2" title="new_symbol" alt="" coords="1031,325,1125,352"/>
+<area shape="rect" id="node10" href="$classgrammar_1_1grammar_1_1_chomsky_grammar.html#a20ece576a14e13d9d640b1d385ceedc9" title="non_terminal_epsilon" alt="" coords="409,325,553,352"/>
+<area shape="rect" id="node12" href="$classgrammar_1_1grammar_1_1_chomsky_grammar.html#a70324b9568d6c5955608e00619778160" title="remove_production" alt="" coords="416,275,547,301"/>
+<area shape="rect" id="node6" href="$classgrammar_1_1grammar_1_1_chomsky_grammar.html#aad4d6876f422fea3c14b8c608c99cabe" title="assure_correct_start\l_symbol" alt="" coords="1181,158,1323,199"/>
+<area shape="rect" id="node11" href="$classgrammar_1_1grammar_1_1_chomsky_grammar.html#a831b963e2931277a3202b98de51e914d" title="has_production" alt="" coords="637,325,748,352"/>
+<area shape="rect" id="node13" href="$classgrammar_1_1grammar_1_1_chomsky_grammar.html#ab0d293ff70fd25981ab6bae03fc0e385" title="remove_start_non_terminal" alt="" coords="604,275,781,301"/>
+<area shape="rect" id="node14" href="$classgrammar_1_1grammar_1_1_chomsky_grammar.html#acfbbeb75485ca87c4bfce1b41932d69f" title="clean_initial_symbol" alt="" coords="833,275,971,301"/>
 </map>

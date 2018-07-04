@@ -5,7 +5,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=9"/>
 <meta name="generator" content="Doxygen 1.8.14"/>
 <meta name="viewport" content="width=device-width, initial-scale=1"/>
-<title>Trabalho 2 Formais: IntermediateGrammar Class Reference</title>
+<title>Chomsky Grammar Tools for Context Free Grammars (CFG): IntermediateGrammar Class Reference</title>
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="jquery.js"></script>
 <script type="text/javascript" src="dynsections.js"></script>
@@ -30,7 +30,7 @@
  <tr style="height: 56px;">
   <td id="projectlogo"><img alt="Logo" src="login.png"/></td>
   <td id="projectalign" style="padding-left: 0.5em;">
-   <div id="projectname">Trabalho 2 Formais
+   <div id="projectname">Chomsky Grammar Tools for Context Free Grammars (CFG)
    </div>
   </td>
  </tr>
@@ -99,15 +99,11 @@ $(document).ready(function(){initNavTree('classgrammar_1_1intermediate__grammar_
 Inheritance diagram for IntermediateGrammar:</div>
 <div class="dyncontent">
 <div class="center"><img src="classgrammar_1_1intermediate__grammar_1_1_intermediate_grammar__inherit__graph.png" border="0" usemap="#_intermediate_grammar_inherit__map" alt="Inheritance graph"/></div>
-<map name="_intermediate_grammar_inherit__map" id="_intermediate_grammar_inherit__map">
-</map>
 <center><span class="legend">[<a target="top" href="graph_legend.html">legend</a>]</span></center></div>
 <div class="dynheader">
 Collaboration diagram for IntermediateGrammar:</div>
 <div class="dyncontent">
 <div class="center"><img src="classgrammar_1_1intermediate__grammar_1_1_intermediate_grammar__coll__graph.png" border="0" usemap="#_intermediate_grammar_coll__map" alt="Collaboration graph"/></div>
-<map name="_intermediate_grammar_coll__map" id="_intermediate_grammar_coll__map">
-</map>
 <center><span class="legend">[<a target="top" href="graph_legend.html">legend</a>]</span></center></div>
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-methods"></a>
@@ -159,7 +155,9 @@ int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><pre class="fragment">    Represents a grammar operation history entry, to be parsed later.
-</pre> </div><h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
+</pre> 
+<p class="definition">Definition at line <a class="el" href="intermediate__grammar_8py_source.html#l00071">71</a> of file <a class="el" href="intermediate__grammar_8py_source.html">intermediate_grammar.py</a>.</p>
+</div><h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
 <a id="a2be7594cb94bb53e8ca93bdf5ce35864"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a2be7594cb94bb53e8ca93bdf5ce35864">&#9670;&nbsp;</a></span>__init__()</h2>
 
@@ -199,6 +197,8 @@ int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class
 </div><div class="memdoc">
 <pre class="fragment">    Creates a full history entry for the current state of the given `grammar`.
 </pre> 
+<p class="definition">Definition at line <a class="el" href="intermediate__grammar_8py_source.html#l00085">85</a> of file <a class="el" href="intermediate__grammar_8py_source.html">intermediate_grammar.py</a>.</p>
+<div class="fragment"><div class="line"><a name="l00085"></a><span class="lineno">   85</span>&#160;    <span class="keyword">def </span>__init__(self, grammar, name, stage):</div><div class="line"><a name="l00086"></a><span class="lineno">   86</span>&#160;        <span class="stringliteral">&quot;&quot;&quot;</span></div><div class="line"><a name="l00087"></a><span class="lineno">   87</span>&#160;<span class="stringliteral">            Creates a full history entry for the current state of the given `grammar`.</span></div><div class="line"><a name="l00088"></a><span class="lineno">   88</span>&#160;<span class="stringliteral">        &quot;&quot;&quot;</span></div><div class="line"><a name="l00089"></a><span class="lineno">   89</span>&#160;        </div><div class="line"><a name="l00090"></a><span class="lineno">   90</span>&#160;        self.timestamp = time.time()</div><div class="line"><a name="l00091"></a><span class="lineno">   91</span>&#160;</div><div class="line"><a name="l00092"></a><span class="lineno">   92</span>&#160;        </div><div class="line"><a name="l00093"></a><span class="lineno">   93</span>&#160;        self.grammar = str( grammar )</div><div class="line"><a name="l00094"></a><span class="lineno">   94</span>&#160;</div><div class="line"><a name="l00095"></a><span class="lineno">   95</span>&#160;        </div><div class="line"><a name="l00096"></a><span class="lineno">   96</span>&#160;        self.name = name</div><div class="line"><a name="l00097"></a><span class="lineno">   97</span>&#160;</div><div class="line"><a name="l00098"></a><span class="lineno">   98</span>&#160;        </div><div class="line"><a name="l00099"></a><span class="lineno">   99</span>&#160;        self.stage = Stage( stage )</div><div class="line"><a name="l00100"></a><span class="lineno">  100</span>&#160;</div><div class="line"><a name="l00101"></a><span class="lineno">  101</span>&#160;        </div><div class="line"><a name="l00102"></a><span class="lineno">  102</span>&#160;        self.extra_text = []</div><div class="line"><a name="l00103"></a><span class="lineno">  103</span>&#160;</div></div><!-- fragment -->
 </div>
 </div>
 <h2 class="groupheader">Member Function Documentation</h2>
@@ -229,6 +229,10 @@ int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class
 </div><div class="memdoc">
 <pre class="fragment">    Determines whether this grammar history entry is equal or not to another one given.
 </pre> 
+<p class="definition">Definition at line <a class="el" href="intermediate__grammar_8py_source.html#l00125">125</a> of file <a class="el" href="intermediate__grammar_8py_source.html">intermediate_grammar.py</a>.</p>
+
+<p class="reference">References <a class="el" href="intermediate__grammar_8py_source.html#l00093">IntermediateGrammar.grammar</a>, <a class="el" href="intermediate__grammar_8py_source.html#l00083">IntermediateGrammar.MIDDLE</a>, and <a class="el" href="intermediate__grammar_8py_source.html#l00099">IntermediateGrammar.stage</a>.</p>
+<div class="fragment"><div class="line"><a name="l00125"></a><span class="lineno">  125</span>&#160;    <span class="keyword">def </span>__eq__(self, other):</div><div class="line"><a name="l00126"></a><span class="lineno">  126</span>&#160;        <span class="stringliteral">&quot;&quot;&quot;</span></div><div class="line"><a name="l00127"></a><span class="lineno">  127</span>&#160;<span class="stringliteral">            Determines whether this grammar history entry is equal or not to another one given.</span></div><div class="line"><a name="l00128"></a><span class="lineno">  128</span>&#160;<span class="stringliteral">        &quot;&quot;&quot;</span></div><div class="line"><a name="l00129"></a><span class="lineno">  129</span>&#160;</div><div class="line"><a name="l00130"></a><span class="lineno">  130</span>&#160;        <span class="keywordflow">if</span> isinstance(self, other.__class__):</div><div class="line"><a name="l00131"></a><span class="lineno">  131</span>&#160;</div><div class="line"><a name="l00132"></a><span class="lineno">  132</span>&#160;            <span class="keywordflow">if</span> ( self.stage.value == self.MIDDLE <span class="keywordflow">or</span> other.stage.value == self.MIDDLE <span class="keywordflow">or</span> self.stage == other.stage ) \</div><div class="line"><a name="l00133"></a><span class="lineno">  133</span>&#160;                    <span class="keywordflow">and</span> str( self.grammar ) == str( other.grammar ):</div><div class="line"><a name="l00134"></a><span class="lineno">  134</span>&#160;                <span class="keywordflow">return</span> <span class="keyword">True</span></div><div class="line"><a name="l00135"></a><span class="lineno">  135</span>&#160;</div><div class="line"><a name="l00136"></a><span class="lineno">  136</span>&#160;        <span class="keywordflow">return</span> <span class="keyword">False</span></div><div class="line"><a name="l00137"></a><span class="lineno">  137</span>&#160;</div><div class="line"><a name="l00138"></a><span class="lineno">  138</span>&#160;</div><!-- fragment -->
 </div>
 </div>
 <a id="a23e8041ce1015febe4fdace3225714f9"></a>
@@ -248,8 +252,12 @@ int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class
 </div><div class="memdoc">
 <pre class="fragment">    Return the full history representation of the saved grammar.
 </pre> 
-<p class="reference">Referenced by <a class="el" href="classgrammar_1_1lockable__type_1_1_lockable_type.html#a9a47563093dfc5ba12274b66e368920c">LockableType.__repr__()</a>.</p>
-<div class="dynheader">
+<p class="definition">Definition at line <a class="el" href="intermediate__grammar_8py_source.html#l00104">104</a> of file <a class="el" href="intermediate__grammar_8py_source.html">intermediate_grammar.py</a>.</p>
+
+<p class="reference">References <a class="el" href="intermediate__grammar_8py_source.html#l00102">IntermediateGrammar.extra_text</a>, <a class="el" href="intermediate__grammar_8py_source.html#l00093">IntermediateGrammar.grammar</a>, <a class="el" href="intermediate__grammar_8py_source.html#l00096">IntermediateGrammar.name</a>, and <a class="el" href="intermediate__grammar_8py_source.html#l00099">IntermediateGrammar.stage</a>.</p>
+
+<p class="reference">Referenced by <a class="el" href="lockable__type_8py_source.html#l00097">LockableType.__repr__()</a>.</p>
+<div class="fragment"><div class="line"><a name="l00104"></a><span class="lineno">  104</span>&#160;    <span class="keyword">def </span>__str__(self):</div><div class="line"><a name="l00105"></a><span class="lineno">  105</span>&#160;        <span class="stringliteral">&quot;&quot;&quot;</span></div><div class="line"><a name="l00106"></a><span class="lineno">  106</span>&#160;<span class="stringliteral">            Return the full history representation of the saved grammar.</span></div><div class="line"><a name="l00107"></a><span class="lineno">  107</span>&#160;<span class="stringliteral">        &quot;&quot;&quot;</span></div><div class="line"><a name="l00108"></a><span class="lineno">  108</span>&#160;</div><div class="line"><a name="l00109"></a><span class="lineno">  109</span>&#160;</div><div class="line"><a name="l00110"></a><span class="lineno">  110</span>&#160;        <span class="keywordflow">if</span> self.extra_text:</div><div class="line"><a name="l00111"></a><span class="lineno">  111</span>&#160;</div><div class="line"><a name="l00112"></a><span class="lineno">  112</span>&#160;            <span class="keywordflow">if</span> len( self.extra_text ) == 1 \</div><div class="line"><a name="l00113"></a><span class="lineno">  113</span>&#160;                    <span class="keywordflow">and</span> self.extra_text[0] == NO_GRAMMAR_CHANGES \</div><div class="line"><a name="l00114"></a><span class="lineno">  114</span>&#160;                    <span class="keywordflow">and</span> self.stage.value != IntermediateGrammar.BEGINNING:</div><div class="line"><a name="l00115"></a><span class="lineno">  115</span>&#160;</div><div class="line"><a name="l00116"></a><span class="lineno">  116</span>&#160;                <span class="keywordflow">return</span> wrap_text( <span class="stringliteral">&quot;&quot;&quot;%s%s\n#    %s</span></div><div class="line"><a name="l00117"></a><span class="lineno">  117</span>&#160;<span class="stringliteral">                    &quot;&quot;&quot;</span> % ( self.name, self.stage, <span class="stringliteral">&quot;\n#    &quot;</span>.join( self.extra_text ) ) )</div><div class="line"><a name="l00118"></a><span class="lineno">  118</span>&#160;</div><div class="line"><a name="l00119"></a><span class="lineno">  119</span>&#160;            <span class="keywordflow">return</span> wrap_text( <span class="stringliteral">&quot;&quot;&quot;%s%s\n#    %s\n%s</span></div><div class="line"><a name="l00120"></a><span class="lineno">  120</span>&#160;<span class="stringliteral">                &quot;&quot;&quot;</span> % ( self.name, self.stage, <span class="stringliteral">&quot;\n#    &quot;</span>.join( self.extra_text ), self.grammar ) )</div><div class="line"><a name="l00121"></a><span class="lineno">  121</span>&#160;</div><div class="line"><a name="l00122"></a><span class="lineno">  122</span>&#160;        <span class="keywordflow">return</span> wrap_text( <span class="stringliteral">&quot;&quot;&quot;%s%s\n%s</span></div><div class="line"><a name="l00123"></a><span class="lineno">  123</span>&#160;<span class="stringliteral">            &quot;&quot;&quot;</span> % ( self.name, self.stage, self.grammar ) )</div><div class="line"><a name="l00124"></a><span class="lineno">  124</span>&#160;</div></div><!-- fragment --><div class="dynheader">
 Here is the caller graph for this function:</div>
 <div class="dyncontent">
 <div class="center"><img src="classgrammar_1_1intermediate__grammar_1_1_intermediate_grammar_a23e8041ce1015febe4fdace3225714f9_icgraph.png" border="0" usemap="#classgrammar_1_1intermediate__grammar_1_1_intermediate_grammar_a23e8041ce1015febe4fdace3225714f9_icgraph" alt=""/></div>
@@ -263,7 +271,7 @@ Here is the caller graph for this function:</div>
 </div>
 </div>
 <hr/>The documentation for this class was generated from the following file:<ul>
-<li>intermediate_grammar.py</li>
+<li><a class="el" href="intermediate__grammar_8py_source.html">intermediate_grammar.py</a></li>
 </ul>
 </div><!-- contents -->
 </div><!-- doc-content -->

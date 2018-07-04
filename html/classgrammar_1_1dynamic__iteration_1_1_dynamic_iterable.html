@@ -5,7 +5,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=9"/>
 <meta name="generator" content="Doxygen 1.8.14"/>
 <meta name="viewport" content="width=device-width, initial-scale=1"/>
-<title>Trabalho 2 Formais: DynamicIterable Class Reference</title>
+<title>Chomsky Grammar Tools for Context Free Grammars (CFG): DynamicIterable Class Reference</title>
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="jquery.js"></script>
 <script type="text/javascript" src="dynsections.js"></script>
@@ -30,7 +30,7 @@
  <tr style="height: 56px;">
   <td id="projectlogo"><img alt="Logo" src="login.png"/></td>
   <td id="projectalign" style="padding-left: 0.5em;">
-   <div id="projectname">Trabalho 2 Formais
+   <div id="projectname">Chomsky Grammar Tools for Context Free Grammars (CFG)
    </div>
   </td>
  </tr>
@@ -98,15 +98,11 @@ $(document).ready(function(){initNavTree('classgrammar_1_1dynamic__iteration_1_1
 Inheritance diagram for DynamicIterable:</div>
 <div class="dyncontent">
 <div class="center"><img src="classgrammar_1_1dynamic__iteration_1_1_dynamic_iterable__inherit__graph.png" border="0" usemap="#_dynamic_iterable_inherit__map" alt="Inheritance graph"/></div>
-<map name="_dynamic_iterable_inherit__map" id="_dynamic_iterable_inherit__map">
-</map>
 <center><span class="legend">[<a target="top" href="graph_legend.html">legend</a>]</span></center></div>
 <div class="dynheader">
 Collaboration diagram for DynamicIterable:</div>
 <div class="dyncontent">
 <div class="center"><img src="classgrammar_1_1dynamic__iteration_1_1_dynamic_iterable__coll__graph.png" border="0" usemap="#_dynamic_iterable_coll__map" alt="Collaboration graph"/></div>
-<map name="_dynamic_iterable_coll__map" id="_dynamic_iterable_coll__map">
-</map>
 <center><span class="legend">[<a target="top" href="graph_legend.html">legend</a>]</span></center></div>
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-methods"></a>
@@ -152,7 +148,9 @@ Public Attributes</h2></td></tr>
 
     Why have an __iter__ method in Python?
     https://stackoverflow.com/questions/36681312/why-have-an-iter-method-in-python
-</pre> </div><h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
+</pre> 
+<p class="definition">Definition at line <a class="el" href="dynamic__iteration_8py_source.html#l00036">36</a> of file <a class="el" href="dynamic__iteration_8py_source.html">dynamic_iteration.py</a>.</p>
+</div><h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
 <a id="a254c0c5ef74b195a729a73470f93aa99"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a254c0c5ef74b195a729a73470f93aa99">&#9670;&nbsp;</a></span>__init__()</h2>
 
@@ -208,6 +206,8 @@ Public Attributes</h2></td></tr>
     @param `end_index` it must be a list with one integer element
     @param `empty_slots` it must be a set with indexes of free place to put new elements
 </pre> 
+<p class="definition">Definition at line <a class="el" href="dynamic__iteration_8py_source.html#l00044">44</a> of file <a class="el" href="dynamic__iteration_8py_source.html">dynamic_iteration.py</a>.</p>
+<div class="fragment"><div class="line"><a name="l00044"></a><span class="lineno">   44</span>&#160;    <span class="keyword">def </span>__init__(self, data_container, iterable_access, empty_slots, end_index=None, filled_slots=set()):</div><div class="line"><a name="l00045"></a><span class="lineno">   45</span>&#160;        <span class="stringliteral">&quot;&quot;&quot;</span></div><div class="line"><a name="l00046"></a><span class="lineno">   46</span>&#160;<span class="stringliteral">            Receives a iterable an initialize the object to start an iteration.</span></div><div class="line"><a name="l00047"></a><span class="lineno">   47</span>&#160;<span class="stringliteral"></span></div><div class="line"><a name="l00048"></a><span class="lineno">   48</span>&#160;<span class="stringliteral">            @param `iterable_access` a function pointer to function which returns the next element given its index</span></div><div class="line"><a name="l00049"></a><span class="lineno">   49</span>&#160;<span class="stringliteral">            @param `end_index` it must be a list with one integer element</span></div><div class="line"><a name="l00050"></a><span class="lineno">   50</span>&#160;<span class="stringliteral">            @param `empty_slots` it must be a set with indexes of free place to put new elements</span></div><div class="line"><a name="l00051"></a><span class="lineno">   51</span>&#160;<span class="stringliteral">        &quot;&quot;&quot;</span></div><div class="line"><a name="l00052"></a><span class="lineno">   52</span>&#160;        </div><div class="line"><a name="l00053"></a><span class="lineno">   53</span>&#160;        self.current_index = -1</div><div class="line"><a name="l00054"></a><span class="lineno">   54</span>&#160;</div><div class="line"><a name="l00055"></a><span class="lineno">   55</span>&#160;        </div><div class="line"><a name="l00056"></a><span class="lineno">   56</span>&#160;        self.empty_slots = empty_slots</div><div class="line"><a name="l00057"></a><span class="lineno">   57</span>&#160;</div><div class="line"><a name="l00058"></a><span class="lineno">   58</span>&#160;        </div><div class="line"><a name="l00059"></a><span class="lineno">   59</span>&#160;        self.filled_slots = filled_slots</div><div class="line"><a name="l00060"></a><span class="lineno">   60</span>&#160;</div><div class="line"><a name="l00061"></a><span class="lineno">   61</span>&#160;        </div><div class="line"><a name="l00062"></a><span class="lineno">   62</span>&#160;        self.data_container = data_container</div><div class="line"><a name="l00063"></a><span class="lineno">   63</span>&#160;</div><div class="line"><a name="l00064"></a><span class="lineno">   64</span>&#160;        </div><div class="line"><a name="l00065"></a><span class="lineno">   65</span>&#160;        <span class="keywordflow">if</span> end_index <span class="keywordflow">is</span> <span class="keywordtype">None</span>:</div><div class="line"><a name="l00066"></a><span class="lineno">   66</span>&#160;            self.iterable_access = iterable_access</div><div class="line"><a name="l00067"></a><span class="lineno">   67</span>&#160;</div><div class="line"><a name="l00068"></a><span class="lineno">   68</span>&#160;        <span class="keywordflow">else</span>:</div><div class="line"><a name="l00069"></a><span class="lineno">   69</span>&#160;            self.iterable_access = <span class="keyword">lambda</span> index: iterable_access( index ) <span class="keywordflow">if</span> index &lt; end_index[0] <span class="keywordflow">else</span> self.stop_iteration( index )</div><div class="line"><a name="l00070"></a><span class="lineno">   70</span>&#160;</div></div><!-- fragment -->
 </div>
 </div>
 <h2 class="groupheader">Member Function Documentation</h2>
@@ -228,6 +228,10 @@ Public Attributes</h2></td></tr>
 </div><div class="memdoc">
 <pre class="fragment">    Resets the current index and return a copy if itself for iteration.
 </pre> 
+<p class="definition">Definition at line <a class="el" href="dynamic__iteration_8py_source.html#l00077">77</a> of file <a class="el" href="dynamic__iteration_8py_source.html">dynamic_iteration.py</a>.</p>
+
+<p class="reference">References <a class="el" href="dynamic__iteration_8py_source.html#l00053">DynamicIterable.current_index</a>.</p>
+<div class="fragment"><div class="line"><a name="l00077"></a><span class="lineno">   77</span>&#160;    <span class="keyword">def </span>__iter__(self):</div><div class="line"><a name="l00078"></a><span class="lineno">   78</span>&#160;        <span class="stringliteral">&quot;&quot;&quot;</span></div><div class="line"><a name="l00079"></a><span class="lineno">   79</span>&#160;<span class="stringliteral">            Resets the current index and return a copy if itself for iteration.</span></div><div class="line"><a name="l00080"></a><span class="lineno">   80</span>&#160;<span class="stringliteral">        &quot;&quot;&quot;</span></div><div class="line"><a name="l00081"></a><span class="lineno">   81</span>&#160;        self.current_index = -1</div><div class="line"><a name="l00082"></a><span class="lineno">   82</span>&#160;        <span class="keywordflow">return</span> self</div><div class="line"><a name="l00083"></a><span class="lineno">   83</span>&#160;</div></div><!-- fragment -->
 </div>
 </div>
 <a id="a810fdc262754b6d21f5acd0e280d4daf"></a>
@@ -247,6 +251,10 @@ Public Attributes</h2></td></tr>
 </div><div class="memdoc">
 <pre class="fragment">    Return the total length of this container.
 </pre> 
+<p class="definition">Definition at line <a class="el" href="dynamic__iteration_8py_source.html#l00071">71</a> of file <a class="el" href="dynamic__iteration_8py_source.html">dynamic_iteration.py</a>.</p>
+
+<p class="reference">References <a class="el" href="dynamic__iteration_8py_source.html#l00062">DynamicIterable.data_container</a>.</p>
+<div class="fragment"><div class="line"><a name="l00071"></a><span class="lineno">   71</span>&#160;    <span class="keyword">def </span>__len__(self):</div><div class="line"><a name="l00072"></a><span class="lineno">   72</span>&#160;        <span class="stringliteral">&quot;&quot;&quot;</span></div><div class="line"><a name="l00073"></a><span class="lineno">   73</span>&#160;<span class="stringliteral">            Return the total length of this container.</span></div><div class="line"><a name="l00074"></a><span class="lineno">   74</span>&#160;<span class="stringliteral">        &quot;&quot;&quot;</span></div><div class="line"><a name="l00075"></a><span class="lineno">   75</span>&#160;        <span class="keywordflow">return</span> len( self.data_container )</div><div class="line"><a name="l00076"></a><span class="lineno">   76</span>&#160;</div></div><!-- fragment -->
 </div>
 </div>
 <a id="a71d9958aa7271de5bb07b861c559d970"></a>
@@ -271,6 +279,10 @@ Public Attributes</h2></td></tr>
     https://stackoverflow.com/questions/21665485/how-to-make-a-custom-object-iterable
     https://stackoverflow.com/questions/4019971/how-to-implement-iter-self-for-a-container-object-python
 </pre> 
+<p class="definition">Definition at line <a class="el" href="dynamic__iteration_8py_source.html#l00084">84</a> of file <a class="el" href="dynamic__iteration_8py_source.html">dynamic_iteration.py</a>.</p>
+
+<p class="reference">References <a class="el" href="dynamic__iteration_8py_source.html#l00053">DynamicIterable.current_index</a>, <a class="el" href="dynamic__iteration_8py_source.html#l00056">DynamicIterable.empty_slots</a>, <a class="el" href="dynamic__iteration_8py_source.html#l00059">DynamicIterable.filled_slots</a>, and <a class="el" href="dynamic__iteration_8py_source.html#l00066">DynamicIterable.iterable_access</a>.</p>
+<div class="fragment"><div class="line"><a name="l00084"></a><span class="lineno">   84</span>&#160;    <span class="keyword">def </span>__next__(self):</div><div class="line"><a name="l00085"></a><span class="lineno">   85</span>&#160;        <span class="stringliteral">&quot;&quot;&quot;</span></div><div class="line"><a name="l00086"></a><span class="lineno">   86</span>&#160;<span class="stringliteral">            Called by Python automatically when iterating over this set and python wants to know the</span></div><div class="line"><a name="l00087"></a><span class="lineno">   87</span>&#160;<span class="stringliteral">            next element to iterate. Raises `StopIteration` when the iteration has been finished.</span></div><div class="line"><a name="l00088"></a><span class="lineno">   88</span>&#160;<span class="stringliteral"></span></div><div class="line"><a name="l00089"></a><span class="lineno">   89</span>&#160;<span class="stringliteral">            How to make a custom object iterable?</span></div><div class="line"><a name="l00090"></a><span class="lineno">   90</span>&#160;<span class="stringliteral">            https://stackoverflow.com/questions/21665485/how-to-make-a-custom-object-iterable</span></div><div class="line"><a name="l00091"></a><span class="lineno">   91</span>&#160;<span class="stringliteral">            https://stackoverflow.com/questions/4019971/how-to-implement-iter-self-for-a-container-object-python</span></div><div class="line"><a name="l00092"></a><span class="lineno">   92</span>&#160;<span class="stringliteral">        &quot;&quot;&quot;</span></div><div class="line"><a name="l00093"></a><span class="lineno">   93</span>&#160;        empty_slots = self.empty_slots</div><div class="line"><a name="l00094"></a><span class="lineno">   94</span>&#160;        current_index = self.current_index + 1</div><div class="line"><a name="l00095"></a><span class="lineno">   95</span>&#160;        filled_slots = self.filled_slots</div><div class="line"><a name="l00096"></a><span class="lineno">   96</span>&#160;</div><div class="line"><a name="l00097"></a><span class="lineno">   97</span>&#160;        <span class="keywordflow">while</span> current_index <span class="keywordflow">in</span> empty_slots <span class="keywordflow">or</span> current_index <span class="keywordflow">in</span> filled_slots:</div><div class="line"><a name="l00098"></a><span class="lineno">   98</span>&#160;            current_index += 1</div><div class="line"><a name="l00099"></a><span class="lineno">   99</span>&#160;</div><div class="line"><a name="l00100"></a><span class="lineno">  100</span>&#160;        <span class="keywordflow">try</span>:</div><div class="line"><a name="l00101"></a><span class="lineno">  101</span>&#160;            self.current_index = current_index</div><div class="line"><a name="l00102"></a><span class="lineno">  102</span>&#160;            <span class="comment"># log( 1, &quot;current_index: %s&quot;, current_index )</span></div><div class="line"><a name="l00103"></a><span class="lineno">  103</span>&#160;            <span class="keywordflow">return</span> self.iterable_access( current_index )</div><div class="line"><a name="l00104"></a><span class="lineno">  104</span>&#160;</div><div class="line"><a name="l00105"></a><span class="lineno">  105</span>&#160;        <span class="keywordflow">except</span> IndexError:</div><div class="line"><a name="l00106"></a><span class="lineno">  106</span>&#160;            <span class="keywordflow">raise</span> StopIteration</div><div class="line"><a name="l00107"></a><span class="lineno">  107</span>&#160;</div></div><!-- fragment -->
 </div>
 </div>
 <a id="a23e8041ce1015febe4fdace3225714f9"></a>
@@ -290,8 +302,10 @@ Public Attributes</h2></td></tr>
 </div><div class="memdoc">
 <pre class="fragment">    Return a nice string representation of this iterable.
 </pre> 
-<p class="reference">Referenced by <a class="el" href="classgrammar_1_1lockable__type_1_1_lockable_type.html#a9a47563093dfc5ba12274b66e368920c">LockableType.__repr__()</a>.</p>
-<div class="dynheader">
+<p class="definition">Definition at line <a class="el" href="dynamic__iteration_8py_source.html#l00114">114</a> of file <a class="el" href="dynamic__iteration_8py_source.html">dynamic_iteration.py</a>.</p>
+
+<p class="reference">Referenced by <a class="el" href="lockable__type_8py_source.html#l00097">LockableType.__repr__()</a>.</p>
+<div class="fragment"><div class="line"><a name="l00114"></a><span class="lineno">  114</span>&#160;    <span class="keyword">def </span>__str__(self):</div><div class="line"><a name="l00115"></a><span class="lineno">  115</span>&#160;        <span class="stringliteral">&quot;&quot;&quot;</span></div><div class="line"><a name="l00116"></a><span class="lineno">  116</span>&#160;<span class="stringliteral">            Return a nice string representation of this iterable.</span></div><div class="line"><a name="l00117"></a><span class="lineno">  117</span>&#160;<span class="stringliteral">        &quot;&quot;&quot;</span></div><div class="line"><a name="l00118"></a><span class="lineno">  118</span>&#160;        representation = []</div><div class="line"><a name="l00119"></a><span class="lineno">  119</span>&#160;</div><div class="line"><a name="l00120"></a><span class="lineno">  120</span>&#160;        <span class="keywordflow">for</span> item <span class="keywordflow">in</span> self:</div><div class="line"><a name="l00121"></a><span class="lineno">  121</span>&#160;            representation.append( str( item ) )</div><div class="line"><a name="l00122"></a><span class="lineno">  122</span>&#160;</div><div class="line"><a name="l00123"></a><span class="lineno">  123</span>&#160;        <span class="keywordflow">return</span> <span class="stringliteral">&quot;{%s}&quot;</span> % ( <span class="stringliteral">&quot;, &quot;</span>.join( representation ) )</div><div class="line"><a name="l00124"></a><span class="lineno">  124</span>&#160;</div><div class="line"><a name="l00125"></a><span class="lineno">  125</span>&#160;</div></div><!-- fragment --><div class="dynheader">
 Here is the caller graph for this function:</div>
 <div class="dyncontent">
 <div class="center"><img src="classgrammar_1_1dynamic__iteration_1_1_dynamic_iterable_a23e8041ce1015febe4fdace3225714f9_icgraph.png" border="0" usemap="#classgrammar_1_1dynamic__iteration_1_1_dynamic_iterable_a23e8041ce1015febe4fdace3225714f9_icgraph" alt=""/></div>
@@ -331,10 +345,12 @@ Here is the caller graph for this function:</div>
 </div><div class="memdoc">
 <pre class="fragment">    Raise the exception `StopIteration` to stop the current iteration.
 </pre> 
+<p class="definition">Definition at line <a class="el" href="dynamic__iteration_8py_source.html#l00108">108</a> of file <a class="el" href="dynamic__iteration_8py_source.html">dynamic_iteration.py</a>.</p>
+<div class="fragment"><div class="line"><a name="l00108"></a><span class="lineno">  108</span>&#160;    <span class="keyword">def </span>stop_iteration(self, index):</div><div class="line"><a name="l00109"></a><span class="lineno">  109</span>&#160;        <span class="stringliteral">&quot;&quot;&quot;</span></div><div class="line"><a name="l00110"></a><span class="lineno">  110</span>&#160;<span class="stringliteral">            Raise the exception `StopIteration` to stop the current iteration.</span></div><div class="line"><a name="l00111"></a><span class="lineno">  111</span>&#160;<span class="stringliteral">        &quot;&quot;&quot;</span></div><div class="line"><a name="l00112"></a><span class="lineno">  112</span>&#160;        <span class="keywordflow">raise</span> StopIteration</div><div class="line"><a name="l00113"></a><span class="lineno">  113</span>&#160;</div></div><!-- fragment -->
 </div>
 </div>
 <hr/>The documentation for this class was generated from the following file:<ul>
-<li>dynamic_iteration.py</li>
+<li><a class="el" href="dynamic__iteration_8py_source.html">dynamic_iteration.py</a></li>
 </ul>
 </div><!-- contents -->
 </div><!-- doc-content -->

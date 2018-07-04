@@ -5,7 +5,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=9"/>
 <meta name="generator" content="Doxygen 1.8.14"/>
 <meta name="viewport" content="width=device-width, initial-scale=1"/>
-<title>Trabalho 2 Formais: Main Page</title>
+<title>Chomsky Grammar Tools for Context Free Grammars (CFG): Chomsky Grammar Tools for Context Free Grammars (CFG)</title>
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="jquery.js"></script>
 <script type="text/javascript" src="dynsections.js"></script>
@@ -30,7 +30,7 @@
  <tr style="height: 56px;">
   <td id="projectlogo"><img alt="Logo" src="login.png"/></td>
   <td id="projectalign" style="padding-left: 0.5em;">
-   <div id="projectname">Trabalho 2 Formais
+   <div id="projectname">Chomsky Grammar Tools for Context Free Grammars (CFG)
    </div>
   </td>
  </tr>
@@ -87,10 +87,32 @@ $(document).ready(function(){initNavTree('index.html','');});
 
 <div class="header">
   <div class="headertitle">
-<div class="title">Trabalho 2 Formais Documentation</div>  </div>
+<div class="title">Chomsky Grammar Tools for Context Free Grammars (CFG) </div>  </div>
 </div><!--header-->
 <div class="contents">
-</div><!-- contents -->
+<div class="textblock"><h2>I - Definition:</h2>
+<p>An application, with graphical interface to manipulate CFG, involving the following checks / operations:</p><ol type="1">
+<li>Edit CFG's verbatim;</li>
+<li>Check whether L (G) is empty, finite or infinite;</li>
+<li>Transform a CFG into Own CFG, providing: Intermediate grammars, NF, Vi, Ne and NA;</li>
+<li>Calculate First (A), Follow (A) and First-NT (A) (defined as the set of symbols of Vn that can start sequences derived from A) for all A ∈ Vn;</li>
+<li>Check if G is factored or if it is factorial in n steps;</li>
+<li>Check whether or not G has Rec. the Left - identifying the recursive non-terminals on the left and the type of recursions (direct and / or indirect) and, if it has, eliminate recursions.</li>
+</ol>
+<h2>II - Observations:</h2>
+<ol type="1">
+<li><p class="startli">Represent the CFG in a textual way, following the pattern of the examples below: <b>a)</b> </p><div class="fragment"><div class="line">E -&gt; E + T | E-T | T</div><div class="line">T -&gt; T * F | T / F | F</div><div class="line">F -&gt; (E) | id</div></div><!-- fragment --><p class="startli"><b>b)</b> </p><div class="fragment"><div class="line"> E -&gt; T E1</div><div class="line">E1 -&gt; + T E1 | &amp;</div><div class="line"> T -&gt; F T1</div><div class="line">T1 -&gt; * F T1 | &amp;</div><div class="line"> F -&gt; (E) | id</div></div><!-- fragment --></li>
+<li>Leave a blank space between the symbols on the right.</li>
+<li>Represent non-terminals by capital letter (followed by 0 or + digits).</li>
+<li>Represent terminals with one or more contiguous characters (any characters, except uppercase letters).</li>
+<li>Use &amp; to represent epsilon.</li>
+<li>Present the intermediate results obtained.</li>
+<li>The work should be done in pairs and the programming language is of free choice (however it must be dominated by the 2 members of the team).</li>
+<li>The work must be sent by email until <b>27/06</b>, in a single zipped file, containing report (describing implementation), source (documented), executable and testing. Use the file name of the team components (ex. JoaoF-MariaG.zip).</li>
+<li>In addition to the correctness, aspects of usability and robustness of the application will be evaluated.</li>
+</ol>
+<h2>Licensing</h2>
+<div class="fragment"><div class="line">#</div><div class="line"># Chomsky Grammar Tools for Context Free Grammars (CFG)</div><div class="line"># Copyright (C) 2018 Evandro Coan &lt;https://github.com/evandrocoan&gt;</div><div class="line">#</div><div class="line">#  This program is free software; you can redistribute it and/or modify it</div><div class="line">#  under the terms of the GNU General Public License as published by the</div><div class="line">#  Free Software Foundation; either version 3 of the License, or ( at</div><div class="line">#  your option ) any later version.</div><div class="line">#</div><div class="line">#  This program is distributed in the hope that it will be useful, but</div><div class="line">#  WITHOUT ANY WARRANTY; without even the implied warranty of</div><div class="line">#  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU</div><div class="line">#  General Public License for more details.</div><div class="line">#</div><div class="line">#  You should have received a copy of the GNU General Public License</div><div class="line">#  along with this program.  If not, see &lt;http://www.gnu.org/licenses/&gt;.</div><div class="line">#</div></div><!-- fragment --> </div></div><!-- contents -->
 </div><!-- doc-content -->
 <!-- start footer part -->
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->

@@ -1,4 +1,4 @@
 <map id="assure_existing_symbols" name="assure_existing_symbols">
-<area shape="rect" id="node2" href="$classgrammar_1_1grammar_1_1_chomsky_grammar.html#a3e506ed66f51939218825a2334340ef6" title="symbols_composition" alt="" coords="373,5,521,32"/>
-<area shape="rect" id="node3" href="$classgrammar_1_1grammar_1_1_chomsky_grammar.html#a14e76ebfb4fc136dd0bebfb9512af820" title="non_terminals" alt="" coords="223,31,325,57"/>
+<area shape="rect" id="node2" href="$classgrammar_1_1grammar_1_1_chomsky_grammar.html#a14e76ebfb4fc136dd0bebfb9512af820" title="non_terminals" alt="" coords="223,5,325,32"/>
+<area shape="rect" id="node3" href="$classgrammar_1_1grammar_1_1_chomsky_grammar.html#a3e506ed66f51939218825a2334340ef6" title="symbols_composition" alt="" coords="373,31,521,57"/>
 </map>

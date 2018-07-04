@@ -5,7 +5,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=9"/>
 <meta name="generator" content="Doxygen 1.8.14"/>
 <meta name="viewport" content="width=device-width, initial-scale=1"/>
-<title>Trabalho 2 Formais: ChomskyGrammarSymbol Class Reference</title>
+<title>Chomsky Grammar Tools for Context Free Grammars (CFG): ChomskyGrammarSymbol Class Reference</title>
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="jquery.js"></script>
 <script type="text/javascript" src="dynsections.js"></script>
@@ -30,7 +30,7 @@
  <tr style="height: 56px;">
   <td id="projectlogo"><img alt="Logo" src="login.png"/></td>
   <td id="projectalign" style="padding-left: 0.5em;">
-   <div id="projectname">Trabalho 2 Formais
+   <div id="projectname">Chomsky Grammar Tools for Context Free Grammars (CFG)
    </div>
   </td>
  </tr>
@@ -178,7 +178,9 @@ Public Attributes</h2></td></tr>
 
     After locking, its length representation is going to be saved as an attribute and returned
     when needed.
-</pre> </div><h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
+</pre> 
+<p class="definition">Definition at line <a class="el" href="symbols_8py_source.html#l00036">36</a> of file <a class="el" href="symbols_8py_source.html">symbols.py</a>.</p>
+</div><h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
 <a id="a792fbaca632ef1ae81f0d5a594ed81cd"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a792fbaca632ef1ae81f0d5a594ed81cd">&#9670;&nbsp;</a></span>__init__()</h2>
 
@@ -222,6 +224,8 @@ Public Attributes</h2></td></tr>
     `sequence` is a integer representing the symbol sort order in a production.
     `lock` if True, the object will be immediately locked upon creation.
 </pre> 
+<p class="definition">Definition at line <a class="el" href="symbols_8py_source.html#l00044">44</a> of file <a class="el" href="symbols_8py_source.html">symbols.py</a>.</p>
+<div class="fragment"><div class="line"><a name="l00044"></a><span class="lineno">   44</span>&#160;    <span class="keyword">def </span>__init__(self, symbols, sequence=0, lock=False):</div><div class="line"><a name="l00045"></a><span class="lineno">   45</span>&#160;        <span class="stringliteral">&quot;&quot;&quot;</span></div><div class="line"><a name="l00046"></a><span class="lineno">   46</span>&#160;<span class="stringliteral">            A full featured Chomsky Grammar symbol able to compose a production or start symbol.</span></div><div class="line"><a name="l00047"></a><span class="lineno">   47</span>&#160;<span class="stringliteral"></span></div><div class="line"><a name="l00048"></a><span class="lineno">   48</span>&#160;<span class="stringliteral">            `symbols` a string representing this symbol</span></div><div class="line"><a name="l00049"></a><span class="lineno">   49</span>&#160;<span class="stringliteral">            `sequence` is a integer representing the symbol sort order in a production.</span></div><div class="line"><a name="l00050"></a><span class="lineno">   50</span>&#160;<span class="stringliteral">            `lock` if True, the object will be immediately locked upon creation.</span></div><div class="line"><a name="l00051"></a><span class="lineno">   51</span>&#160;<span class="stringliteral">        &quot;&quot;&quot;</span></div><div class="line"><a name="l00052"></a><span class="lineno">   52</span>&#160;        super().__init__()</div><div class="line"><a name="l00053"></a><span class="lineno">   53</span>&#160;</div><div class="line"><a name="l00054"></a><span class="lineno">   54</span>&#160;        </div><div class="line"><a name="l00055"></a><span class="lineno">   55</span>&#160;        self.str = str( symbols )</div><div class="line"><a name="l00056"></a><span class="lineno">   56</span>&#160;        self.check_consistency()</div><div class="line"><a name="l00057"></a><span class="lineno">   57</span>&#160;</div><div class="line"><a name="l00058"></a><span class="lineno">   58</span>&#160;        </div><div class="line"><a name="l00059"></a><span class="lineno">   59</span>&#160;        self.sequence = sequence</div><div class="line"><a name="l00060"></a><span class="lineno">   60</span>&#160;</div><div class="line"><a name="l00061"></a><span class="lineno">   61</span>&#160;        </div><div class="line"><a name="l00062"></a><span class="lineno">   62</span>&#160;        self.len = 0</div><div class="line"><a name="l00063"></a><span class="lineno">   63</span>&#160;</div><div class="line"><a name="l00064"></a><span class="lineno">   64</span>&#160;        <span class="keywordflow">if</span> lock:</div><div class="line"><a name="l00065"></a><span class="lineno">   65</span>&#160;            self.lock()</div><div class="line"><a name="l00066"></a><span class="lineno">   66</span>&#160;</div></div><!-- fragment -->
 </div>
 </div>
 <h2 class="groupheader">Member Function Documentation</h2>
@@ -254,6 +258,10 @@ Public Attributes</h2></td></tr>
 
     A symbol is compared explicitly by its string representation.
 </pre> 
+<p class="definition">Definition at line <a class="el" href="symbols_8py_source.html#l00075">75</a> of file <a class="el" href="symbols_8py_source.html">symbols.py</a>.</p>
+
+<p class="reference">References <a class="el" href="symbols_8py_source.html#l00055">ChomskyGrammarSymbol.str</a>, and <a class="el" href="lockable__type_8py_source.html#l00059">LockableType.str</a>.</p>
+<div class="fragment"><div class="line"><a name="l00075"></a><span class="lineno">   75</span>&#160;    <span class="keyword">def </span>__lt__(self, other):</div><div class="line"><a name="l00076"></a><span class="lineno">   76</span>&#160;        <span class="stringliteral">&quot;&quot;&quot;</span></div><div class="line"><a name="l00077"></a><span class="lineno">   77</span>&#160;<span class="stringliteral">            Operator less than `&lt;` used when comparing production&#39;s objects.</span></div><div class="line"><a name="l00078"></a><span class="lineno">   78</span>&#160;<span class="stringliteral"></span></div><div class="line"><a name="l00079"></a><span class="lineno">   79</span>&#160;<span class="stringliteral">            A symbol is compared explicitly by its string representation.</span></div><div class="line"><a name="l00080"></a><span class="lineno">   80</span>&#160;<span class="stringliteral">        &quot;&quot;&quot;</span></div><div class="line"><a name="l00081"></a><span class="lineno">   81</span>&#160;</div><div class="line"><a name="l00082"></a><span class="lineno">   82</span>&#160;        <span class="keywordflow">if</span> isinstance( other, LockableType ):</div><div class="line"><a name="l00083"></a><span class="lineno">   83</span>&#160;            <span class="keywordflow">return</span> str( self ) &lt; str( other )</div><div class="line"><a name="l00084"></a><span class="lineno">   84</span>&#160;</div><div class="line"><a name="l00085"></a><span class="lineno">   85</span>&#160;        <span class="keywordflow">raise</span> TypeError( <span class="stringliteral">&quot;&#39;&lt;&#39; not supported between instances of &#39;%s&#39; and &#39;%s&#39;&quot;</span> % (</div><div class="line"><a name="l00086"></a><span class="lineno">   86</span>&#160;                self.__class__.__name__, other.__class__.__name__ ) )</div><div class="line"><a name="l00087"></a><span class="lineno">   87</span>&#160;</div></div><!-- fragment -->
 </div>
 </div>
 <a id="abf1ebb7e8108b6161c718bc7908758af"></a>
@@ -273,8 +281,12 @@ Public Attributes</h2></td></tr>
 </div><div class="memdoc">
 <pre class="fragment">    Assures the symbol has meaning, i.e., is not empty.
 </pre> 
-<p class="reference">Referenced by <a class="el" href="classgrammar_1_1symbols_1_1_chomsky_grammar_symbol.html#a8f6a887961a10aa3cbfe3ebed8e644ef">ChomskyGrammarSymbol.lock()</a>.</p>
-<div class="dynheader">
+<p class="definition">Definition at line <a class="el" href="symbols_8py_source.html#l00067">67</a> of file <a class="el" href="symbols_8py_source.html">symbols.py</a>.</p>
+
+<p class="reference">References <a class="el" href="lockable__type_8py_source.html#l00059">LockableType.str</a>.</p>
+
+<p class="reference">Referenced by <a class="el" href="symbols_8py_source.html#l00091">ChomskyGrammarSymbol.lock()</a>.</p>
+<div class="fragment"><div class="line"><a name="l00067"></a><span class="lineno">   67</span>&#160;    <span class="keyword">def </span>check_consistency(self):</div><div class="line"><a name="l00068"></a><span class="lineno">   68</span>&#160;        <span class="stringliteral">&quot;&quot;&quot;</span></div><div class="line"><a name="l00069"></a><span class="lineno">   69</span>&#160;<span class="stringliteral">            Assures the symbol has meaning, i.e., is not empty.</span></div><div class="line"><a name="l00070"></a><span class="lineno">   70</span>&#160;<span class="stringliteral">        &quot;&quot;&quot;</span></div><div class="line"><a name="l00071"></a><span class="lineno">   71</span>&#160;</div><div class="line"><a name="l00072"></a><span class="lineno">   72</span>&#160;        <span class="keywordflow">if</span> <span class="keywordflow">not</span> self.str:</div><div class="line"><a name="l00073"></a><span class="lineno">   73</span>&#160;            <span class="keywordflow">raise</span> RuntimeError( <span class="stringliteral">&quot;Invalid symbol creation! Symbol with no length: `%s`&quot;</span> % self.str )</div><div class="line"><a name="l00074"></a><span class="lineno">   74</span>&#160;</div></div><!-- fragment --><div class="dynheader">
 Here is the caller graph for this function:</div>
 <div class="dyncontent">
 <div class="center"><img src="classgrammar_1_1symbols_1_1_chomsky_grammar_symbol_abf1ebb7e8108b6161c718bc7908758af_icgraph.png" border="0" usemap="#classgrammar_1_1symbols_1_1_chomsky_grammar_symbol_abf1ebb7e8108b6161c718bc7908758af_icgraph" alt=""/></div>
@@ -301,18 +313,22 @@ Here is the caller graph for this function:</div>
       </table>
 </div><div class="memdoc">
 <pre class="fragment">    Block further changes to this object attributes and save its length for faster access.
-</pre> <div class="dynheader">
+</pre> 
+<p class="definition">Definition at line <a class="el" href="symbols_8py_source.html#l00091">91</a> of file <a class="el" href="symbols_8py_source.html">symbols.py</a>.</p>
+
+<p class="reference">References <a class="el" href="symbols_8py_source.html#l00067">ChomskyGrammarSymbol.check_consistency()</a>, <a class="el" href="production_8py_source.html#l00394">Production.check_consistency()</a>, <a class="el" href="lockable__type_8py_source.html#l00056">LockableType.locked</a>, <a class="el" href="symbols_8py_source.html#l00103">ChomskyGrammarSymbol.trim_epsilons()</a>, and <a class="el" href="production_8py_source.html#l00303">Production.trim_epsilons()</a>.</p>
+<div class="fragment"><div class="line"><a name="l00091"></a><span class="lineno">   91</span>&#160;    <span class="keyword">def </span>lock(self):</div><div class="line"><a name="l00092"></a><span class="lineno">   92</span>&#160;        <span class="stringliteral">&quot;&quot;&quot;</span></div><div class="line"><a name="l00093"></a><span class="lineno">   93</span>&#160;<span class="stringliteral">            Block further changes to this object attributes and save its length for faster access.</span></div><div class="line"><a name="l00094"></a><span class="lineno">   94</span>&#160;<span class="stringliteral">        &quot;&quot;&quot;</span></div><div class="line"><a name="l00095"></a><span class="lineno">   95</span>&#160;</div><div class="line"><a name="l00096"></a><span class="lineno">   96</span>&#160;        <span class="keywordflow">if</span> self.locked:</div><div class="line"><a name="l00097"></a><span class="lineno">   97</span>&#160;            <span class="keywordflow">return</span></div><div class="line"><a name="l00098"></a><span class="lineno">   98</span>&#160;</div><div class="line"><a name="l00099"></a><span class="lineno">   99</span>&#160;        self.trim_epsilons()</div><div class="line"><a name="l00100"></a><span class="lineno">  100</span>&#160;        self.check_consistency()</div><div class="line"><a name="l00101"></a><span class="lineno">  101</span>&#160;        super().lock()</div><div class="line"><a name="l00102"></a><span class="lineno">  102</span>&#160;</div></div><!-- fragment --><div class="dynheader">
 Here is the call graph for this function:</div>
 <div class="dyncontent">
 <div class="center"><img src="classgrammar_1_1symbols_1_1_chomsky_grammar_symbol_a8f6a887961a10aa3cbfe3ebed8e644ef_cgraph.png" border="0" usemap="#classgrammar_1_1symbols_1_1_chomsky_grammar_symbol_a8f6a887961a10aa3cbfe3ebed8e644ef_cgraph" alt=""/></div>
 <map name="classgrammar_1_1symbols_1_1_chomsky_grammar_symbol_a8f6a887961a10aa3cbfe3ebed8e644ef_cgraph" id="classgrammar_1_1symbols_1_1_chomsky_grammar_symbol_a8f6a887961a10aa3cbfe3ebed8e644ef_cgraph">
-<area shape="rect" id="node2" href="classgrammar_1_1production_1_1_production.html#a575fe449e32fea11392103073f0e3eeb" title="grammar.production.Production.trim\l_epsilons" alt="" coords="107,68,336,109"/>
-<area shape="rect" id="node6" href="classgrammar_1_1symbols_1_1_chomsky_grammar_symbol.html#a575fe449e32fea11392103073f0e3eeb" title="trim_epsilons" alt="" coords="172,14,271,41"/>
-<area shape="rect" id="node7" href="classgrammar_1_1production_1_1_production.html#abf1ebb7e8108b6161c718bc7908758af" title="grammar.production.Production.check\l_consistency" alt="" coords="100,133,343,175"/>
-<area shape="rect" id="node8" href="classgrammar_1_1symbols_1_1_chomsky_grammar_symbol.html#abf1ebb7e8108b6161c718bc7908758af" title="check_consistency" alt="" coords="154,199,289,226"/>
-<area shape="rect" id="node3" href="classgrammar_1_1lockable__type_1_1_lockable_type.html#a91ed7fad4a0b8bc7f6fc454694b5c5ac" title="grammar.lockable_type.Lockable\lType.new" alt="" coords="398,5,611,47"/>
-<area shape="rect" id="node4" href="classgrammar_1_1dynamic__iteration_1_1_dynamic_iteration_dict.html#a85625f4f51c09e054281275733d62f00" title="grammar.dynamic_iteration.\lDynamicIterationDict.add" alt="" coords="413,71,596,112"/>
-<area shape="rect" id="node5" href="classgrammar_1_1production_1_1_production.html#a1154caae48c545d6c01a37f331985e0a" title="grammar.production.Production.add" alt="" coords="391,137,619,163"/>
+<area shape="rect" id="node2" href="classgrammar_1_1symbols_1_1_chomsky_grammar_symbol.html#abf1ebb7e8108b6161c718bc7908758af" title="check_consistency" alt="" coords="154,5,289,32"/>
+<area shape="rect" id="node3" href="classgrammar_1_1production_1_1_production.html#abf1ebb7e8108b6161c718bc7908758af" title="grammar.production.Production.check\l_consistency" alt="" coords="100,57,343,98"/>
+<area shape="rect" id="node4" href="classgrammar_1_1symbols_1_1_chomsky_grammar_symbol.html#a575fe449e32fea11392103073f0e3eeb" title="trim_epsilons" alt="" coords="172,123,271,149"/>
+<area shape="rect" id="node6" href="classgrammar_1_1production_1_1_production.html#a575fe449e32fea11392103073f0e3eeb" title="grammar.production.Production.trim\l_epsilons" alt="" coords="107,174,336,215"/>
+<area shape="rect" id="node5" href="classgrammar_1_1lockable__type_1_1_lockable_type.html#a91ed7fad4a0b8bc7f6fc454694b5c5ac" title="grammar.lockable_type.Lockable\lType.new" alt="" coords="398,115,611,157"/>
+<area shape="rect" id="node7" href="classgrammar_1_1production_1_1_production.html#a1154caae48c545d6c01a37f331985e0a" title="grammar.production.Production.add" alt="" coords="391,181,619,208"/>
+<area shape="rect" id="node8" href="classgrammar_1_1dynamic__iteration_1_1_dynamic_iteration_dict.html#a85625f4f51c09e054281275733d62f00" title="grammar.dynamic_iteration.\lDynamicIterationDict.add" alt="" coords="413,233,596,274"/>
 </map>
 </div>
 
@@ -349,8 +365,12 @@ Here is the call graph for this function:</div>
     If `new_copy` is True, then instead of modifying the current object, return a new copy
     with epsilon's trimmed.
 </pre> 
-<p class="reference">Referenced by <a class="el" href="classgrammar_1_1symbols_1_1_chomsky_grammar_symbol.html#a8f6a887961a10aa3cbfe3ebed8e644ef">ChomskyGrammarSymbol.lock()</a>.</p>
-<div class="dynheader">
+<p class="definition">Definition at line <a class="el" href="symbols_8py_source.html#l00103">103</a> of file <a class="el" href="symbols_8py_source.html">symbols.py</a>.</p>
+
+<p class="reference">References <a class="el" href="symbols_8py_source.html#l00062">ChomskyGrammarSymbol.len</a>, <a class="el" href="lockable__type_8py_source.html#l00170">LockableType.new()</a>, and <a class="el" href="lockable__type_8py_source.html#l00059">LockableType.str</a>.</p>
+
+<p class="reference">Referenced by <a class="el" href="symbols_8py_source.html#l00091">ChomskyGrammarSymbol.lock()</a>.</p>
+<div class="fragment"><div class="line"><a name="l00103"></a><span class="lineno">  103</span>&#160;    <span class="keyword">def </span>trim_epsilons(self, new_copy=False):</div><div class="line"><a name="l00104"></a><span class="lineno">  104</span>&#160;        <span class="stringliteral">&quot;&quot;&quot;</span></div><div class="line"><a name="l00105"></a><span class="lineno">  105</span>&#160;<span class="stringliteral">            Merges the epsilon symbol with other symbols, because the epsilon symbol has not</span></div><div class="line"><a name="l00106"></a><span class="lineno">  106</span>&#160;<span class="stringliteral">            meaning, unless it is alone.</span></div><div class="line"><a name="l00107"></a><span class="lineno">  107</span>&#160;<span class="stringliteral"></span></div><div class="line"><a name="l00108"></a><span class="lineno">  108</span>&#160;<span class="stringliteral">            If `new_copy` is True, then instead of modifying the current object, return a new copy</span></div><div class="line"><a name="l00109"></a><span class="lineno">  109</span>&#160;<span class="stringliteral">            with epsilon&#39;s trimmed.</span></div><div class="line"><a name="l00110"></a><span class="lineno">  110</span>&#160;<span class="stringliteral">        &quot;&quot;&quot;</span></div><div class="line"><a name="l00111"></a><span class="lineno">  111</span>&#160;</div><div class="line"><a name="l00112"></a><span class="lineno">  112</span>&#160;        <span class="keywordflow">if</span> new_copy:</div><div class="line"><a name="l00113"></a><span class="lineno">  113</span>&#160;            self = self.new()</div><div class="line"><a name="l00114"></a><span class="lineno">  114</span>&#160;</div><div class="line"><a name="l00115"></a><span class="lineno">  115</span>&#160;        <span class="keywordflow">if</span> len( self ):</div><div class="line"><a name="l00116"></a><span class="lineno">  116</span>&#160;            new_symbols = []</div><div class="line"><a name="l00117"></a><span class="lineno">  117</span>&#160;</div><div class="line"><a name="l00118"></a><span class="lineno">  118</span>&#160;            <span class="keywordflow">for</span> symbol <span class="keywordflow">in</span> self.str:</div><div class="line"><a name="l00119"></a><span class="lineno">  119</span>&#160;</div><div class="line"><a name="l00120"></a><span class="lineno">  120</span>&#160;                <span class="keywordflow">if</span> symbol != <span class="stringliteral">&#39;&amp;&#39;</span>:</div><div class="line"><a name="l00121"></a><span class="lineno">  121</span>&#160;                    new_symbols.append( symbol )</div><div class="line"><a name="l00122"></a><span class="lineno">  122</span>&#160;</div><div class="line"><a name="l00123"></a><span class="lineno">  123</span>&#160;            self.str = <span class="stringliteral">&quot;&quot;</span>.join( new_symbols )</div><div class="line"><a name="l00124"></a><span class="lineno">  124</span>&#160;</div><div class="line"><a name="l00125"></a><span class="lineno">  125</span>&#160;        <span class="keywordflow">else</span>:</div><div class="line"><a name="l00126"></a><span class="lineno">  126</span>&#160;            self.str = self.str[0]</div><div class="line"><a name="l00127"></a><span class="lineno">  127</span>&#160;</div><div class="line"><a name="l00128"></a><span class="lineno">  128</span>&#160;</div></div><!-- fragment --><div class="dynheader">
 Here is the call graph for this function:</div>
 <div class="dyncontent">
 <div class="center"><img src="classgrammar_1_1symbols_1_1_chomsky_grammar_symbol_a575fe449e32fea11392103073f0e3eeb_cgraph.png" border="0" usemap="#classgrammar_1_1symbols_1_1_chomsky_grammar_symbol_a575fe449e32fea11392103073f0e3eeb_cgraph" alt=""/></div>
@@ -370,7 +390,7 @@ Here is the caller graph for this function:</div>
 </div>
 </div>
 <hr/>The documentation for this class was generated from the following file:<ul>
-<li>symbols.py</li>
+<li><a class="el" href="symbols_8py_source.html">symbols.py</a></li>
 </ul>
 </div><!-- contents -->
 </div><!-- doc-content -->

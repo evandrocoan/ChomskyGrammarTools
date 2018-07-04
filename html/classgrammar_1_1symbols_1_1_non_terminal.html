@@ -5,7 +5,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=9"/>
 <meta name="generator" content="Doxygen 1.8.14"/>
 <meta name="viewport" content="width=device-width, initial-scale=1"/>
-<title>Trabalho 2 Formais: NonTerminal Class Reference</title>
+<title>Chomsky Grammar Tools for Context Free Grammars (CFG): NonTerminal Class Reference</title>
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="jquery.js"></script>
 <script type="text/javascript" src="dynsections.js"></script>
@@ -30,7 +30,7 @@
  <tr style="height: 56px;">
   <td id="projectlogo"><img alt="Logo" src="login.png"/></td>
   <td id="projectalign" style="padding-left: 0.5em;">
-   <div id="projectname">Trabalho 2 Formais
+   <div id="projectname">Chomsky Grammar Tools for Context Free Grammars (CFG)
    </div>
   </td>
  </tr>
@@ -178,7 +178,9 @@ Additional Inherited Members</h2></td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><pre class="fragment">    Represents a non terminal symbol on an ChomskyGrammar.
-</pre> </div><h2 class="groupheader">Member Function Documentation</h2>
+</pre> 
+<p class="definition">Definition at line <a class="el" href="symbols_8py_source.html#l00152">152</a> of file <a class="el" href="symbols_8py_source.html">symbols.py</a>.</p>
+</div><h2 class="groupheader">Member Function Documentation</h2>
 <a id="abf1ebb7e8108b6161c718bc7908758af"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#abf1ebb7e8108b6161c718bc7908758af">&#9670;&nbsp;</a></span>check_consistency()</h2>
 
@@ -196,10 +198,14 @@ Additional Inherited Members</h2></td></tr>
 </div><div class="memdoc">
 <pre class="fragment">    Assures the symbol has meaning, i.e., is not empty.
 </pre> 
+<p class="definition">Definition at line <a class="el" href="symbols_8py_source.html#l00159">159</a> of file <a class="el" href="symbols_8py_source.html">symbols.py</a>.</p>
+
+<p class="reference">References <a class="el" href="symbols_8py_source.html#l00062">ChomskyGrammarSymbol.len</a>, and <a class="el" href="lockable__type_8py_source.html#l00059">LockableType.str</a>.</p>
+<div class="fragment"><div class="line"><a name="l00159"></a><span class="lineno">  159</span>&#160;    <span class="keyword">def </span>check_consistency(self):</div><div class="line"><a name="l00160"></a><span class="lineno">  160</span>&#160;        <span class="stringliteral">&quot;&quot;&quot;</span></div><div class="line"><a name="l00161"></a><span class="lineno">  161</span>&#160;<span class="stringliteral">            Assures the symbol has meaning, i.e., is not empty.</span></div><div class="line"><a name="l00162"></a><span class="lineno">  162</span>&#160;<span class="stringliteral">        &quot;&quot;&quot;</span></div><div class="line"><a name="l00163"></a><span class="lineno">  163</span>&#160;        super().check_consistency()</div><div class="line"><a name="l00164"></a><span class="lineno">  164</span>&#160;</div><div class="line"><a name="l00165"></a><span class="lineno">  165</span>&#160;        <span class="keywordflow">if</span> <span class="keywordflow">not</span> len( self ):</div><div class="line"><a name="l00166"></a><span class="lineno">  166</span>&#160;            <span class="keywordflow">raise</span> RuntimeError( <span class="stringliteral">&quot;Invalid symbol creation! Symbol with no length: `%s`&quot;</span> % self.str )</div><div class="line"><a name="l00167"></a><span class="lineno">  167</span>&#160;</div><div class="line"><a name="l00168"></a><span class="lineno">  168</span>&#160;</div><!-- fragment -->
 </div>
 </div>
 <hr/>The documentation for this class was generated from the following file:<ul>
-<li>symbols.py</li>
+<li><a class="el" href="symbols_8py_source.html">symbols.py</a></li>
 </ul>
 </div><!-- contents -->
 </div><!-- doc-content -->
