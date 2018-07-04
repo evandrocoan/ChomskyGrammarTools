@@ -1,0 +1,9 @@
+<map id="trim_epsilons" name="trim_epsilons">
+<area shape="rect" id="node2" href="$classgrammar_1_1production_1_1_production.html#ade7dca7b1f69676ba253d0e65536f06e" title="filter_non_terminals" alt="" coords="204,5,339,32"/>
+<area shape="rect" id="node3" href="$classgrammar_1_1symbols_1_1_chomsky_grammar_symbol.html#a8f6a887961a10aa3cbfe3ebed8e644ef" title="grammar.symbols.ChomskyGrammar\lSymbol.lock" alt="" coords="152,57,391,98"/>
+<area shape="rect" id="node4" href="$classgrammar_1_1production_1_1_production.html#a8f6a887961a10aa3cbfe3ebed8e644ef" title="lock" alt="" coords="248,123,295,149"/>
+<area shape="rect" id="node5" href="$classgrammar_1_1production_1_1_production.html#ace1c6ccbf992066adb3ff3e5a95014d2" title="remove_everything_after" alt="" coords="191,173,351,200"/>
+<area shape="rect" id="node6" href="$classgrammar_1_1production_1_1_production.html#abc4bd3648ef6d34c0a9091fff69e33ee" title="remove_everything_before" alt="" coords="186,224,357,251"/>
+<area shape="rect" id="node8" href="$classgrammar_1_1production_1_1_production.html#af1f7c93d6d5f04010a461ef81015b02f" title="replace" alt="" coords="239,275,303,301"/>
+<area shape="rect" id="node7" href="$classgrammar_1_1production_1_1_production.html#aac48ff12fcb5fea45a6720343a71c60a" title="following_symbols" alt="" coords="439,224,565,251"/>
+</map>

@@ -1,0 +1,6 @@
+<map id="has_left_recursion" name="has_left_recursion">
+<area shape="rect" id="node2" href="$classgrammar_1_1grammar_1_1_chomsky_grammar.html#acffd7605f88377cc925c375229fa7522" title="left_recursion" alt="" coords="180,31,279,57"/>
+<area shape="rect" id="node3" href="$classgrammar_1_1grammar_1_1_chomsky_grammar.html#aa81ca901977164f8ea0f4503e71a182f" title="first_non_terminals" alt="" coords="327,5,457,32"/>
+<area shape="rect" id="node4" href="$classgrammar_1_1grammar_1_1_chomsky_grammar.html#a6e04c84a0d964fc767e4f54977249097" title="first_non_terminals_from" alt="" coords="505,31,668,57"/>
+<area shape="rect" id="node5" href="$classgrammar_1_1grammar_1_1_chomsky_grammar.html#a831b963e2931277a3202b98de51e914d" title="has_production" alt="" coords="716,31,827,57"/>
+</map>

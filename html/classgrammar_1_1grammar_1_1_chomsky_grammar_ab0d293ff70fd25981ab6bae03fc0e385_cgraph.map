@@ -1,0 +1,7 @@
+<map id="remove_start_non_terminal" name="remove_start_non_terminal">
+<area shape="rect" id="node2" href="$classgrammar_1_1grammar_1_1_chomsky_grammar.html#a70324b9568d6c5955608e00619778160" title="remove_production" alt="" coords="235,5,365,32"/>
+<area shape="rect" id="node3" href="$classgrammar_1_1grammar_1_1_chomsky_grammar.html#acfbbeb75485ca87c4bfce1b41932d69f" title="clean_initial_symbol" alt="" coords="231,56,369,83"/>
+<area shape="rect" id="node4" href="$classgrammar_1_1grammar_1_1_chomsky_grammar.html#aeb0f19c94bae8eb9606a31661525cad2" title="new_symbol" alt="" coords="425,31,520,57"/>
+<area shape="rect" id="node5" href="$classgrammar_1_1grammar_1_1_chomsky_grammar.html#ab7e00ef2cb9a892b0806817bd377a7d1" title="add_production" alt="" coords="417,81,528,108"/>
+<area shape="rect" id="node6" href="$classgrammar_1_1grammar_1_1_chomsky_grammar.html#aad4d6876f422fea3c14b8c608c99cabe" title="assure_correct_start\l_symbol" alt="" coords="576,74,717,115"/>
+</map>

@@ -1,0 +1,7 @@
+<map id="eliminate_simple_non_terminals" name="eliminate_simple_non_terminals">
+<area shape="rect" id="node2" href="$classgrammar_1_1grammar_1_1_chomsky_grammar.html#a76020ecf6b87c4fd83aaf3c76380c398" title="convert_to_proper" alt="" coords="200,5,324,32"/>
+<area shape="rect" id="node5" href="$classgrammar_1_1grammar_1_1_chomsky_grammar.html#ac3efedd5b82de942ab677585bcb8ceb1" title="is_infinite" alt="" coords="224,56,300,83"/>
+<area shape="rect" id="node3" href="$classgrammar_1_1grammar_1_1_chomsky_grammar.html#a3e4b9395b0536be92e5caab06a015f96" title="eliminate_left_recursion" alt="" coords="372,5,531,32"/>
+<area shape="rect" id="node4" href="$classgrammar_1_1grammar_1_1_chomsky_grammar.html#a798324cfdb5ce9241790e0ec062c89fd" title="factor_it" alt="" coords="579,5,647,32"/>
+<area shape="rect" id="node6" href="$classgrammar_1_1grammar_1_1_chomsky_grammar.html#af61ecc2cec6a8c7fe65f3f1cd4cb0cf8" title="is_finite" alt="" coords="418,56,485,83"/>
+</map>

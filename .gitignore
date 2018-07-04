@@ -2,7 +2,6 @@
 *.pyc
 *.sublime-workspace
 
-html
 latex
 rtf
 
