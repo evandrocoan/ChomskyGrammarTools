@@ -10,7 +10,8 @@ _parser = lark.Lark( r"""
         production  : WHITE_SPACE* symbols_begin "|" production
                     | WHITE_SPACE* symbols_begin
 
-        grammar_symbols      : non_terminals_begin
+        grammar_symbols      : terminals_begin | non_terminals_begin
+        terminal_symbols     : LOW_CASE_LETTER
         non_terminal_symbols : UPPER_CASE_LETTER
 
         symbols_begin : grammar_symbols symbols_end
@@ -18,6 +19,12 @@ _parser = lark.Lark( r"""
 
         non_terminals_begin : non_terminal_symbols non_terminals_end
         non_terminals_end   : non_terminal_symbols non_terminals_end | white_space+ | UPPER_CASE_LETTER2
+
+        terminals_begin : terminal_symbols terminals_end
+        terminals_end   : terminal_symbols terminals_end | white_space+ | LOW_CASE_LETTER2
+
+        LOW_CASE_LETTER  : /[a-zØ-öø-ÿ]/
+        LOW_CASE_LETTER2 : /[a-zØ-öø-ÿ]$/
 
         UPPER_CASE_LETTER  : /[A-ZÀ-Ö]/
         UPPER_CASE_LETTER2 : /[A-ZÀ-Ö]$/
@@ -28,6 +35,6 @@ _parser = lark.Lark( r"""
 """, start='grammar', parser='earley', ambiguity="explicit" )
 # """, start='grammar', parser='lalr' )
 
-tree = _parser.parse( "S -> S SS AAA  |  B  |  C  " )
+tree = _parser.parse( "S -> a | S SS AAA  |  B  |  C  " )
 print( tree.pretty() )
 
