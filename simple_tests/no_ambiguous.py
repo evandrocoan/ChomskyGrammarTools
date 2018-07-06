@@ -4,23 +4,23 @@
 import lark
 
 _parser = lark.Lark( r"""
-        start        : start_symbol "->" productions
-        start_symbol : white_spaces symbols white_spaces
+        grammar      : start_symbol "->" productions
+        start_symbol : WHITE_SPACE* non_terminal WHITE_SPACE*
 
-        productions  : white_spaces symbols white_spaces productions | symbols
+        productions : non_terminals "|" productions | non_terminals
+        non_terminals  : WHITE_SPACE* non_terminal WHITE_SPACE* non_terminals | non_terminal
 
-        symbols  : UPPER_CASE_LETTER symbols2
-        ?symbols2 : UPPER_CASE_LETTER symbols2 | WHITE_SPACE | UPPER_CASE_LETTER2
+        non_terminal   : UPPER_CASE_LETTER non_terminal2
+        ?non_terminal2 : UPPER_CASE_LETTER non_terminal2 | WHITE_SPACE | non_terminal3
+        non_terminal3  : UPPER_CASE_LETTER2
 
         UPPER_CASE_LETTER  : /[A-ZÀ-Ö]/
         UPPER_CASE_LETTER2 : /[A-ZÀ-Ö]$/
 
         // Common definitions
-        WHITE_SPACE  : ( " " | /\t/ )
-        white_space  : WHITE_SPACE
-        white_spaces : WHITE_SPACE white_spaces | []
-""", start='start', parser='earley', ambiguity="explicit" )
+        WHITE_SPACE : ( " " | /\t/ )
+""", start='grammar', parser='earley', ambiguity="explicit" )
 
-tree = _parser.parse( "S -> S SS SSS AAA" )
+tree = _parser.parse( "S -> S SS AAA" )
 print( tree.pretty() )
 
