@@ -4,21 +4,33 @@
 import lark
 
 _parser = lark.Lark( r"""
-        grammar      : start_symbol "->" production
-        start_symbol : WHITE_SPACE* production_symbols+
+        productions : start_symbol "->" production_symbols
 
-        production  : WHITE_SPACE* production_symbols+ "|" production
-                    | WHITE_SPACE* production_symbols+
+        production_symbols : WHITE_SPACE* token+ "|" production_symbols
+                           | WHITE_SPACE* token+
 
-        production_symbols   : terminals_begin | non_terminals_begin
-        terminal_symbols     : LOW_CASE_LETTER
-        non_terminal_symbols : UPPER_CASE_LETTER | QUOTE | DIGIT
+        // Rename the start symbol, so when parsing the tree it is simple to find it
+        start_symbol : WHITE_SPACE* token+
 
-        non_terminals_begin : non_terminal_symbols non_terminals_end
-        non_terminals_end   : non_terminal_symbols non_terminals_end | WHITE_SPACE+ | UPPER_CASE_LETTER2 | QUOTE2 | DIGIT2
+        token                : terminal_begin | non_terminal_begin
+        terminal_symbols     : LOW_CASE_LETTER | DIGIT | EPSILON
+        non_terminal_symbols : UPPER_CASE_LETTER | DIGIT | QUOTE
 
-        terminals_begin : terminal_symbols terminals_end
-        terminals_end   : terminal_symbols terminals_end | WHITE_SPACE+ | LOW_CASE_LETTER2
+        terminal_begin : terminal_symbols terminal_end
+        terminal_end   : terminal_symbols terminal_end
+                        | LOW_CASE_LETTER2
+                        | WHITE_SPACE+
+                        | WHITE_SPACE+ new_line productions
+                        | new_line productions
+
+        non_terminal_begin : UPPER_CASE_LETTER non_terminal_end
+        non_terminal_end   : non_terminal_symbols non_terminal_end
+                            | QUOTE2
+                            | DIGIT2
+                            | UPPER_CASE_LETTER2
+                            | WHITE_SPACE+
+                            | WHITE_SPACE+ new_line productions
+                            | new_line productions
 
         LOW_CASE_LETTER  : /[a-zØ-öø-ÿ]/
         LOW_CASE_LETTER2 : /[a-zØ-öø-ÿ]$/
@@ -34,13 +46,14 @@ _parser = lark.Lark( r"""
 
         CR        : /\r/
         LF        : /\n/
-        NEWLINE   : (CR? LF)+
+        new_line  : (CR? LF)+
 
         // Common definitions
+        EPSILON : "&"+
         WHITE_SPACE : ( " " | /\t/ )
-""", start='grammar', parser='lalr' )
-# """, start='grammar', parser='earley', ambiguity="explicit" )
+""", start='productions', parser='lalr' )
+# """, start='productions', parser='earley', ambiguity="explicit" )
 
-tree = _parser.parse( "S -> a 1 | aa S1 a SS AAA  |  B  |  C  " )
+tree = _parser.parse( "S -> a & 1 | aa S1 a SS AAA  |  B  |  C  a\n B -> BB\nC -> CC" )
 print( tree.pretty() )
 
