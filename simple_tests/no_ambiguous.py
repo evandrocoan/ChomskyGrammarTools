@@ -5,16 +5,19 @@ import lark
 
 _parser = lark.Lark( r"""
         grammar      : start_symbol "->" production
-        start_symbol : WHITE_SPACE* symbols
+        start_symbol : WHITE_SPACE* symbols_begin
 
-        production  : WHITE_SPACE* symbols "|" production
-                    | WHITE_SPACE* symbols
+        production  : WHITE_SPACE* symbols_begin "|" production
+                    | WHITE_SPACE* symbols_begin
 
-        symbols : non_terminal symbols | non_terminal
+        grammar_symbols      : non_terminals_begin
+        non_terminal_symbols : UPPER_CASE_LETTER
 
-        non_terminal   : UPPER_CASE_LETTER non_terminal2
-        non_terminal2  : UPPER_CASE_LETTER non_terminal2 | non_terminal3
-        non_terminal3  : white_space+ | UPPER_CASE_LETTER2
+        symbols_begin : grammar_symbols symbols_end
+        symbols_end   : grammar_symbols symbols_end | []
+
+        non_terminals_begin : non_terminal_symbols non_terminals_end
+        non_terminals_end   : non_terminal_symbols non_terminals_end | white_space+ | UPPER_CASE_LETTER2
 
         UPPER_CASE_LETTER  : /[A-ZÀ-Ö]/
         UPPER_CASE_LETTER2 : /[A-ZÀ-Ö]$/
