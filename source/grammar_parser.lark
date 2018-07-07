@@ -3,11 +3,11 @@
 grammar : ( start_symbol "->" productions new_line+ )* ( start_symbol "->" productions )
 
 // Rename the start symbol, so when parsing the tree it is simple to find it
-start_symbol : tokens
-productions  : tokens ( "|" tokens )*
+start_symbol : production
+productions  : production ( "|" production )*
 
-token  : terminals | non_terminals
-tokens : SPACES* ( token+ SPACES+ )* token*
+token : terminals | non_terminals
+production : SPACES* ( token+ SPACES+ )* token*
 
 terminals     : ( LOWER_CASE_LETTER | EPSILON | DIGIT | signs | signs_extra | parens )+
 non_terminals : UPPER_CASE_LETTER ( UPPER_CASE_LETTER | DIGIT | QUOTE )*

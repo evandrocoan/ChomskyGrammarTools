@@ -297,7 +297,7 @@ def getCleanSpaces(inputText, minimumLength=0, lineCutTrigger="", keepSpaceSepat
 
         `minimumLength` of a line to not be ignored
         `lineCutTrigger` all lines after a line starting with this string will be ignored
-        `keepSpaceSepators` it will keep at a single space between sentences as `S S`, given `S    S`
+        `keepSpaceSepators` if True, it will keep at a single space between sentences as `S S`, given `S    S`
     """
 
     if keepSpaceSepators:
@@ -335,7 +335,7 @@ def getCleanSpaces(inputText, minimumLength=0, lineCutTrigger="", keepSpaceSepat
     return clean_lines
 
 
-def wrap_text(text, wrap=0, trim_tabs=False, trim_spaces=False, trim_lines=False,indent=""):
+def wrap_text(text, wrap=0, trim_tabs=False, trim_spaces=False, trim_lines=False, indent=""):
     """
         1. Remove input text leading common indentation, trailing white spaces
         2. If `wrap`, wraps big lists on 80 characters.

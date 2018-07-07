@@ -2029,478 +2029,865 @@ class TestGrammarFertileSymbols(TestingUtilities):
 
 class TestGrammarTreeParsing(TestingUtilities):
 
-    def test_grammarTreeParsingComplexSingleProduction(self):
-        firstGrammar = ChomskyGrammar.parse( wrap_text(
+    def test_grammarInputParsingComplexSingleProduction(self):
+        grammar = \
         r"""
             S -> aABbbCC1aAbA BC | ba | c
-        """ ) )
-
-        self.assertTextEqual(
-        r"""
-            + productions
-            +   non_terminal_start
-            +     non_terminal  S
-            +   space
-            +   non_terminals
-            +     production
-            +       space
-            +       terminal  a
-            +       non_terminal
-            +         A
-            +         B
-            +       terminal
-            +         b
-            +         b
-            +       non_terminal
-            +         C
-            +         C
-            +       terminal
-            +         1
-            +         a
-            +       non_terminal  A
-            +       terminal  b
-            +       non_terminal  A
-            +       space
-            +       non_terminal
-            +         B
-            +         C
-            +       space
-            +     production
-            +       space
-            +       terminal
-            +         b
-            +         a
-            +       space
-            +     production
-            +       space
-            +       terminal  c
-        """, firstGrammar.pretty() )
-
-    def test_grammarInputParsingComplexSingleProduction(self):
-        firstGrammar = ChomskyGrammar.load_from_text_lines(
-        r"""
-            S  -> aABbbCC1aAbA BC | ba | c
-            A  -> &
+            A -> &
             AB -> &
             BC -> &
-            CC -> &
-        """ )
+            CC1 -> &
+        """
+        firstGrammar = ChomskyGrammar.load_from_text_lines( grammar )
 
         self.assertTextEqual(
         r"""
-            +  S -> c | ba | a AB bb CC 1a A b A BC
-            +  A -> &
-            + AB -> &
-            + BC -> &
-            + CC -> &
+            +   S -> c | ba | a AB bb CC1 a A b A BC
+            +   A -> &
+            +  AB -> &
+            +  BC -> &
+            + CC1 -> &
         """, firstGrammar )
 
+    def test_grammarTreeParsingComplexSingleProduction(self):
+        grammar = \
+        r"""
+            S -> aABbbCC1aAbA BC | ba | c
+            A -> &
+            AB -> &
+            BC -> &
+            CC1 -> &
+        """
+        firstGrammar = ChomskyGrammar.parse( grammar )
+        new_tree = ChomskyGrammarTreeTransformer().transform( firstGrammar )
+
+        self.assertTextEqual(
+        r"""
+            + grammar
+            +   S
+            +   productions
+            +     a AB bb CC1 a A b A BC
+            +     ba
+            +     c
+            +   new_line
+            +
+            +   A
+            +   productions  &
+            +   new_line
+            +
+            +   AB
+            +   productions  &
+            +   new_line
+            +
+            +   BC
+            +   productions  &
+            +   new_line
+            +
+            +   CC1
+            +   productions  &
+        """, new_tree.pretty() )
+
+    def test_grammarRawTreeParsingComplexSingleProduction(self):
+        grammar = \
+        r"""
+            S -> aABbbCC1aAbA BC | ba | c
+            A -> &
+            AB -> &
+            BC -> &
+            CC1 -> &
+        """
+        firstGrammar = ChomskyGrammar.parse( grammar )
+
+        self.assertTextEqual(
+        r"""
+            + grammar
+            +   start_symbol
+            +     production
+            +       token
+            +         non_terminals  S
+            +
+            +   productions
+            +     production
+            +
+            +       token
+            +         terminals  a
+            +       token
+            +         non_terminals
+            +           A
+            +           B
+            +       token
+            +         terminals
+            +           b
+            +           b
+            +       token
+            +         non_terminals
+            +           C
+            +           C
+            +           1
+            +       token
+            +         terminals  a
+            +       token
+            +         non_terminals  A
+            +       token
+            +         terminals  b
+            +       token
+            +         non_terminals  A
+            +
+            +       token
+            +         non_terminals
+            +           B
+            +           C
+            +
+            +     production
+            +
+            +       token
+            +         terminals
+            +           b
+            +           a
+            +
+            +     production
+            +
+            +       token
+            +         terminals  c
+            +   new_line
+            +
+            +   start_symbol
+            +     production
+            +       token
+            +         non_terminals  A
+            +
+            +   productions
+            +     production
+            +
+            +       token
+            +         terminals  &
+            +   new_line
+            +
+            +   start_symbol
+            +     production
+            +       token
+            +         non_terminals
+            +           A
+            +           B
+            +
+            +   productions
+            +     production
+            +
+            +       token
+            +         terminals  &
+            +   new_line
+            +
+            +   start_symbol
+            +     production
+            +       token
+            +         non_terminals
+            +           B
+            +           C
+            +
+            +   productions
+            +     production
+            +
+            +       token
+            +         terminals  &
+            +   new_line
+            +
+            +   start_symbol
+            +     production
+            +       token
+            +         non_terminals
+            +           C
+            +           C
+            +           1
+            +
+            +   productions
+            +     production
+            +
+            +       token
+            +         terminals  &
+        """, firstGrammar.pretty() )
+
     def test_grammarInputParsingSymbolMerging(self):
-        firstGrammar = ChomskyGrammar.load_from_text_lines(
+        grammar = \
         r"""
             S -> a b cd | AccD | Ac cD
             A -> &
             D -> &
-        """ )
+        """
+        firstGrammar = ChomskyGrammar.parse( grammar )
+        firstGrammar = ChomskyGrammar.load_from_text_lines( grammar )
 
         self.assertTextEqual(
         r"""
             + S -> a b cd | A cc D | A c c D
             + A -> &
             + D -> &
-        """, str( firstGrammar ) )
+        """, firstGrammar )
 
-    def test_grammarTreeParsingABandB(self):
-        firstGrammar = ChomskyGrammar.parse( wrap_text(
+    def test_grammarTreeParsingSymbolMerging(self):
+        grammar = \
         r"""
-            S -> aABb BC | b
-        """ ) )
+            S -> a b cd | AccD | Ac cD
+            A -> &
+            D -> &
+        """
+        firstGrammar = ChomskyGrammar.parse( grammar )
+        new_tree = ChomskyGrammarTreeTransformer().transform( firstGrammar )
 
         self.assertTextEqual(
         r"""
-            + productions
-            +   non_terminal_start
-            +     non_terminal  S
-            +   space
-            +   non_terminals
+            + grammar
+            +   S
+            +   productions
+            +     a b cd
+            +     A cc D
+            +     A c c D
+            +   new_line
+            +
+            +   A
+            +   productions  &
+            +   new_line
+            +
+            +   D
+            +   productions  &
+        """, new_tree.pretty() )
+
+    def test_grammarRawTreeParsingSymbolMerging(self):
+        grammar = \
+        r"""
+            S -> a b cd | AccD | Ac cD
+            A -> &
+            D -> &
+        """
+        firstGrammar = ChomskyGrammar.parse( grammar )
+
+        self.assertTextEqual(
+        r"""
+            + grammar
+            +   start_symbol
             +     production
-            +       space
-            +       terminal  a
-            +       non_terminal
-            +         A
-            +         B
-            +       terminal  b
-            +       space
-            +       non_terminal
-            +         B
-            +         C
-            +       space
+            +       token
+            +         non_terminals  S
+            +
+            +   productions
             +     production
-            +       space
-            +       terminal  b
+            +
+            +       token
+            +         terminals  a
+            +
+            +       token
+            +         terminals  b
+            +
+            +       token
+            +         terminals
+            +           c
+            +           d
+            +
+            +     production
+            +
+            +       token
+            +         non_terminals  A
+            +       token
+            +         terminals
+            +           c
+            +           c
+            +       token
+            +         non_terminals  D
+            +
+            +     production
+            +
+            +       token
+            +         non_terminals  A
+            +       token
+            +         terminals  c
+            +
+            +       token
+            +         terminals  c
+            +       token
+            +         non_terminals  D
+            +   new_line
+            +
+            +   start_symbol
+            +     production
+            +       token
+            +         non_terminals  A
+            +
+            +   productions
+            +     production
+            +
+            +       token
+            +         terminals  &
+            +   new_line
+            +
+            +   start_symbol
+            +     production
+            +       token
+            +         non_terminals  D
+            +
+            +   productions
+            +     production
+            +
+            +       token
+            +         terminals  &
+        """, firstGrammar.pretty() )
+
+    def test_grammarInputParsingABandB(self):
+        grammar = \
+        r"""
+            S -> aABb BC | b
+            AB -> &
+            BC -> &
+        """
+        firstGrammar = ChomskyGrammar.load_from_text_lines( grammar )
+
+        self.assertTextEqual(
+        r"""
+            +  S -> b | a AB b BC
+            + AB -> &
+            + BC -> &
+        """, firstGrammar )
+
+    def test_grammarTreeParsingABandB(self):
+        grammar = \
+        r"""
+            S -> aABb BC | b
+            AB -> &
+            BC -> &
+        """
+        firstGrammar = ChomskyGrammar.parse( grammar )
+        new_tree = ChomskyGrammarTreeTransformer().transform( firstGrammar )
+
+        self.assertTextEqual(
+        r"""
+            + grammar
+            +   S
+            +   productions
+            +     a AB b BC
+            +     b
+            +   new_line
+            +
+            +   AB
+            +   productions  &
+            +   new_line
+            +
+            +   BC
+            +   productions  &
+        """, new_tree.pretty() )
+
+    def test_grammarRawTreeParsingABandB(self):
+        grammar = \
+        r"""
+            S -> aABb BC | b
+            AB -> &
+            BC -> &
+        """
+        firstGrammar = ChomskyGrammar.parse( grammar )
+
+        self.assertTextEqual(
+        r"""
+            + grammar
+            +   start_symbol
+            +     production
+            +       token
+            +         non_terminals  S
+            +
+            +   productions
+            +     production
+            +
+            +       token
+            +         terminals  a
+            +       token
+            +         non_terminals
+            +           A
+            +           B
+            +       token
+            +         terminals  b
+            +
+            +       token
+            +         non_terminals
+            +           B
+            +           C
+            +
+            +     production
+            +
+            +       token
+            +         terminals  b
+            +   new_line
+            +
+            +   start_symbol
+            +     production
+            +       token
+            +         non_terminals
+            +           A
+            +           B
+            +
+            +   productions
+            +     production
+            +
+            +       token
+            +         terminals  &
+            +   new_line
+            +
+            +   start_symbol
+            +     production
+            +       token
+            +         non_terminals
+            +           B
+            +           C
+            +
+            +   productions
+            +     production
+            +
+            +       token
+            +         terminals  &
         """, firstGrammar.pretty() )
 
     def test_grammarInputParsingEmptyEpsilon(self):
-        firstGrammar = ChomskyGrammar.load_from_text_lines(
+        grammar = \
         r"""
              S ->
             SS -> S |
-        """ )
+        """
+        firstGrammar = ChomskyGrammar.load_from_text_lines( grammar )
 
         self.assertTextEqual(
         r"""
             +  S -> &
             + SS -> & | S
-        """, str( firstGrammar ) )
+        """, firstGrammar )
 
     def test_grammarTreeParsingEmptyEpsilon(self):
-        firstGrammar = ChomskyGrammar.parse( wrap_text(
+        grammar = \
         r"""
              S ->
             SS -> S |
-        """ ) )
+        """
+        firstGrammar = ChomskyGrammar.parse( grammar )
+        new_tree = ChomskyGrammarTreeTransformer().transform( firstGrammar )
 
         self.assertTextEqual(
         r"""
-            + productions
-            +   space
-            +   non_terminal_start
-            +     non_terminal  S
-            +   space
-            +   non_terminals
-            +     production
-            +       epsilon
-            +   end_symbol
-            +     new_line
+            + grammar
+            +   S
+            +   productions
+            +   new_line
             +
-            +   non_terminal_start
-            +     non_terminal
-            +       S
-            +       S
-            +   space
-            +   non_terminals
+            +   SS
+            +   productions
+            +     S
+        """, new_tree.pretty() )
+
+    def test_grammarRawTreeParsingEmptyEpsilon(self):
+        grammar = \
+        r"""
+             S ->
+            SS -> S |
+        """
+        firstGrammar = ChomskyGrammar.parse( grammar )
+
+        self.assertTextEqual(
+        r"""
+            + grammar
+            +   start_symbol
             +     production
-            +       space
-            +       non_terminal  S
-            +       space
+            +       token
+            +         non_terminals  S
+            +
+            +   productions
             +     production
-            +       epsilon
+            +   new_line
+            +
+            +   start_symbol
+            +     production
+            +       token
+            +         non_terminals
+            +           S
+            +           S
+            +
+            +   productions
+            +     production
+            +
+            +       token
+            +         non_terminals  S
+            +
+            +     production
         """, firstGrammar.pretty() )
 
     def test_grammarInputParsingSSandEpsilon(self):
-        firstGrammar = ChomskyGrammar.load_from_text_lines(
+        grammar = \
         r"""
             S   -> SS SSS | &
             SS  -> &
             SSS -> &
-        """ )
+        """
+        firstGrammar = ChomskyGrammar.load_from_text_lines( grammar )
 
         self.assertTextEqual(
         r"""
             +   S -> & | SS SSS
             +  SS -> &
             + SSS -> &
-        """, str( firstGrammar ) )
+        """, firstGrammar )
 
     def test_grammarTreeParsingSSandEpsilon(self):
-        firstGrammar = ChomskyGrammar.parse(
+        grammar = \
         r"""
-            S -> S SS | &
-        """ )
+            S   -> SS SSS | &
+            SS  -> &
+            SSS -> &
+        """
+        firstGrammar = ChomskyGrammar.parse( grammar )
+        new_tree = ChomskyGrammarTreeTransformer().transform( firstGrammar )
 
         self.assertTextEqual(
         r"""
-            + productions
+            + grammar
+            +   S
+            +   productions
+            +     SS SSS
+            +     &
             +   new_line
             +
-            +   space
-            +   space
-            +   space
-            +   space
-            +   space
-            +   space
-            +   space
-            +   space
-            +   space
-            +   space
-            +   space
-            +   space
-            +   non_terminal_start
-            +     non_terminal  S
-            +   space
-            +   non_terminals
-            +     production
-            +       space
-            +       non_terminal  S
-            +       space
-            +       non_terminal
-            +         S
-            +         S
-            +       space
-            +     production
-            +       space
-            +       epsilon
-            +   end_symbol
-            +     new_line
+            +   SS
+            +   productions  &
+            +   new_line
             +
-            +     space
-            +     space
-            +     space
-            +     space
-            +     space
-            +     space
-            +     space
-            +     space
-        """, firstGrammar.pretty() )
+            +   SSS
+            +   productions  &
+        """, new_tree.pretty() )
 
-    def test_grammarSingleAmbiguityCase(self):
-        firstGrammar = ChomskyGrammar.parse( wrap_text(
+    def test_grammarRawTreeParsingSSandEpsilon(self):
+        grammar = \
+        r"""
+            S   -> SS SSS | &
+            SS  -> &
+            SSS -> &
+        """
+        firstGrammar = ChomskyGrammar.parse( grammar )
+        new_tree = ChomskyGrammarTreeTransformer().transform( firstGrammar )
+
+        self.assertTextEqual(
+        r"""
+            + grammar
+            +   S
+            +   productions
+            +     SS SSS
+            +     &
+            +   new_line
+            +
+            +   SS
+            +   productions  &
+            +   new_line
+            +
+            +   SSS
+            +   productions  &
+        """, new_tree.pretty() )
+
+    def test_grammarInputSingleAmbiguityCase(self):
+        grammar = \
         r"""
             S -> S S | &
-        """ ) )
+        """
+        firstGrammar = ChomskyGrammar.load_from_text_lines( grammar )
 
         self.assertTextEqual(
         r"""
-            + productions
-            +   non_terminal_start
-            +     non_terminal  S
-            +   space
-            +   non_terminals
+            + S -> & | S S
+        """, firstGrammar )
+
+    def test_grammarTreeSingleAmbiguityCase(self):
+        grammar = \
+        r"""
+            S -> S S | &
+        """
+        firstGrammar = ChomskyGrammar.parse( grammar )
+        new_tree = ChomskyGrammarTreeTransformer().transform( firstGrammar )
+
+        self.assertTextEqual(
+        r"""
+            + grammar
+            +   S
+            +   productions
+            +     S S
+            +     &
+        """, new_tree.pretty() )
+
+    def test_grammarRawTreeSingleAmbiguityCase(self):
+        grammar = \
+        r"""
+            S -> S S | &
+        """
+        firstGrammar = ChomskyGrammar.parse( grammar )
+
+        self.assertTextEqual(
+        r"""
+            + grammar
+            +   start_symbol
             +     production
-            +       space
-            +       non_terminal  S
-            +       space
-            +       non_terminal  S
-            +       space
+            +       token
+            +         non_terminals  S
+            +
+            +   productions
             +     production
-            +       space
-            +       epsilon
+            +
+            +       token
+            +         non_terminals  S
+            +
+            +       token
+            +         non_terminals  S
+            +
+            +     production
+            +
+            +       token
+            +         terminals  &
         """, firstGrammar.pretty() )
 
-    def test_grammarSpecialSymbolsList3Exercice7ItemA(self):
-        firstGrammar = ChomskyGrammar.parse( wrap_text(
+    def test_grammarInputSpecialSymbolsList3Exercice7ItemA(self):
+        grammar = \
         r"""
             P -> D L | &
-            C -> V=exp | id (E)
+            C -> V = exp | id ( E )
             D -> d D | &
             E -> exp , E | exp
-            L -> L ;C | C
-            V -> id[E] | id
-        """ ) )
+            L -> L ; C | C
+            V -> id [ E ] | id
+        """
+        firstGrammar = ChomskyGrammar.load_from_text_lines( grammar )
 
         self.assertTextEqual(
         r"""
-            + productions
-            +   non_terminal_start
-            +     non_terminal  P
-            +   space
-            +   non_terminals
-            +     production
-            +       space
-            +       non_terminal  D
-            +       space
-            +       non_terminal  L
-            +       space
-            +     production
-            +       space
-            +       epsilon
-            +   end_symbol
-            +     new_line
+            + P -> & | D L
+            + C -> V = exp | id ( E )
+            + D -> & | d D
+            + E -> exp | exp , E
+            + L -> C | L ; C
+            + V -> id | id [ E ]
+        """, firstGrammar )
+
+    def test_grammarTreeSpecialSymbolsList3Exercice7ItemA(self):
+        grammar = \
+        r"""
+            P -> D L | &
+            C -> V = exp | id ( E )
+            D -> d D | &
+            E -> exp , E | exp
+            L -> L ; C | C
+            V -> id [ E ] | id
+        """
+        firstGrammar = ChomskyGrammar.parse( grammar )
+        new_tree = ChomskyGrammarTreeTransformer().transform( firstGrammar )
+
+        self.assertTextEqual(
+        r"""
+            + grammar
+            +   P
+            +   productions
+            +     D L
+            +     &
+            +   new_line
             +
-            +   non_terminal_start
-            +     non_terminal  C
-            +   space
-            +   non_terminals
-            +     production
-            +       space
-            +       non_terminal  V
-            +       terminal
-            +         equals
-            +         e
-            +         x
-            +         p
-            +       space
-            +     production
-            +       space
-            +       terminal
-            +         i
-            +         d
-            +       space
-            +       terminal
-            +         open_paren
-            +       non_terminal  E
-            +       terminal
-            +         close_paren
-            +   end_symbol
-            +     new_line
+            +   C
+            +   productions
+            +     V = exp
+            +     id ( E )
+            +   new_line
             +
-            +   non_terminal_start
-            +     non_terminal  D
-            +   space
-            +   non_terminals
-            +     production
-            +       space
-            +       terminal  d
-            +       space
-            +       non_terminal  D
-            +       space
-            +     production
-            +       space
-            +       epsilon
-            +   end_symbol
-            +     new_line
+            +   D
+            +   productions
+            +     d D
+            +     &
+            +   new_line
             +
-            +   non_terminal_start
-            +     non_terminal  E
-            +   space
-            +   non_terminals
-            +     production
-            +       space
-            +       terminal
-            +         e
-            +         x
-            +         p
-            +       space
-            +       terminal
-            +         comma
-            +       space
-            +       non_terminal  E
-            +       space
-            +     production
-            +       space
-            +       terminal
-            +         e
-            +         x
-            +         p
-            +   end_symbol
-            +     new_line
+            +   E
+            +   productions
+            +     exp , E
+            +     exp
+            +   new_line
             +
-            +   non_terminal_start
-            +     non_terminal  L
-            +   space
-            +   non_terminals
-            +     production
-            +       space
-            +       non_terminal  L
-            +       space
-            +       terminal
-            +         semicolon
-            +       non_terminal  C
-            +       space
-            +     production
-            +       space
-            +       non_terminal  C
-            +   end_symbol
-            +     new_line
+            +   L
+            +   productions
+            +     L ; C
+            +     C
+            +   new_line
             +
-            +   non_terminal_start
-            +     non_terminal  V
-            +   space
-            +   non_terminals
+            +   V
+            +   productions
+            +     id [ E ]
+            +     id
+        """, new_tree.pretty() )
+
+    def test_grammarRawTreeSpecialSymbolsList3Exercice7ItemA(self):
+        grammar = \
+        r"""
+            P -> D L | &
+            C -> V = exp | id ( E )
+            D -> d D | &
+            E -> exp , E | exp
+            L -> L ; C | C
+            V -> id [ E ] | id
+        """
+        firstGrammar = ChomskyGrammar.parse( grammar )
+
+        self.assertTextEqual(
+        r"""
+            + grammar
+            +   start_symbol
             +     production
-            +       space
-            +       terminal
-            +         i
-            +         d
-            +         open_bracket
-            +       non_terminal  E
-            +       terminal
-            +         close_bracket
-            +       space
+            +       token
+            +         non_terminals  P
+            +
+            +   productions
             +     production
-            +       space
-            +       terminal
-            +         i
-            +         d
+            +
+            +       token
+            +         non_terminals  D
+            +
+            +       token
+            +         non_terminals  L
+            +
+            +     production
+            +
+            +       token
+            +         terminals  &
+            +   new_line
+            +
+            +   start_symbol
+            +     production
+            +       token
+            +         non_terminals  C
+            +
+            +   productions
+            +     production
+            +
+            +       token
+            +         non_terminals  V
+            +
+            +       token
+            +         terminals  =
+            +
+            +       token
+            +         terminals
+            +           e
+            +           x
+            +           p
+            +
+            +     production
+            +
+            +       token
+            +         terminals
+            +           i
+            +           d
+            +
+            +       token
+            +         terminals  (
+            +
+            +       token
+            +         non_terminals  E
+            +
+            +       token
+            +         terminals  )
+            +   new_line
+            +
+            +   start_symbol
+            +     production
+            +       token
+            +         non_terminals  D
+            +
+            +   productions
+            +     production
+            +
+            +       token
+            +         terminals  d
+            +
+            +       token
+            +         non_terminals  D
+            +
+            +     production
+            +
+            +       token
+            +         terminals  &
+            +   new_line
+            +
+            +   start_symbol
+            +     production
+            +       token
+            +         non_terminals  E
+            +
+            +   productions
+            +     production
+            +
+            +       token
+            +         terminals
+            +           e
+            +           x
+            +           p
+            +
+            +       token
+            +         terminals  ,
+            +
+            +       token
+            +         non_terminals  E
+            +
+            +     production
+            +
+            +       token
+            +         terminals
+            +           e
+            +           x
+            +           p
+            +   new_line
+            +
+            +   start_symbol
+            +     production
+            +       token
+            +         non_terminals  L
+            +
+            +   productions
+            +     production
+            +
+            +       token
+            +         non_terminals  L
+            +
+            +       token
+            +         terminals  ;
+            +
+            +       token
+            +         non_terminals  C
+            +
+            +     production
+            +
+            +       token
+            +         non_terminals  C
+            +   new_line
+            +
+            +   start_symbol
+            +     production
+            +       token
+            +         non_terminals  V
+            +
+            +   productions
+            +     production
+            +
+            +       token
+            +         terminals
+            +           i
+            +           d
+            +
+            +       token
+            +         terminals  [
+            +
+            +       token
+            +         non_terminals  E
+            +
+            +       token
+            +         terminals  ]
+            +
+            +     production
+            +
+            +       token
+            +         terminals
+            +           i
+            +           d
         """, firstGrammar.pretty() )
-
-
-class TestGrammarTreeTransformation(TestingUtilities):
-
-    def setUp(self):
-        super().setUp()
-        LockableType._USE_STRING = False
-
-    def test_grammarTransformationTreeParsingParenStarPlusSymbols(self):
-        firstGrammar = ChomskyGrammar.parse( wrap_text(
-        r"""
-            E  -> T E'
-            E' -> + T E' | &
-            T  -> F T'
-            T' -> * F T'
-            F  -> ( E ) | id
-        """ ) )
-        firstGrammar = ChomskyGrammarTreeTransformer().transform( firstGrammar )
-
-        self.assertTextEqual(
-        r"""
-            + Tree(productions, [Production locked: False, str: , symbols: [NonTerminal locked: True, str: E,
-            + sequence: 1, len: 1;], sequence: 1, len: 0;
-            + , Tree(space, []), Tree(space, []), Tree(non_terminals, [Production locked: False, str: , symbols:
-            + [NonTerminal locked: True, str: T, sequence: 1, len: 1;, NonTerminal locked: True, str: E',
-            + sequence: 2, len: 1;], sequence: 2, len: 0;
-            + ]), Tree(end_symbol, [Tree(new_line, [Token(NEWLINE, '\n')])]), Production locked: False, str: ,
-            + symbols: [NonTerminal locked: True, str: E', sequence: 1, len: 1;], sequence: 1, len: 0;
-            + , Tree(space, []), Tree(non_terminals, [Production locked: False, str: , symbols: [Terminal locked:
-            + True, str: +, sequence: 1, len: 1;, NonTerminal locked: True, str: T, sequence: 2, len: 1;,
-            + NonTerminal locked: True, str: E', sequence: 3, len: 1;], sequence: 3, len: 0;
-            + , Production locked: False, str: , symbols: [Terminal locked: True, str: &, sequence: 1, len: 0;],
-            + sequence: 1, len: 0;
-            + ]), Tree(end_symbol, [Tree(new_line, [Token(NEWLINE, '\n')])]), Production locked: False, str: ,
-            + symbols: [NonTerminal locked: True, str: T, sequence: 1, len: 1;], sequence: 1, len: 0;
-            + , Tree(space, []), Tree(space, []), Tree(non_terminals, [Production locked: False, str: , symbols:
-            + [NonTerminal locked: True, str: F, sequence: 1, len: 1;, NonTerminal locked: True, str: T',
-            + sequence: 2, len: 1;], sequence: 2, len: 0;
-            + ]), Tree(end_symbol, [Tree(new_line, [Token(NEWLINE, '\n')])]), Production locked: False, str: ,
-            + symbols: [NonTerminal locked: True, str: T', sequence: 1, len: 1;], sequence: 1, len: 0;
-            + , Tree(space, []), Tree(non_terminals, [Production locked: False, str: , symbols: [Terminal locked:
-            + True, str: *, sequence: 1, len: 1;, NonTerminal locked: True, str: F, sequence: 2, len: 1;,
-            + NonTerminal locked: True, str: T', sequence: 3, len: 1;], sequence: 3, len: 0;
-            + ]), Tree(end_symbol, [Tree(new_line, [Token(NEWLINE, '\n')])]), Production locked: False, str: ,
-            + symbols: [NonTerminal locked: True, str: F, sequence: 1, len: 1;], sequence: 1, len: 0;
-            + , Tree(space, []), Tree(space, []), Tree(non_terminals, [Production locked: False, str: , symbols:
-            + [Terminal locked: True, str: (, sequence: 1, len: 1;, NonTerminal locked: True, str: E, sequence: 2,
-            + len: 1;, Terminal locked: True, str: ), sequence: 3, len: 1;], sequence: 3, len: 0;
-            + , Production locked: False, str: , symbols: [Terminal locked: True, str: id, sequence: 1, len: 1;],
-            + sequence: 1, len: 0;
-            + ])])
-        """, wrap_text( firstGrammar, wrap=100 ) )
-
-    def test_grammarTransformationParsingComplexSingleProduction(self):
-        firstGrammar = ChomskyGrammar.parse( wrap_text(
-        r"""
-            S -> aABbbCC1aAbA BC | ba | c
-        """ ) )
-        firstGrammar = ChomskyGrammarTreeTransformer().transform( firstGrammar )
-
-        self.assertTextEqual(
-        r"""
-            + productions
-            +   S
-            +   space
-            +   non_terminals
-            +     a AB bb CC 1a A b A BC
-            +     ba
-            +     c
-        """, firstGrammar.pretty() )
-
-        self.assertTextEqual( wrap_text(
-        r"""
-            + Tree(productions, [Production locked: False, str: , symbols: [NonTerminal locked: True, str: S,
-            + sequence: 1, len: 1;], sequence: 1, len: 0;
-            + , Tree(space, []), Tree(non_terminals, [Production locked: False, str: , symbols: [Terminal locked:
-            + True, str: a, sequence: 1, len: 1;, NonTerminal locked: True, str: AB, sequence: 2, len: 1;,
-            + Terminal locked: True, str: bb, sequence: 3, len: 1;, NonTerminal locked: True, str: CC, sequence:
-            + 4, len: 1;, Terminal locked: True, str: 1a, sequence: 5, len: 1;, NonTerminal locked: True, str: A,
-            + sequence: 6, len: 1;, Terminal locked: True, str: b, sequence: 7, len: 1;, NonTerminal locked: True,
-            + str: A, sequence: 8, len: 1;, NonTerminal locked: True, str: BC, sequence: 9, len: 1;], sequence: 9,
-            + len: 0;
-            + , Production locked: False, str: , symbols: [Terminal locked: True, str: ba, sequence: 1, len: 1;],
-            + sequence: 1, len: 0;
-            + , Production locked: False, str: , symbols: [Terminal locked: True, str: c, sequence: 1, len: 1;],
-            + sequence: 1, len: 0;
-            + ])])
-        """ ), wrap_text( str( firstGrammar ), wrap=100 ) )
 
 
 class TestProduction(TestingUtilities):
