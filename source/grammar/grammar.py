@@ -47,6 +47,7 @@ from .intermediate_grammar import IntermediateGrammar
 from .utilities import getCleanSpaces
 from .utilities import dictionary_to_string
 from .utilities import convert_to_text_lines
+from .utilities import get_relative_path
 from .utilities import get_duplicated_elements
 from .utilities import sort_alphabetically_and_by_length
 
@@ -73,7 +74,7 @@ class ChomskyGrammar():
     """
 
     ## The relative path the the lark grammar parser file from the current file
-    grammar_file_path = "grammar_parser.lark"
+    grammar_file_path = get_relative_path( "../grammar_parser.lark", __file__ )
 
     with open( grammar_file_path, "r", encoding='utf-8' ) as file:
         ## The parser used to build the Abstract Syntax Tree and parse the input text

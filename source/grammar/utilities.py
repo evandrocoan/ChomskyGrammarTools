@@ -54,6 +54,16 @@ def get_unique_hash():
     return initial_hash
 
 
+def get_relative_path(relative_path, script_file):
+    """
+        Computes a relative path for a file on the same folder as this class file declaration.
+        https://stackoverflow.com/questions/4381569/python-os-module-open-file-above-current-directory-with-relative-path
+    """
+    basepath = os.path.dirname( script_file )
+    filepath = os.path.abspath( os.path.join( basepath, relative_path ) )
+    return filepath
+
+
 def get_duplicated_elements(elements_list):
     """
         Given an `elements_list` with duplicated elements, return a set only with the duplicated
