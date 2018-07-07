@@ -3,66 +3,12 @@
 
 import lark
 
-_parser = lark.Lark( r"""
-        grammar : ( start_symbol "->" productions new_line+ )* ( start_symbol "->" productions )
+grammar_file_path = "../source/grammar_parser.lark"
 
-        // Rename the start symbol, so when parsing the tree it is simple to find it
-        start_symbol : tokens
-        productions  : tokens ( "|" tokens )*
+with open( grammar_file_path, "r", encoding='utf-8' ) as file:
+    _parser = lark.Lark( file.read(), start='grammar', parser='lalr' )
 
-        token  : terminals | non_terminals
-        tokens : SPACES* ( token+ SPACES+ )* token*
-
-        terminals     : ( LOWER_CASE_LETTER | EPSILON | DIGIT | signs | signs_extra | parens )+
-        non_terminals : UPPER_CASE_LETTER ( UPPER_CASE_LETTER | DIGIT | QUOTE )*
-
-        // https://stackoverflow.com/questions/20690499/concrete-javascript-regex-for-accented-characters-diacritics
-        UPPER_CASE_LETTER : /[A-ZÀ-Ö]/
-        LOWER_CASE_LETTER : /[a-zØ-öø-ÿ]/
-
-        // Common definitions
-        EPSILON  : "&"
-        QUOTE    : "'"
-        DIGIT    : "0".."9"
-        SPACES   : ( " " | /\t/ )
-        CR       : /\r/
-        LF       : /\n/
-        new_line : ( CR? LF )+
-
-        // Tells the tree-builder to inline this branch if it has only one member
-        ?signs    : MINUS |  PLUS | STAR | COMMA | COLON | EQUALS | SEMICOLON | SLASH | BACKSLASH | DOT
-        SEMICOLON : ";"
-        COMMA     : ","
-        COLON     : ":"
-        DOT       : "."
-        EQUALS    : "="
-        MINUS     : "-"
-        STAR      : "*"
-        PLUS      : "+"
-        SLASH     : "/"
-        BACKSLASH : "\\"
-
-        ?signs_extra : QUESTION | DOUBLE_QUOTE | PERCENTAGE | DOLLAR | AT_SIGN | SHARP | EXCLAMATION | TICK | BACKTICK | CARET | TILDE
-        SHARP        : "#"
-        DOLLAR       : "$"
-        QUESTION     : "?"
-        AT_SIGN      : "@"
-        TICK         : "´"
-        CARET        : "^"
-        TILDE        : "~"
-        BACKTICK     : "`"
-        PERCENTAGE   : "%"
-        EXCLAMATION  : "!"
-        DOUBLE_QUOTE : "\""
-
-        ?parens       : OPEN_PAREN | CLOSE_PAREN | OPEN_BRACKET | CLOSE_BRACKET | OPEN_BRACE | CLOSE_BRACE
-        OPEN_BRACKET  : "["
-        CLOSE_BRACKET : "]"
-        OPEN_BRACE    : "{"
-        CLOSE_BRACE   : "}"
-        OPEN_PAREN    : "("
-        CLOSE_PAREN   : ")"
-""", start='grammar', parser='lalr' )
+# _parser = lark.Lark.open( "../source/grammar_parser.lark", start='grammar', parser='lalr' )
 # """, start='grammar', parser='earley', ambiguity="explicit" )
 
 tree = _parser.parse( "S -> S SS | &" )
