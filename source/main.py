@@ -63,6 +63,7 @@ from grammar.utilities import convert_to_text_lines
 from grammar.utilities import setTextWithoutCleaningHistory
 from grammar.utilities import trimMessage
 from grammar.utilities import getCleanSpaces
+from grammar.utilities import get_relative_path
 from grammar.utilities import dictionary_to_string
 from grammar.utilities import get_duplicated_elements
 
@@ -141,7 +142,7 @@ class ProgramWindow(QtWidgets.QMainWindow):
 
         # https://github.com/GNOME/adwaita-icon-theme
         # https://code.google.com/archive/p/faenza-icon-theme/
-        self.mainApplicationIcon = QtGui.QIcon( "../login.png" )
+        self.mainApplicationIcon = QtGui.QIcon( get_relative_path( "../login.png", __file__ ) )
 
         # PyQt4 set windows taskbar icon
         # https://stackoverflow.com/questions/12432637/pyqt4-set-windows-taskbar-icon
