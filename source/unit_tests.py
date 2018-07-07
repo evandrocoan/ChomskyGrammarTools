@@ -2563,24 +2563,119 @@ class TestGrammarTreeParsing(TestingUtilities):
             SSS -> &
         """
         firstGrammar = ChomskyGrammar.parse( grammar )
+
+        self.assertTextEqual(
+        r"""
+            + grammar
+            +   start_symbol
+            +     production
+            +       token
+            +         non_terminals  S
+            +
+            +
+            +
+            +   productions
+            +     production
+            +
+            +       token
+            +         non_terminals
+            +           S
+            +           S
+            +
+            +       token
+            +         non_terminals
+            +           S
+            +           S
+            +           S
+            +
+            +     production
+            +
+            +       token
+            +         terminals  &
+            +   new_line
+            +
+            +   start_symbol
+            +     production
+            +       token
+            +         non_terminals
+            +           S
+            +           S
+            +
+            +
+            +   productions
+            +     production
+            +
+            +       token
+            +         terminals  &
+            +   new_line
+            +
+            +   start_symbol
+            +     production
+            +       token
+            +         non_terminals
+            +           S
+            +           S
+            +           S
+            +
+            +   productions
+            +     production
+            +
+            +       token
+            +         terminals  &
+        """, firstGrammar.pretty() )
+
+    def test_grammarInputParsingDoubleSSSstart(self):
+        grammar = \
+        r"""
+            SS SS -> a
+        """
+
+        with self.assertRaisesRegex( ValueError, "The start symbol must to be a Production with length 1! SS SS" ):
+            firstGrammar = ChomskyGrammar.load_from_text_lines( grammar )
+
+    def test_grammarTreeParsingDoubleSSSstart(self):
+        grammar = \
+        r"""
+            SS SS -> a
+        """
+        firstGrammar = ChomskyGrammar.parse( grammar )
         new_tree = ChomskyGrammarTreeTransformer().transform( firstGrammar )
 
         self.assertTextEqual(
         r"""
             + grammar
-            +   S
-            +   productions
-            +     SS SSS
-            +     &
-            +   new_line
-            +
-            +   SS
-            +   productions  &
-            +   new_line
-            +
-            +   SSS
-            +   productions  &
+            +   SS SS
+            +   productions  a
         """, new_tree.pretty() )
+
+    def test_grammarRawTreeParsingDoubleSSSstart(self):
+        grammar = \
+        r"""
+            SS SS -> a
+        """
+        firstGrammar = ChomskyGrammar.parse( grammar )
+
+        self.assertTextEqual(
+        r"""
+            + grammar
+            +   start_symbol
+            +     production
+            +       token
+            +         non_terminals
+            +           S
+            +           S
+            +
+            +       token
+            +         non_terminals
+            +           S
+            +           S
+            +
+            +   productions
+            +     production
+            +
+            +       token
+            +         terminals  a
+        """, firstGrammar.pretty() )
 
     def test_grammarInputSingleAmbiguityCase(self):
         grammar = \
