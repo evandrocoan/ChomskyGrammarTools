@@ -862,14 +862,41 @@ class ChomskyGrammar():
 
     def factors(self):
         """
-            Call `eliminate_indirect_factors()` then returns a list with tuple on the format
-            (NonTerminal, Terminal) representing this grammar nondeterministic factors for each non
-            deterministic non terminal start symbol.
+            Returns a list with tuple on the format (Production, Production) representing this
+            grammar nondeterministic factors for each start symbol.
 
             If the list contains duplicated entries, it means this grammar is non factored, i.e.,
             non deterministic.
         """
-        factors = []
+        non_terminal_factors = self.non_terminal_factors()
+        non_terminal_factors.extend( self.terminal_factors() )
+        return non_terminal_factors
+
+    def non_terminal_factors(self):
+        """
+            Return all factors which start with a NonTerminal symbol.
+        """
+        non_terminal_factors = []
+        productions_keys = self.productions
+
+        for start_symbol in productions_keys:
+            productions = productions_keys[start_symbol]
+
+            for production in productions:
+
+                if len( production ) and type( production[0] ) is NonTerminal:
+                    production_new = production.new()
+                    production_new.remove_everything_after( 0 )
+                    production_new.lock()
+                    non_terminal_factors.append( ( start_symbol, production_new ) )
+
+        return non_terminal_factors
+
+    def terminal_factors(self):
+        """
+            Return all factors which start with a Terminal symbol.
+        """
+        terminal_factors = []
         first_terminals = self.first_terminals()
         productions_keys = self.productions
 
@@ -883,16 +910,9 @@ class ChomskyGrammar():
                 for first_terminal in first_terminals_from:
 
                     if len( first_terminal ):
-                        factors.append( ( start_symbol, Production( [first_terminal.new()], lock=True ) ) )
+                        terminal_factors.append( ( start_symbol, Production( [first_terminal.new()], lock=True ) ) )
 
-                # Also add NonTerminal common factors
-                if len( production ) and type( production[0] ) is NonTerminal:
-                    production_new = production.new()
-                    production_new.remove_everything_after( 0 )
-                    production_new.lock()
-                    factors.append( ( start_symbol, production_new ) )
-
-        return factors
+        return terminal_factors
 
     def has_duplicated_factors(self):
         """
