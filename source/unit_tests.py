@@ -255,7 +255,7 @@ class TestGrammarFactoringAndRecursionSymbols(TestingUtilities):
             +  H -> c
             +
             + # 2. Converting to Epsilon Free, End
-            + #    No changes required/performed here.
+            + #    No changes performed.
             +
             + # 3. Eliminating Simple Productions, End
             + #    Simple Non Terminals: S -> {S}; F -> {F, G, H}; G -> {G, H}; H -> {H}
@@ -286,7 +286,7 @@ class TestGrammarFactoringAndRecursionSymbols(TestingUtilities):
             +  F -> f | f F
             +
             + # 2. Converting to Epsilon Free, End
-            + #    No changes required/performed here.
+            + #    No changes performed.
             +
             + # 3. Eliminating Simple Productions, End
             + #    Simple Non Terminals: S -> {S}; B -> {B, E, F}; D -> {D, F}; E -> {E}; F -> {F}
@@ -318,7 +318,7 @@ class TestGrammarFactoringAndRecursionSymbols(TestingUtilities):
             +  F -> f | f F
             +
             + # 2. Converting to Epsilon Free, End
-            + #    No changes required/performed here.
+            + #    No changes performed.
         """, firstGrammar.get_operation_history() )
 
     def test_grammarEliminateLeftRecursionCalculationOfChapter5Item5Example1(self):
@@ -334,10 +334,10 @@ class TestGrammarFactoringAndRecursionSymbols(TestingUtilities):
             +  S -> b | S a
             +
             + # 2. Eliminating Infertile Symbols, End
-            + #    No changes required/performed here.
+            + #    No changes performed.
             +
             + # 3. Eliminating Unreachable Symbols, End
-            + #    No changes required/performed here.
+            + #    No changes performed.
             +
             + # 4. Eliminating Left Recursion, End
             + #    Direct recursion eliminated: {S a} -> {b S'} @ S' -> {a S', &}
@@ -372,10 +372,10 @@ class TestGrammarFactoringAndRecursionSymbols(TestingUtilities):
             +  T -> F | T * F
             +
             + # 2. Eliminating Infertile Symbols, End
-            + #    No changes required/performed here.
+            + #    No changes performed.
             +
             + # 3. Eliminating Unreachable Symbols, End
-            + #    No changes required/performed here.
+            + #    No changes performed.
             +
             + # 4. Eliminating Left Recursion, End
             + #    Direct recursion eliminated: {E + T} -> {T E'} @ E' -> {+ T E', &}
@@ -403,7 +403,7 @@ class TestGrammarFactoringAndRecursionSymbols(TestingUtilities):
         self.assertTextEqual(
         r"""
             + # 1. Eliminating Left Recursion, Beginning
-            + #    No changes required/performed here.
+            + #    No changes performed.
             +  E -> T | a E + T
             +  F -> id | ( E )
             +  T -> F | b T * T
@@ -428,7 +428,7 @@ class TestGrammarFactoringAndRecursionSymbols(TestingUtilities):
             +  A -> d | S c
             +
             + # 2. Eliminating Infertile Symbols, End
-            + #    No changes required/performed here.
+            + #    No changes performed.
             +
             + # 3. Eliminating Unreachable Symbols, End
             + #    Direct recursion eliminated: {S b} -> {A a S'} @ S' -> {b S', &}
@@ -521,7 +521,7 @@ class TestGrammarFactoringAndRecursionSymbols(TestingUtilities):
         self.assertTextEqual(
         r"""
             + # 1. Eliminating Left Recursion, Beginning
-            + #    No changes required/performed here.
+            + #    No changes performed.
             +  S -> a A a | b S b
             +  A -> d | S c
         """, firstGrammar.get_operation_history() )
@@ -547,7 +547,7 @@ class TestGrammarFactoringAndRecursionSymbols(TestingUtilities):
             +  B -> e | B d | S a
             +
             + # 2. Eliminating Infertile Symbols, End
-            + #    No changes required/performed here.
+            + #    No changes performed.
             +
             + # 3. Eliminating Unreachable Symbols, End
             + #    Direct recursion eliminated: {A b} -> {B c A', a A'} @ A' -> {b A', &}
@@ -587,7 +587,7 @@ class TestGrammarFactoringAndRecursionSymbols(TestingUtilities):
         self.assertTextEqual(
         r"""
             + # 1. Eliminating Left Recursion, Beginning
-            + #    No changes required/performed here.
+            + #    No changes performed.
             +  S -> a S | a A b
             +  A -> a | a A b | b B c
             +  B -> e | a S a | b B d
@@ -619,10 +619,10 @@ class TestGrammarFactoringAndRecursionSymbols(TestingUtilities):
             +   S -> B d
             +
             + # 3. Eliminating Infertile Symbols, End
-            + #    No changes required/performed here.
+            + #    No changes performed.
             +
             + # 4. Eliminating Unreachable Symbols, End
-            + #    No changes required/performed here.
+            + #    No changes performed.
             +
             + # 5. Eliminate indirect left recursion
             + #    Indirect recursion eliminated: [B: {(S a >> A b => S a b), (a >> A b => a b)}]
@@ -691,10 +691,10 @@ class TestGrammarFactoringAndRecursionSymbols(TestingUtilities):
             +  V -> id | id [ E ]
             +
             + # 3. Eliminating Infertile Symbols, End
-            + #    No changes required/performed here.
+            + #    No changes performed.
             +
             + # 4. Eliminating Unreachable Symbols, End
-            + #    No changes required/performed here.
+            + #    No changes performed.
             +
             + # 5. Eliminating Left Recursion, End
             + #    Direct recursion eliminated: {L ; C} -> {C L'} @ L' -> {; C L', &}
@@ -777,7 +777,7 @@ class TestGrammarFactoringAndRecursionSymbols(TestingUtilities):
             +  S1 -> b | B c
             +
             + # 3. Eliminating Direct Factors, End
-            + #    No changes required/performed here.
+            + #    No changes performed.
             +
             + # 4. Eliminating Indirect Factors, End
             + #    Indirect factors eliminated: {S1 => B c, S1 => A d c}
@@ -801,6 +801,7 @@ class TestGrammarFactoringAndRecursionSymbols(TestingUtilities):
         """, convert_to_text_lines( get_duplicated_elements( firstGrammar.factors() ) ) )
 
         self.assertTrue( factor_it )
+        self.assertEqual( 5, firstGrammar.last_factoring_step )
         self.assertTrue( firstGrammar.is_factored() )
 
     def test_grammarFactoringOfList3Exercice7ItemA(self):
@@ -892,6 +893,7 @@ class TestGrammarFactoringAndRecursionSymbols(TestingUtilities):
 
         self.assertTrue( factor_it )
         self.assertTrue( firstGrammar.is_factored() )
+        self.assertEqual( 5, firstGrammar.last_factoring_step )
         self.assertTextEqual(
         r"""
             + No elements found.
@@ -965,6 +967,7 @@ class TestGrammarFactoringAndRecursionSymbols(TestingUtilities):
 
         self.assertTrue( factor_it )
         self.assertTrue( firstGrammar.is_factored() )
+        self.assertEqual( 5, firstGrammar.last_factoring_step )
         self.assertTextEqual(
         r"""
             + No elements found.
@@ -1051,10 +1054,10 @@ class TestGrammarFactoringAndRecursionSymbols(TestingUtilities):
             +   P -> d | L | M | d P | M L
             +
             + # 3. Eliminating Infertile Symbols, End
-            + #    No changes required/performed here.
+            + #    No changes performed.
             +
             + # 4. Eliminating Unreachable Symbols, End
-            + #    No changes required/performed here.
+            + #    No changes performed.
             +
             + # 5. Eliminating Left Recursion, End
             + #    Direct recursion eliminated: {C # id} -> {id ( E ) C', id = E C', b P e C', b e C', # id C'} @ C' -> {# id C', &}
@@ -1104,7 +1107,7 @@ class TestGrammarFactoringAndRecursionSymbols(TestingUtilities):
             +  S'2 -> & | P
             +
             + # 8. Eliminating Indirect Factors, End
-            + #    No changes required/performed here.
+            + #    No changes performed.
             +
             + # 9. Eliminating Direct Factors, End
             + #    Direct factors eliminated: {M1 -> [;]}
@@ -1131,12 +1134,53 @@ class TestGrammarFactoringAndRecursionSymbols(TestingUtilities):
 
         self.assertTrue( factor_it )
         self.assertTrue( firstGrammar.is_factored() )
+        self.assertEqual( 5, firstGrammar.last_factoring_step )
         self.assertTextEqual(
         r"""
             + No elements found.
         """, convert_to_text_lines( get_duplicated_elements( firstGrammar.factors() ) ) )
 
-    def test_historyFactorsBySeveralFactorsInOneProduction(self):
+    def test_historyFactorsByFactorsAandAAandAAAInOneProduction(self):
+        firstGrammar = ChomskyGrammar.load_from_text_lines( wrap_text(
+        r"""
+            S -> A S | A A B S  | A A A B S | c
+            A -> a
+            B -> b
+        """ ) )
+
+        self.assertTextEqual(
+        r"""
+            + (A, a)
+            + (B, b)
+            + (S, a)
+            + (S, a)
+            + (S, a)
+            + (S, c)
+            + (S, A)
+            + (S, A)
+            + (S, A)
+        """, convert_to_text_lines( firstGrammar.factors(), sort=sort_correctly ) )
+
+    def test_historyFactorsByFactorsAAandAAAInOneProduction(self):
+        firstGrammar = ChomskyGrammar.load_from_text_lines( wrap_text(
+        r"""
+            S -> A A S | A A A B S | c
+            A -> a
+            B -> b
+        """ ) )
+
+        self.assertTextEqual(
+        r"""
+            + (A, a)
+            + (B, b)
+            + (S, a)
+            + (S, a)
+            + (S, c)
+            + (S, A A)
+            + (S, A A)
+        """, convert_to_text_lines( firstGrammar.factors(), sort=sort_correctly ) )
+
+    def test_historyFactorsByFactorsAAandAAInOneProduction(self):
         firstGrammar = ChomskyGrammar.load_from_text_lines( wrap_text(
         r"""
             S -> A A S | A A B S | c
@@ -1155,33 +1199,164 @@ class TestGrammarFactoringAndRecursionSymbols(TestingUtilities):
             + (S, A A)
         """, convert_to_text_lines( firstGrammar.factors(), sort=sort_correctly ) )
 
-    # @unittest.skip( "In construction" )
     def test_historyFactoringBySeveralFactorsInOneProduction(self):
         firstGrammar = ChomskyGrammar.load_from_text_lines( wrap_text(
         r"""
-            S -> A A S | A A B S | c
+            S -> A A A | A A S | A A B S | A A C S | d
             A -> a
             B -> b
+            C -> c
         """ ) )
 
         factor_it = firstGrammar.factor_it(5)
         self.assertTextEqual(
         r"""
             + # 1. Factoring, Beginning
-            +  S -> c | A A S | A A B S
+            +  S -> d | A A A | A A S | A A B S | A A C S
             +  A -> a
             +  B -> b
+            +  C -> c
             +
             + # 2. Eliminating Direct Factors, End
             + #    Direct factors eliminated: {S -> [A A]}
-            +   S -> c | A A S1
+            +   S -> d | A A S1
             +   A -> a
             +   B -> b
-            +  S1 -> S | B S
+            +   C -> c
+            +  S1 -> A | S | B S | C S
+            +
+            + # 3. Eliminating Indirect Factors, End
+            + #    Indirect factors eliminated: {S1: A => a, S1: S => d | A A S1, S1: B S => b S, S1: C S => c S}
+            +   S -> d | A A S1
+            +   A -> a
+            +   B -> b
+            +   C -> c
+            +  S1 -> a | d | b S | c S | A A S1
+            +
+            + # 4. Eliminating Direct Factors, End
+            + #    No changes performed.
+            +
+            + # 5. Eliminating Indirect Factors, End
+            + #    Indirect factors eliminated: {S1: A A S1 => a A S1}
+            +   S -> d | A A S1
+            +   A -> a
+            +   B -> b
+            +   C -> c
+            +  S1 -> a | d | b S | c S | a A S1
+            +
+            + # 6. Eliminating Direct Factors, End
+            + #    Direct factors eliminated: {S1 -> [a]}
+            +   S -> d | A A S1
+            +   A -> a
+            +   B -> b
+            +   C -> c
+            +  S1 -> d | b S | c S | a S2
+            +  S2 -> & | A S1
         """, firstGrammar.get_operation_history() )
 
         self.assertTrue( factor_it )
         self.assertTrue( firstGrammar.is_factored() )
+        self.assertEqual( 4, firstGrammar.last_factoring_step )
+        self.assertTextEqual(
+        r"""
+            + No elements found.
+        """, convert_to_text_lines( get_duplicated_elements( firstGrammar.factors() ) ) )
+
+    # @unittest.skip( "In construction" )
+    def test_historyFactoringBySeveralMixedFactorsInOneProduction(self):
+        firstGrammar = ChomskyGrammar.load_from_text_lines( wrap_text(
+        r"""
+            S -> a A A | A A S | A A B S | A A C S | d
+            A -> a
+            B -> b
+            C -> c
+        """ ) )
+
+        factor_it = firstGrammar.factor_it(5)
+        self.assertTextEqual(
+        r"""
+            + # 1. Factoring, Beginning
+            +  S -> d | a A A | A A S | A A B S | A A C S
+            +  A -> a
+            +  B -> b
+            +  C -> c
+            +
+            + # 2. Eliminating Direct Factors, End
+            + #    Direct factors eliminated: {S -> [A A]}
+            +   S -> d | a A A | A A S1
+            +   A -> a
+            +   B -> b
+            +   C -> c
+            +  S1 -> S | B S | C S
+            +
+            + # 3. Eliminating Indirect Factors, End
+            + #    Indirect factors eliminated: {S: A A S1 => a A S1}
+            +   S -> d | a A A | a A S1
+            +   A -> a
+            +   B -> b
+            +   C -> c
+            +  S1 -> S | B S | C S
+            +
+            + # 4. Eliminating Direct Factors, End
+            + #    Direct factors eliminated: {S -> [a]}
+            +   S -> d | a S2
+            +   A -> a
+            +   B -> b
+            +   C -> c
+            +  S1 -> S | B S | C S
+            +  S2 -> A A | A S1
+            +
+            + # 5. Eliminating Direct Factors, End
+            + #    Direct factors eliminated: {S2 -> [A]}
+            +   S -> d | a S2
+            +   A -> a
+            +   B -> b
+            +   C -> c
+            +  S1 -> S | B S | C S
+            +  S2 -> A S3
+            +  S3 -> A | S1
+            +
+            + # 6. Eliminating Direct Factors, End
+            + #    No changes performed.
+            +
+            + # 7. Eliminating Indirect Factors, End
+            + #    Indirect factors eliminated: {S3: A => a, S3: S1 => S | B S | C S}
+            +   S -> d | a S2
+            +   A -> a
+            +   B -> b
+            +   C -> c
+            +  S1 -> S | B S | C S
+            +  S2 -> A S3
+            +  S3 -> a | S | B S | C S
+            +
+            + # 8. Eliminating Direct Factors, End
+            + #    No changes performed.
+            +
+            + # 9. Eliminating Indirect Factors, End
+            + #    Indirect factors eliminated: {S3: S => a S2 | d, S3: B S => b S, S3: C S => c S}
+            +   S -> d | a S2
+            +   A -> a
+            +   B -> b
+            +   C -> c
+            +  S1 -> S | B S | C S
+            +  S2 -> A S3
+            +  S3 -> a | d | b S | c S | a S2
+            +
+            + # 10. Eliminating Direct Factors, End
+            + #    Direct factors eliminated: {S3 -> [a]}
+            +   S -> d | a S2
+            +   A -> a
+            +   B -> b
+            +   C -> c
+            +  S1 -> S | B S | C S
+            +  S2 -> A S3
+            +  S3 -> d | b S | c S | a S4
+            +  S4 -> & | S2
+        """, firstGrammar.get_operation_history() )
+
+        self.assertTrue( factor_it )
+        self.assertTrue( firstGrammar.is_factored() )
+        self.assertEqual( 5, firstGrammar.last_factoring_step )
         self.assertTextEqual(
         r"""
             + No elements found.

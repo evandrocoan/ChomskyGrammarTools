@@ -30,7 +30,7 @@ from debug_tools import getLogger
 log = getLogger( 127-4, __name__ )
 
 HISTORY_KEY_LINE = "-- Grammar History"
-NO_GRAMMAR_CHANGES = "No changes required/performed here."
+NO_GRAMMAR_CHANGES = "No changes performed."
 
 
 class ChomskyGrammarSymbol(LockableType):

@@ -37,6 +37,7 @@ from .symbols import Terminal
 from .symbols import NonTerminal
 from .symbols import epsilon_terminal
 from .symbols import HISTORY_KEY_LINE
+from .symbols import NO_GRAMMAR_CHANGES
 
 from .production import Production
 from .production import epsilon_production
@@ -211,7 +212,7 @@ class ChomskyGrammar():
             if stage == IntermediateGrammar.END or len( operations_history ) == 1:
 
                 if not operation.extra_text:
-                    operation.extra_text.append( "No changes required/performed here." )
+                    operation.extra_text.append( NO_GRAMMAR_CHANGES )
 
             counter += 1
             history_list.append( "# %s. %s" % ( counter, operation ) )
@@ -901,7 +902,7 @@ class ChomskyGrammar():
                             if first_symbol == other_first_symbol:
 
                                 if len( biggest_common_factor ) > 1:
-                                    maximum_index = max( len( biggest_common_factor ), len( other_production ) )
+                                    maximum_index = min( len( biggest_common_factor ), len( other_production ) )
 
                                     for index in range( 1, maximum_index ):
 
@@ -910,7 +911,7 @@ class ChomskyGrammar():
                                             break
 
                                 else:
-                                    maximum_index = max( len( production ), len( other_production ) )
+                                    maximum_index = min( len( production ), len( other_production ) )
 
                                     for index in range( 1, maximum_index ):
                                         current_element = production[index]
@@ -993,20 +994,18 @@ class ChomskyGrammar():
             if self.last_factoring_step > maximum_steps:
                 break
 
-            non_deterministic_factors_dictionary, is_non_terminal_factored = self.get_factoring_duplicated_elements()
 
-            if is_non_terminal_factored:
+            while True:
+                non_deterministic_factors_dictionary, _ = self.get_factoring_duplicated_elements()
                 self.eliminate_direct_factors( non_deterministic_factors_dictionary )
 
-                non_deterministic_factors_dictionary, _ = self.get_factoring_duplicated_elements()
+                non_deterministic_factors_dictionary, is_non_terminal_factored = self.get_factoring_duplicated_elements()
 
-                if non_deterministic_factors_dictionary:
+                if is_non_terminal_factored:
                     self.eliminate_direct_factors( non_deterministic_factors_dictionary )
 
-            else:
-                self.eliminate_direct_factors( non_deterministic_factors_dictionary )
-
-            non_deterministic_factors_dictionary, _ = self.get_factoring_duplicated_elements()
+                else:
+                    break
 
             if non_deterministic_factors_dictionary:
                 self.eliminate_indirect_factors( non_deterministic_factors_dictionary )
@@ -1031,10 +1030,12 @@ class ChomskyGrammar():
         for item in duplicated_elements:
 
             if type( item[1][0] ) is NonTerminal:
-                is_non_terminal_factored = True
                 non_deterministic_factors_list.append( item )
 
-        if not is_non_terminal_factored:
+        if non_deterministic_factors_list:
+            is_non_terminal_factored = True
+
+        else:
             non_deterministic_factors_list = duplicated_elements
 
         productions_keys = self.productions
@@ -1049,40 +1050,43 @@ class ChomskyGrammar():
 
     def eliminate_indirect_factors(self, non_deterministic_factors_dictionary):
         """
-            Converts all indirect factors on this grammar to direct factors.
+            Try to convert indirect factors on this grammar to direct factors.
+
+            The elimination may not eliminate all indirect factors. Therefore, it is required to
+            keep calling this function until no indirect factors are remaining.
         """
         self._save_history( "Eliminating Indirect Factors", IntermediateGrammar.BEGINNING )
         old_counter = -1
-        current_counter = 0
 
         productions_keys = self.productions
         _save_data_factors_list = DynamicIterationDict()
 
-        while old_counter != current_counter:
-            old_counter = current_counter
+        for start_symbol in productions_keys:
+            start_productions = productions_keys[start_symbol]
+            start_symbol_non_deterministic_factors = non_deterministic_factors_dictionary[start_symbol]
 
-            for start_symbol in productions_keys:
-                start_productions = productions_keys[start_symbol]
-                start_symbol_non_deterministic_factors = non_deterministic_factors_dictionary[start_symbol]
-                # log( 1, "start_productions: %s", start_productions )
-                log( 16, "start_symbol: %s, start_symbol_non_deterministic_factors: %s", start_symbol, start_symbol_non_deterministic_factors )
+            # log( 1, "start_productions: %s", start_productions )
+            log( 16, "start_symbol: %s, start_symbol_non_deterministic_factors: %s", start_symbol, start_symbol_non_deterministic_factors )
 
-                for start_production in start_productions(1):
-                    first_symbol = start_production[0]
+            for start_production in start_productions(1):
+                first_symbol = start_production[0]
 
-                    if type( first_symbol ) is NonTerminal and start_symbol_non_deterministic_factors:
-                        remove_production = False
-                        first_symbol_productions = productions_keys[first_symbol]
-                        _save_data_factors_list.append( "%s => %s" % ( start_symbol, start_production ) )
+                if type( first_symbol ) is NonTerminal and start_symbol_non_deterministic_factors:
+                    remove_production = False
+                    first_symbol_productions = productions_keys[first_symbol]
+                    replaced_productions = []
 
-                        for first_symbol_production in first_symbol_productions(1):
-                            remove_production = True
-                            new_production = start_production.replace( 0, first_symbol_production )
-                            self.add_production( start_symbol, new_production )
+                    for first_symbol_production in first_symbol_productions(1):
+                        remove_production = True
+                        new_production = start_production.replace( 0, first_symbol_production )
+                        self.add_production( start_symbol, new_production )
+                        replaced_productions.append( str( new_production ) )
 
-                        if remove_production:
-                            current_counter += 1
-                            self.remove_production( start_symbol, start_production )
+                    if remove_production:
+                        self.remove_production( start_symbol, start_production )
+
+                    _save_data_factors_list.append( "%s: %s => %s" % (
+                            start_symbol, start_production, " | ".join( replaced_productions ) ) )
 
         self._save_history( "Eliminating Indirect Factors", IntermediateGrammar.END )
         self._save_data( "Indirect factors eliminated: %s", _save_data_factors_list.keys() )
