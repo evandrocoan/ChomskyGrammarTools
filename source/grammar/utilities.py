@@ -65,6 +65,15 @@ def get_relative_path(relative_path, script_file):
     return filepath
 
 
+def assure_existing_key(dictionary, key, default_value):
+    """
+        If the given `key` is not present on the `dictionary`, then add it with the `default_value`.
+    """
+
+    if key not in dictionary:
+        dictionary[key] = default_value
+
+
 def get_duplicated_elements(elements_list):
     """
         Given an `elements_list` with duplicated elements, return a set only with the duplicated

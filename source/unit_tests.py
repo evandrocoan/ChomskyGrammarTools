@@ -970,7 +970,7 @@ class TestGrammarFactoringAndRecursionSymbols(TestingUtilities):
             + No elements found.
         """, convert_to_text_lines( get_duplicated_elements( firstGrammar.factors() ) ) )
 
-    def test_historyFactoringOfSimpleNonTerminalsFactors(self):
+    def test_historyFactorsOfSimpleNonTerminalsFactors(self):
         firstGrammar = ChomskyGrammar.load_from_text_lines( wrap_text(
         r"""
             S -> M | M m
@@ -985,6 +985,13 @@ class TestGrammarFactoringAndRecursionSymbols(TestingUtilities):
             + (S, M)
             + (S, M)
         """, convert_to_text_lines( firstGrammar.factors(), sort=sort_correctly ) )
+
+    def test_historyFactoringOfSimpleNonTerminalsFactors(self):
+        firstGrammar = ChomskyGrammar.load_from_text_lines( wrap_text(
+        r"""
+            S -> M | M m
+            M -> m | &
+        """ ) )
 
         factor_it = firstGrammar.factor_it(2)
         self.assertTextEqual(
@@ -1128,6 +1135,58 @@ class TestGrammarFactoringAndRecursionSymbols(TestingUtilities):
         r"""
             + No elements found.
         """, convert_to_text_lines( get_duplicated_elements( firstGrammar.factors() ) ) )
+
+    def test_historyFactorsBySeveralFactorsInOneProduction(self):
+        firstGrammar = ChomskyGrammar.load_from_text_lines( wrap_text(
+        r"""
+            S -> A A S | A A B S | c
+            A -> a
+            B -> b
+        """ ) )
+
+        self.assertTextEqual(
+        r"""
+            + (A, a)
+            + (B, b)
+            + (S, a)
+            + (S, a)
+            + (S, c)
+            + (S, A A)
+            + (S, A A)
+        """, convert_to_text_lines( firstGrammar.factors(), sort=sort_correctly ) )
+
+    # @unittest.skip( "In construction" )
+    def test_historyFactoringBySeveralFactorsInOneProduction(self):
+        firstGrammar = ChomskyGrammar.load_from_text_lines( wrap_text(
+        r"""
+            S -> A A S | A A B S | c
+            A -> a
+            B -> b
+        """ ) )
+
+        factor_it = firstGrammar.factor_it(5)
+        self.assertTextEqual(
+        r"""
+            + # 1. Factoring, Beginning
+            +  S -> c | A A S | A A B S
+            +  A -> a
+            +  B -> b
+            +
+            + # 2. Eliminating Direct Factors, End
+            + #    Direct factors eliminated: {S -> [A A]}
+            +   S -> c | A A S1
+            +   A -> a
+            +   B -> b
+            +  S1 -> S | B S
+        """, firstGrammar.get_operation_history() )
+
+        self.assertTrue( factor_it )
+        self.assertTrue( firstGrammar.is_factored() )
+        self.assertTextEqual(
+        r"""
+            + No elements found.
+        """, convert_to_text_lines( get_duplicated_elements( firstGrammar.factors() ) ) )
+
 
 class TestGrammarFirstAndFollow(TestingUtilities):
 

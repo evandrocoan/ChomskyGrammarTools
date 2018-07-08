@@ -46,6 +46,7 @@ from .intermediate_grammar import IntermediateGrammar
 
 from .utilities import getCleanSpaces
 from .utilities import dictionary_to_string
+from .utilities import assure_existing_key
 from .utilities import convert_to_text_lines
 from .utilities import get_relative_path
 from .utilities import get_duplicated_elements
@@ -881,14 +882,50 @@ class ChomskyGrammar():
 
         for start_symbol in productions_keys:
             productions = productions_keys[start_symbol]
+            biggest_common_factors = {}
 
             for production in productions:
+                first_symbol = production[0]
 
-                if len( production ) and type( production[0] ) is NonTerminal:
-                    production_new = production.new()
-                    production_new.remove_everything_after( 0 )
-                    production_new.lock()
-                    non_terminal_factors.append( ( start_symbol, production_new ) )
+                if len( production ) and type( first_symbol ) is NonTerminal:
+                    assure_existing_key( biggest_common_factors, first_symbol, [] )
+                    biggest_common_factor = biggest_common_factors[first_symbol]
+
+                    if not biggest_common_factor:
+                        biggest_common_factor.append( first_symbol )
+
+                        for other_production in productions:
+                            other_first_symbol = other_production[0]
+
+                            # Initialize the first symbol or skip the other unrelated production
+                            if first_symbol == other_first_symbol:
+
+                                if len( biggest_common_factor ) > 1:
+                                    maximum_index = max( len( biggest_common_factor ), len( other_production ) )
+
+                                    for index in range( 1, maximum_index ):
+
+                                        if biggest_common_factor[index] != other_production[index]:
+                                            del biggest_common_factor[index:]
+                                            break
+
+                                else:
+                                    maximum_index = max( len( production ), len( other_production ) )
+
+                                    for index in range( 1, maximum_index ):
+                                        current_element = production[index]
+
+                                        if current_element != other_production[index]:
+                                            break
+
+                                        else:
+                                            biggest_common_factor.append( current_element )
+
+                                # There is nothing else to do, as we are on the minimum acceptable length
+                                if len( biggest_common_factor ) == 1:
+                                    break
+
+                    non_terminal_factors.append( ( start_symbol, Production( [item.new() for item in biggest_common_factor], lock=True ) ) )
 
         return non_terminal_factors
 
@@ -1105,15 +1142,18 @@ class ChomskyGrammar():
                         for start_production in start_productions(1):
 
                             if start_production in direct_factors_productions:
+                                start_production_factors = direct_factors_productions[start_production]
 
+                                # We see to add it first because if it was the last production, then
+                                # the start symbol will be removed by `remove_production()`
                                 if not has_added_first_production:
                                     has_added_first_production = True
-                                    new_start_production = direct_factors_productions[start_production].new()
+                                    new_start_production = start_production_factors.new()
                                     new_start_production.add( new_factor_start_symbol[0].new() )
                                     self.add_production( start_symbol, new_start_production )
 
                                 new_factor_production = start_production.new()
-                                new_factor_production.remove( 0 )
+                                new_factor_production.remove_everything_before( len( start_production_factors ) )
 
                                 self.add_production( new_factor_start_symbol, new_factor_production )
                                 self.remove_production( start_symbol, start_production )
