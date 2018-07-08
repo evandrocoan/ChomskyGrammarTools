@@ -49,6 +49,7 @@ from debug_tools import getLogger
 log = getLogger( 127, __name__ )
 log( 1, "Importing " + __name__ )
 
+from grammar.utilities import get_screen_center
 from grammar.utilities import wrap_text
 from grammar.utilities import ignore_exceptions
 from grammar.utilities import setTextWithoutCleaningHistory
@@ -63,20 +64,33 @@ class StringInputDialog(QMainWindow):
         https://stackoverflow.com/questions/27420338/how-to-clear-child-window-reference-stored-in-parent-application-when-child-wind
     """
 
-    def __init__(self, parent, fontOptions, _openFileCall, dialogTypeName, dialogTitleMessage):
+    def __init__(self, parent, settings, fontOptions, _openFileCall, dialogTypeName, dialogTitleMessage):
         super().__init__( parent )
         self.result = 0
         self.setAttribute( Qt.WA_DeleteOnClose )
 
+        self.settings = settings
         self._openFileCall = _openFileCall
 
         # QWidget::setLayout: Attempting to set QLayout “” on ProgramWindow “”, which already has a layout
         # https://stackoverflow.com/questions/50176661/qwidgetsetlayout-attempting-to-set-qlayout-on-programwindow-which-alre
         self.centralwidget = QWidget()
         self.setCentralWidget( self.centralwidget )
-
-        self.resize( 600, 400  )
         self.setWindowTitle( dialogTitleMessage )
+
+        # Initial window size/pos last saved. Use default values for first time
+        windowScreenGeometry = self.settings.value( "stringInputWindowScreenGeometry" )
+        windowScreenState = self.settings.value( "stringInputWindowScreenState" )
+
+        if windowScreenGeometry:
+            self.restoreGeometry( windowScreenGeometry )
+
+        else:
+            self.resize( 600, 400 )
+            # self.move( get_screen_center( self ) )
+
+        if windowScreenState:
+            self.restoreState( windowScreenState )
 
         # nice widget for editing the date
         self.textEditWidget = QPlainTextEdit( self )
@@ -142,7 +156,11 @@ class StringInputDialog(QMainWindow):
 
     def closeEvent(self, event=None):
         # log( 1, "closeEvent" )
-        super().closeEvent( event )
+        self.settings.setValue( "stringInputWindowScreenGeometry", self.saveGeometry() )
+        self.settings.setValue( "stringInputWindowScreenState", self.saveState() )
+
+        # super().closeEvent( event )
+        # self.event.quit()
 
     def keyPressEvent(self, event):
         """

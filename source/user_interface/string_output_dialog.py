@@ -52,6 +52,7 @@ from debug_tools import getLogger
 log = getLogger( 127, __name__ )
 log( 1, "Importing " + __name__ )
 
+from grammar.utilities import get_screen_center
 from grammar.utilities import wrap_text
 from grammar.utilities import ignore_exceptions
 from grammar.utilities import setTextWithoutCleaningHistory
@@ -67,9 +68,11 @@ class StringOutputDialog(QMainWindow):
         https://stackoverflow.com/questions/27420338/how-to-clear-child-window-reference-stored-in-parent-application-when-child-wind
     """
 
-    def __init__(self, parent, fontOptions, fileDialogOptions, isToStop):
+    def __init__(self, parent, settings, fontOptions, fileDialogOptions, isToStop):
         super().__init__( parent )
         inputString = ""
+        self.settings = settings
+
         self.isToStop = isToStop
         self.fileDialogOptions = fileDialogOptions
 
@@ -77,9 +80,21 @@ class StringOutputDialog(QMainWindow):
         # https://stackoverflow.com/questions/50176661/qwidgetsetlayout-attempting-to-set-qlayout-on-programwindow-which-alre
         self.centralwidget = QWidget()
         self.setCentralWidget( self.centralwidget )
-
-        self.resize( 600, 400  )
         self.setWindowTitle( "Results output window" )
+
+        # Initial window size/pos last saved. Use default values for first time
+        windowScreenGeometry = self.settings.value( "stringOutputWindowScreenGeometry" )
+        windowScreenState = self.settings.value( "stringOutputWindowScreenState" )
+
+        if windowScreenGeometry:
+            self.restoreGeometry( windowScreenGeometry )
+
+        else:
+            self.resize( 600, 400 )
+            # self.move( get_screen_center( self ) )
+
+        if windowScreenState:
+            self.restoreState( windowScreenState )
 
         # nice widget for editing the date
         self.textEditWidget = QPlainTextEdit( self )
@@ -151,7 +166,13 @@ class StringOutputDialog(QMainWindow):
         self.disableStopButton()
 
     def closeEvent(self, event=None):
-        super().closeEvent( event )
+        # log( 1, "closeEvent" )
+        self.settings.setValue( "stringOutputWindowScreenGeometry", self.saveGeometry() )
+        self.settings.setValue( "stringOutputWindowScreenState", self.saveState() )
+
+        # super().closeEvent( event )
+        # self.event.quit()
+
         self.stopProcessing()
         self.deleteLater()
 

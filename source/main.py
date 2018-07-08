@@ -40,8 +40,6 @@ from PyQt5 import QtWidgets
 
 from PyQt5.QtCore import Qt
 from PyQt5.QtCore import QSettings
-from PyQt5.QtCore import QSize
-from PyQt5.QtCore import QPoint
 
 from PyQt5.QtWidgets import QWidget
 from PyQt5.QtWidgets import QFrame
@@ -64,6 +62,7 @@ from grammar.utilities import sort_correctly
 from grammar.utilities import ignore_exceptions
 from grammar.utilities import convert_to_text_lines
 from grammar.utilities import setTextWithoutCleaningHistory
+from grammar.utilities import get_screen_center
 from grammar.utilities import trimMessage
 from grammar.utilities import getCleanSpaces
 from grammar.utilities import get_relative_path
@@ -137,15 +136,6 @@ class ProgramWindow(QtWidgets.QMainWindow):
         self.create_grammar_input_text()
         self.set_window_layout()
 
-    def get_screen_center(self):
-        """
-            https://stackoverflow.com/questions/12432740/pyqt4-what-is-the-best-way-to-center-dialog-windows
-        """
-        screenGeometry = QtWidgets.QApplication.desktop().screenGeometry()
-        x = ( screenGeometry.width() - self.width() ) / 2
-        y = ( screenGeometry.height() - self.height() ) / 2
-        return QPoint( x, y )
-
     def setup_main_window(self):
         """
             How to remember last geometry of PyQt application?
@@ -156,8 +146,18 @@ class ProgramWindow(QtWidgets.QMainWindow):
         self.largestFirstCollumn = 0
 
         # Initial window size/pos last saved. Use default values for first time
-        self.resize( self.settings.value( "mainWindowScreenSize", QSize( 800, 600 ) ) )
-        self.move( self.settings.value( "mainWindowScreenPostion", self.get_screen_center() ) )
+        windowScreenGeometry = self.settings.value( "mainWindowScreenGeometry" )
+        windowScreenState = self.settings.value( "mainWindowScreenState" )
+
+        if windowScreenGeometry:
+            self.restoreGeometry( windowScreenGeometry )
+
+        else:
+            self.resize( 800, 600 )
+            # self.move( get_screen_center( self ) )
+
+        if windowScreenState:
+            self.restoreState( windowScreenState )
 
         # https://github.com/GNOME/adwaita-icon-theme
         # https://code.google.com/archive/p/faenza-icon-theme/
@@ -292,9 +292,9 @@ class ProgramWindow(QtWidgets.QMainWindow):
         """
             Write window size and position to config file
         """
-        log( 1, "closeEvent" )
-        self.settings.setValue( "mainWindowScreenSize", self.size() )
-        self.settings.setValue( "mainWindowScreenPostion", self.pos() )
+        # log( 1, "closeEvent" )
+        self.settings.setValue( "mainWindowScreenGeometry", self.saveGeometry() )
+        self.settings.setValue( "mainWindowScreenState", self.saveState() )
         self.settings.setValue( "mainWindowGrammarTextEditWidget", self.grammarTextEditWidget.toPlainText() )
         super().closeEvent( event )
 
@@ -359,7 +359,7 @@ class ProgramWindow(QtWidgets.QMainWindow):
     @ignore_exceptions
     def _handleFunctionAsync(self, target_function, initial_message):
         isToStop = [False]
-        results_dialog = StringOutputDialog( self, self.getMainFontOptions(), self._getFileDialogOptions(), isToStop )
+        results_dialog = StringOutputDialog( self, self.settings, self.getMainFontOptions(), self._getFileDialogOptions(), isToStop )
 
         target_function.results = ""
         target_function.isToStop = isToStop
@@ -418,7 +418,7 @@ class ProgramWindow(QtWidgets.QMainWindow):
     @ignore_exceptions
     def handleTryToFactorGrammar(self, qt_decorator_bug):
         fontOptions = self.getMainFontOptions()
-        ( maximumSteps, isAccepted ) = IntegerInputDialog.getNewUserInput( self, fontOptions )
+        ( maximumSteps, isAccepted ) = IntegerInputDialog.getNewUserInput( self, self.settings, fontOptions )
 
         if not isAccepted:
             return
