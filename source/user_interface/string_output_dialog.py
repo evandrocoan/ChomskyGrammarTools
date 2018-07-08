@@ -151,6 +151,7 @@ class StringOutputDialog(QMainWindow):
         self.disableStopButton()
 
     def closeEvent(self, event=None):
+        super().closeEvent( event )
         self.stopProcessing()
         self.deleteLater()
 

@@ -39,6 +39,9 @@ from PyQt5 import QtCore
 from PyQt5 import QtWidgets
 
 from PyQt5.QtCore import Qt
+from PyQt5.QtCore import QSettings
+from PyQt5.QtCore import QSize
+from PyQt5.QtCore import QPoint
 
 from PyQt5.QtWidgets import QWidget
 from PyQt5.QtWidgets import QFrame
@@ -134,11 +137,27 @@ class ProgramWindow(QtWidgets.QMainWindow):
         self.create_grammar_input_text()
         self.set_window_layout()
 
+    def get_screen_center(self):
+        """
+            https://stackoverflow.com/questions/12432740/pyqt4-what-is-the-best-way-to-center-dialog-windows
+        """
+        screenGeometry = QtWidgets.QApplication.desktop().screenGeometry()
+        x = ( screenGeometry.width() - self.width() ) / 2
+        y = ( screenGeometry.height() - self.height() ) / 2
+        return QPoint( x, y )
+
     def setup_main_window(self):
+        """
+            How to remember last geometry of PyQt application?
+            https://stackoverflow.com/questions/33869721/how-to-remember-last-geometry-of-pyqt-application
+        """
+        self.setWindowTitle( "Chomsky Grammar Tools for Context Free Grammars (CFG)" )
+        self.settings = QSettings( 'Open Source GPL v3 Application', 'Chomsky Grammar Tools for Context Free Grammars (CFG)' )
         self.largestFirstCollumn = 0
 
-        self.resize( 800, 600 )
-        self.setWindowTitle( "Chomsky Grammar Tools for Context Free Grammars (CFG)" )
+        # Initial window size/pos last saved. Use default values for first time
+        self.resize( self.settings.value( "mainWindowScreenSize", QSize( 800, 600 ) ) )
+        self.move( self.settings.value( "mainWindowScreenPostion", self.get_screen_center() ) )
 
         # https://github.com/GNOME/adwaita-icon-theme
         # https://code.google.com/archive/p/faenza-icon-theme/
@@ -163,11 +182,11 @@ class ProgramWindow(QtWidgets.QMainWindow):
         self.grammarTextEditWidget.setStyleSheet( self.getMainFontOptions() )
 
         # Set initial value of text
-        self.grammarTextEditWidget.document().setPlainText( wrap_text( """
+        self.grammarTextEditWidget.document().setPlainText( self.settings.value( "mainWindowGrammarTextEditWidget", wrap_text( """
             # Write your Grammar here
             S -> a A | a
             A -> b S | b
-        """ ) )
+        """ ) ) )
 
         self.redoGrammarButton        = QPushButton( "Redo Operations" )
         self.undoGrammarButton        = QPushButton( "Undo Operations" )
@@ -268,6 +287,16 @@ class ProgramWindow(QtWidgets.QMainWindow):
 
         if event.key() == PyQt5.QtCore.Qt.Key_Escape:
             self.close()
+
+    def closeEvent(self, event=None):
+        """
+            Write window size and position to config file
+        """
+        log( 1, "closeEvent" )
+        self.settings.setValue( "mainWindowScreenSize", self.size() )
+        self.settings.setValue( "mainWindowScreenPostion", self.pos() )
+        self.settings.setValue( "mainWindowGrammarTextEditWidget", self.grammarTextEditWidget.toPlainText() )
+        super().closeEvent( event )
 
     def handleUndoGrammarTextEdit(self):
         self.grammarTextEditWidget.document().undo()

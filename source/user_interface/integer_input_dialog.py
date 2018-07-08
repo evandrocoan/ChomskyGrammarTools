@@ -136,7 +136,7 @@ class IntegerInputDialog(QMainWindow):
 
     def closeEvent(self, event=None):
         # log( 1, "closeEvent " )
-        self.event.quit()
+        super().closeEvent( event )
 
     def keyPressEvent(self, event):
         """
