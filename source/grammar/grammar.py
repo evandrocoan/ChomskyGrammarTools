@@ -28,7 +28,10 @@ from threading import Lock
 from debug_tools import getLogger
 
 import lark
-from typing import Dict, Set
+from lark import Tree
+
+from typing import Set
+from typing import Dict
 
 from .symbols import Terminal
 from .symbols import NonTerminal
@@ -44,6 +47,7 @@ from .intermediate_grammar import IntermediateGrammar
 from .utilities import getCleanSpaces
 from .utilities import dictionary_to_string
 from .utilities import convert_to_text_lines
+from .utilities import get_relative_path
 from .utilities import get_duplicated_elements
 from .utilities import sort_alphabetically_and_by_length
 
@@ -69,83 +73,25 @@ class ChomskyGrammar():
         B -> bB | b
     """
 
-    _parser = lark.Lark( r"""
-        productions   : new_line* ( space* non_terminal_start space* "->" space* non_terminals space* end_symbol )* space* non_terminal_start space* "->" space* non_terminals space* end_symbol?
-        non_terminals : production ( "|" production )*
-        production    : space* ( ( epsilon | terminal | non_terminal )+ space+ )* ( epsilon | terminal | non_terminal )+ space*
+    ## The relative path the the lark grammar parser file from the current file
+    grammar_file_path = get_relative_path( "../grammar_parser.lark", __file__ )
 
-        // Forces them to appear in the tree as branches
-        epsilon         : [] | "&"+
-        end_symbol      : ";"* space* new_line ( new_line | space )*
-        terminal        : ( DIGIT | low_case_letter | signs | signs_extra | parens )+
-        non_terminal    : upper_case_letter+ ( upper_case_letter | DIGIT | quote )*
-        new_line        : NEWLINE
-        quote           : "'"
-        space           : " "
-
-        // Common definitions
-        DIGIT     : "0".."9"
-        NEWLINE   : (CR? LF)+
-        CR        : /\r/
-        LF        : /\n/
-        WS_INLINE : (" "|/\t/)+
-
-        // Tells the tree-builder to inline this branch if it has only one member
-        // https://stackoverflow.com/questions/20690499/concrete-javascript-regex-for-accented-characters-diacritics
-        ?low_case_letter   : /[a-zØ-öø-ÿ]/
-        ?upper_case_letter : /[A-ZÀ-Ö]/
-
-        ?signs    : minus |  plus | star | comma | colon | equals | semicolon | slash | backslash | dot
-        semicolon : ";"
-        comma     : ","
-        colon     : ":"
-        dot       : "."
-        equals    : "="
-        minus     : "-"
-        star      : "*"
-        plus      : "+"
-        slash     : "/"
-        backslash : "\\"
-
-        ?signs_extra : question | double_quote | percentage | dollar | at_sign | sharp | exclamation | tick | backtick | caret | tilde
-        sharp        : "#"
-        dollar       : "$"
-        question     : "?"
-        at_sign      : "@"
-        tick         : "´"
-        caret        : "^"
-        tilde        : "~"
-        backtick     : "`"
-        percentage   : "%"
-        exclamation  : "!"
-        double_quote : "\""
-
-        ?parens       : open_paren | close_paren | open_bracket | close_bracket | open_brace | close_brace
-        open_bracket  : "["
-        close_bracket : "]"
-        open_brace    : "{"
-        close_brace   : "}"
-        open_paren    : "("
-        close_paren   : ")"
-
-        // Rename the start symbol, so when parsing the tree it is simple to find it
-        non_terminal_start : non_terminal
-
-        // Stops Lark from automatically filtering out these literals from the tree
-        null   : "null"
-        true   : "true"
-        false  : "false"
-
-        // Set to ignore white spaces
-        // %ignore WS_INLINE
-    """, start='productions' )
+    with open( grammar_file_path, "r", encoding='utf-8' ) as file:
+        ## The parser used to build the Abstract Syntax Tree and parse the input text
+        _parser = lark.Lark( file.read(), start='grammar', parser='lalr' )
 
     @classmethod
-    def parse(cls, inputGrammar):
+    def parse(cls, input_text_form):
         """
             Parse the regular grammar and return its Abstract Syntax Tree.
         """
-        return cls._parser.parse( inputGrammar )
+        clean_text = "\n".join( getCleanSpaces(
+                input_text_form,
+                minimumLength=3,
+                lineCutTrigger=HISTORY_KEY_LINE,
+                keepSpaceSepators=True ) )
+
+        return cls._parser.parse( clean_text )
 
     def __str__(self):
         """
@@ -164,17 +110,14 @@ class ChomskyGrammar():
             for production in productions:
                 productions_string.append( str( production ) )
 
-            log( 4, "productions:        %s", productions )
-            log( 4, "productions_string: %s", productions_string )
+            # log( 1, "productions:        %s", productions )
+            # log( 1, "productions_string: %s", productions_string )
 
             return " {:>{biggest}} -> {}".format( str( start_symbol ),
                     " | ".join( sort_alphabetically_and_by_length( productions_string ) ), biggest=biggest )
 
         if self.initial_symbol in self.productions:
             grammar_lines.append( create_grammar_line( self.initial_symbol, self.productions[self.initial_symbol] ) )
-
-        else:
-            raise RuntimeError( "Your grammar has an invalid initial_symbol! %s, %s" % ( self.initial_symbol, self.productions ) )
 
         for non_terminal in sort_alphabetically_and_by_length( set( self.productions ) - {self.initial_symbol} ):
             grammar_lines.append( create_grammar_line( non_terminal, self.productions[non_terminal] ) )
@@ -190,7 +133,7 @@ class ChomskyGrammar():
             if production_length > biggest_label_length:
                 biggest_label_length = production_length
 
-        log( 4, "biggest_label_length: %s", biggest_label_length )
+        # log( 1, "biggest_label_length: %s", biggest_label_length )
         return biggest_label_length
 
     def initial_symbol_as_first(self):
@@ -297,13 +240,13 @@ class ChomskyGrammar():
         """
 
         if type( start_symbol ) is not Production:
-            raise RuntimeError( "Your start symbol is not an instance of Production! %s (%s)" % ( start_symbol, repr( start_symbol ) ) )
+            raise RuntimeError( "Your start symbol is not an instance of Production! %s (%s)" % ( start_symbol, type( start_symbol ) ) )
 
         if len( start_symbol ) != 1:
-            raise ValueError( "The start symbol be a Production with length 1! %s (%s)" % ( start_symbol, repr( value ) ) )
+            raise ValueError( "The start symbol must to be a Production with length 1! %s (%s)" % ( start_symbol, start_symbol.repr() ) )
 
         if type( start_symbol[0] ) is not NonTerminal:
-            raise ValueError( "The start symbol production first symbol must be a NonTerminal! %s (%s)" % ( start_symbol, repr( value ) ) )
+            raise ValueError( "The start symbol production must to be a NonTerminal! %s (%s)" % ( start_symbol, start_symbol.repr() ) )
 
         start_symbol.lock()
 
@@ -322,14 +265,17 @@ class ChomskyGrammar():
                 1 -> a | a2 | b | b2
                 2 -> a | a2 | b | b2
         """
-        AST = cls.parse( "\n".join( getCleanSpaces( input_text_form, lineCutTrigger=HISTORY_KEY_LINE, keepSpaceSepators=True ) ) )
         grammar = ChomskyGrammar()
 
-        # initial_symbol: 1
-        # productions:    {'1': {'b', 'a2', 'b2', 'a'}, '2': {'b', 'a2', 'b2', 'a'}}
-        log( 4, "\n%s", AST.pretty() )
+        if input_text_form:
+            AST = cls.parse( input_text_form )
+
+        else:
+            raise TypeError( "`load_from_text_lines()` missing 1 required positional argument: 'input_text_form'" )
 
         # S -> S SS | &
+        # initial_symbol: 1
+        # productions:    {'1': {'b', 'a2', 'b2', 'a'}, '2': {'b', 'a2', 'b2', 'a'}}
         current_level = ''
 
         def parse_tree(tree, level, children_count):
@@ -340,29 +286,34 @@ class ChomskyGrammar():
 
             for node in tree.children:
 
-                if isinstance( node, lark.Tree ):
-                    log( 4, "level: %s, level_name: %-15s children_count: %s", level, level_name, children_count )
+                if isinstance( node, Tree ):
+                    log( 4, "level: %s, level_name: %-16s children: %s", level, level_name, children_count )
                     parse_tree( node, level+1, len( node.children ) )
 
                 else:
-                    log( 4, "level: %s, level_name: %-15s node: %-15s current_level: %s", level, level_name, node, current_level )
+                    log( 4, "level: %s, level_name: %-15s  current_level: %-8s node: %-8s %s",
+                            level, level_name, "`" + str( current_level ) + "`", "`" + str( node ) + "`", node.__class__.__name__ )
 
-                    if level_name == 'productions':
+                    if level_name == 'grammar':
 
                         if level == 0:
                             current_level = node
 
                             if len( grammar.initial_symbol ) == 0:
-                                log( 4, "setting initial_symbol: %s", grammar.initial_symbol )
+                                log( 4, "setting initial_symbol: %s (`%s`)", current_level, grammar.initial_symbol )
                                 grammar.initial_symbol = current_level
 
-                    if level_name == 'non_terminals':
-                        grammar.add_production( current_level, node )
+                    if level_name == 'productions':
 
+                        if isinstance( node, Production ):
+                            grammar.add_production( current_level, node )
+
+        # log( 4, "AST.pretty: \n%s", AST.pretty() )
         new_tree = ChomskyGrammarTreeTransformer().transform( AST )
-        parse_tree( new_tree, 0, len( new_tree.children ) )
 
         log( 4, "\n%s", new_tree.pretty() )
+        parse_tree( new_tree, 0, len( new_tree.children ) )
+
         log( 4, "Result initial_symbol: %s", grammar.initial_symbol )
         log( 4, "Result productions:    %s", grammar.productions )
         log( 4, "Result grammar:        %s", grammar )
@@ -385,7 +336,7 @@ class ChomskyGrammar():
         if start_symbol not in self.productions:
             self.productions[start_symbol] = DynamicIterationDict( is_set=True )
 
-        log( 58, "   %s -> %s", start_symbol, production )
+        log( 62, "   %s -> %s", start_symbol, production )
         self.productions[start_symbol].add( production )
 
     def has_production(self, start_symbol, production):
@@ -460,7 +411,7 @@ class ChomskyGrammar():
                     raise RuntimeError( "Invalid Non Terminal `%s` added to the grammar: \n%s" % ( non_terminal, self ) )
 
         if self.initial_symbol not in productions_keys:
-            raise ValueError( "Error: The new initial symbol has not productions! %s" % repr( self.initial_symbol ) )
+            raise ValueError( "Error: The new initial symbol is not in the grammar productions! %s" % type( self.initial_symbol ) )
 
     def is_epsilon_free(self):
         """
@@ -597,7 +548,7 @@ class ChomskyGrammar():
             `start_symbol` symbol is also removed from the grammar `productions` and everywhere it
             is mentioned.
         """
-        log( 58, "%s -> %s", start_symbol, production )
+        log( 62, "%s -> %s", start_symbol, production )
         productions = self.productions[start_symbol]
         productions.discard( production )
 

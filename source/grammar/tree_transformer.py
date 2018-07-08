@@ -24,6 +24,7 @@
 import os
 import lark
 
+from lark import Tree
 from debug_tools import getLogger
 
 from .production import Production
@@ -67,235 +68,52 @@ class ChomskyGrammarTreeTransformer(lark.Transformer):
             )
     """
 
-    def non_terminal_start(self, non_terminal):
+    def start_symbol(self, productions):
         """
             Converts the tree start symbol into a production ready to be used in the Chomsky Grammar.
         """
-        log( 4, 'non_terminal: %s', non_terminal )
-        new_production = Production()
-        new_production.add( non_terminal[0] )
-        return new_production
+        log( 4, 'productions: %s', productions )
+        return productions[0]
 
-    def terminal(self, _terminals):
+    def terminals(self, _terminals):
         """
             Converts the tree leaf terminal into a Terminal ready to be used in the Chomsky Grammar.
         """
         return self._parse_symbols( _terminals, Terminal )
 
-    def non_terminal(self, _non_terminals):
+    def non_terminals(self, _non_terminals):
         """
             Converts the tree leaf non terminal symbol into a NonTerminal ready to be used in the Chomsky Grammar.
         """
         return self._parse_symbols( _non_terminals, NonTerminal )
 
-    def epsilon(self, _terminal):
-        """
-            Converts the tree leaf epsilon '&' symbol into a Terminal ready to be used in the Chomsky Grammar.
-        """
-        return self._parse_symbol( _terminal, '&' )
-
-    def quote(self, _terminal):
-        """
-            Converts the tree leaf single quote "'" symbol into a Terminal ready to be used in the Chomsky Grammar.
-        """
-        return self._parse_symbol( _terminal, "'" )
-
-    def minus(self, _terminal):
-        """
-            Converts the tree leaf hyphen '-' symbol into a Terminal ready to be used in the Chomsky Grammar.
-        """
-        return self._parse_symbol( _terminal, "-" )
-
-    def plus(self, _terminal):
-        """
-            Converts the tree leaf plus '+' symbol into a Terminal ready to be used in the Chomsky Grammar.
-        """
-        return self._parse_symbol( _terminal, "+" )
-
-    def star(self, _terminal):
-        """
-            Converts the tree leaf '*' symbol into a Terminal ready to be used in the Chomsky Grammar.
-        """
-        return self._parse_symbol( _terminal, "*" )
-
-    def comma(self, _terminal):
-        """
-            Converts the tree leaf ',' symbol into a Terminal ready to be used in the Chomsky Grammar.
-        """
-        return self._parse_symbol( _terminal, "," )
-
-    def colon(self, _terminal):
-        """
-            Converts the tree leaf ':' symbol into a Terminal ready to be used in the Chomsky Grammar.
-        """
-        return self._parse_symbol( _terminal, ":" )
-
-    def dot(self, _terminal):
-        """
-            Converts the tree leaf '.' symbol into a Terminal ready to be used in the Chomsky Grammar.
-        """
-        return self._parse_symbol( _terminal, "." )
-
-    def double_quote(self, _terminal):
-        """
-            Converts the tree leaf '"' symbol into a Terminal ready to be used in the Chomsky Grammar.
-        """
-        return self._parse_symbol( _terminal, "\"" )
-
-    def percentage(self, _terminal):
-        """
-            Converts the tree leaf '%' symbol into a Terminal ready to be used in the Chomsky Grammar.
-        """
-        return self._parse_symbol( _terminal, "%" )
-
-    def dollar(self, _terminal):
-        """
-            Converts the tree leaf '$' symbol into a Terminal ready to be used in the Chomsky Grammar.
-        """
-        return self._parse_symbol( _terminal, "$" )
-
-    def at_sign(self, _terminal):
-        """
-            Converts the tree leaf '@' symbol into a Terminal ready to be used in the Chomsky Grammar.
-        """
-        return self._parse_symbol( _terminal, "@" )
-
-    def sharp(self, _terminal):
-        """
-            Converts the tree leaf '#' symbol into a Terminal ready to be used in the Chomsky Grammar.
-        """
-        return self._parse_symbol( _terminal, "#" )
-
-    def exclamation(self, _terminal):
-        """
-            Converts the tree leaf '!' symbol into a Terminal ready to be used in the Chomsky Grammar.
-        """
-        return self._parse_symbol( _terminal, "!" )
-
-    def backtick(self, _terminal):
-        """
-            Converts the tree leaf '`' symbol into a Terminal ready to be used in the Chomsky Grammar.
-        """
-        return self._parse_symbol( _terminal, "`" )
-
-    def tick(self, _terminal):
-        """
-            Converts the tree leaf '´' symbol into a Terminal ready to be used in the Chomsky Grammar.
-        """
-        return self._parse_symbol( _terminal, "´" )
-
-    def caret(self, _terminal):
-        """
-            Converts the tree leaf '^' symbol into a Terminal ready to be used in the Chomsky Grammar.
-        """
-        return self._parse_symbol( _terminal, "^" )
-
-    def tilde(self, _terminal):
-        """
-            Converts the tree leaf '~' symbol into a Terminal ready to be used in the Chomsky Grammar.
-        """
-        return self._parse_symbol( _terminal, "~" )
-
-    def question(self, _terminal):
-        """
-            Converts the tree leaf '?' symbol into a Terminal ready to be used in the Chomsky Grammar.
-        """
-        return self._parse_symbol( _terminal, "?" )
-
-    def equals(self, _terminal):
-        """
-            Converts the tree leaf '=' symbol into a Terminal ready to be used in the Chomsky Grammar.
-        """
-        return self._parse_symbol( _terminal, "=" )
-
-    def semicolon(self, _terminal):
-        """
-            Converts the tree leaf ';' symbol into a Terminal ready to be used in the Chomsky Grammar.
-        """
-        return self._parse_symbol( _terminal, ";" )
-
-    def slash(self, _terminal):
-        """
-            Converts the tree leaf '/' symbol into a Terminal ready to be used in the Chomsky Grammar.
-        """
-        return self._parse_symbol( _terminal, "/" )
-
-    def backslash(self, _terminal):
-        """
-            Converts the tree leaf '\' symbol into a Terminal ready to be used in the Chomsky Grammar.
-        """
-        return self._parse_symbol( _terminal, "\\" )
-
-    def open_paren(self, _terminal):
-        """
-            Converts the tree leaf '(' symbol into a Terminal ready to be used in the Chomsky Grammar.
-        """
-        return self._parse_symbol( _terminal, "(" )
-
-    def close_paren(self, _terminal):
-        """
-            Converts the tree leaf ')' symbol into a Terminal ready to be used in the Chomsky Grammar.
-        """
-        return self._parse_symbol( _terminal, ")" )
-
-    def open_bracket(self, _terminal):
-        """
-            Converts the tree leaf '[' symbol into a Terminal ready to be used in
-            the Chomsky Grammar.
-        """
-        return self._parse_symbol( _terminal, "[" )
-
-    def close_bracket(self, _terminal):
-        """
-            Converts the tree leaf ']' symbol into a Terminal ready to be used in the Chomsky Grammar.
-        """
-        return self._parse_symbol( _terminal, "]" )
-
-    def open_brace(self, _terminal):
-        """
-            Converts the tree leaf '{' symbol into a Terminal ready to be used in
-            the Chomsky Grammar.
-        """
-        return self._parse_symbol( _terminal, "{" )
-
-    def close_brace(self, _terminal):
-        """
-            Converts the tree leaf '}' symbol into a Terminal ready to be used in the Chomsky Grammar.
-        """
-        return self._parse_symbol( _terminal, "}" )
-
-    def _parse_symbol(self, _terminal, default):
-
-        if len( _terminal ):
-            return Terminal( _terminal )
-
-        return Terminal( default )
-
-    def _parse_symbols(self, _symbols, Type):
-        log( 4, 'productions: %s, type: %s', _symbols, Type )
+    def _parse_symbols(self, symbols, Type):
+        log( 4, 'productions: %s, type: %s', symbols, Type )
         results = []
 
-        for _symbol in _symbols:
-            results.append( str( _symbol ) )
+        for symbol in symbols:
+            results.append( str( symbol ) )
 
         symbol = Type( "".join( results ) )
-        log( 4, "results: %s", results )
-        log( 4, "symbol:  %s", symbol )
+        log( 4, "results: %s %s", results, symbol.repr() )
         return symbol
 
-    def production(self, productions):
+    def production(self, tokens):
         """
             Converts the tree leaf Terminal's and NonTerminal's symbols into a production ready to
             be used in the Chomsky Grammar.
         """
-        log( 4, 'productions: %s', productions )
+        log( 4, 'tokens: %s', tokens )
         new_production = Production()
 
-        for production in productions:
+        for element in tokens:
 
-            if isinstance( production, ( Terminal, NonTerminal ) ):
-                new_production.add( production )
+            if isinstance( element, Tree ):
+                symbol = element.children[0]
 
-        log( 4, "new_production: %s", new_production )
+                if isinstance( symbol, ( Terminal, NonTerminal ) ):
+                    new_production.add( symbol )
+
+        log( 4, "new_production: %s", new_production.repr() )
         return new_production
 

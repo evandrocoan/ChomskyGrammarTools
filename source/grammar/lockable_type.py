@@ -94,6 +94,12 @@ class LockableType(object):
         """
         return self._hash
 
+    def repr(self):
+        """
+            See `__repr__()` for details.
+        """
+        return get_representation( self, ignore={'hash'}, emquote=self._EMQUOTE_STRING )
+
     def __repr__(self):
         """
             Prints a representation of this object within all its attributes.
@@ -102,7 +108,7 @@ class LockableType(object):
         if self._USE_STRING:
             return self.__str__()
 
-        return get_representation( self, ignore={'hash'}, emquote=self._EMQUOTE_STRING )
+        return self.repr()
 
     def __str__(self):
         """

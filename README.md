@@ -8,8 +8,8 @@ with graphical interface to manipulate CFG,
 involving the following checks / operations:
 1. Edit CFG's verbatim;
 2. Check whether L (G) is empty, finite or infinite;
-3. Transform a CFG into Own CFG,
-   providing: Intermediate grammars, NF, Vi, Ne and NA;
+3. Transform a CFG into Proper CFG,
+   providing: Intermediate grammars, Nf, Vi, Ne and Na;
 4. Calculate First (A),
    Follow (A) and First-NT (A) (defined as the set of symbols of Vn that can start sequences derived from A) for all A ∈ Vn;
 5. Check if G is factored or if it is factorial in n steps;
@@ -20,6 +20,7 @@ involving the following checks / operations:
 
 ## II - Observations:
 1. Represent the CFG in a textual way, following the pattern of the examples below:
+
    **a)**
    ```
    E -> E + T | E-T | T

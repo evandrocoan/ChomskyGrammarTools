@@ -54,6 +54,16 @@ def get_unique_hash():
     return initial_hash
 
 
+def get_relative_path(relative_path, script_file):
+    """
+        Computes a relative path for a file on the same folder as this class file declaration.
+        https://stackoverflow.com/questions/4381569/python-os-module-open-file-above-current-directory-with-relative-path
+    """
+    basepath = os.path.dirname( script_file )
+    filepath = os.path.abspath( os.path.join( basepath, relative_path ) )
+    return filepath
+
+
 def get_duplicated_elements(elements_list):
     """
         Given an `elements_list` with duplicated elements, return a set only with the duplicated
@@ -297,7 +307,7 @@ def getCleanSpaces(inputText, minimumLength=0, lineCutTrigger="", keepSpaceSepat
 
         `minimumLength` of a line to not be ignored
         `lineCutTrigger` all lines after a line starting with this string will be ignored
-        `keepSpaceSepators` it will keep at a single space between sentences as `S S`, given `S    S`
+        `keepSpaceSepators` if True, it will keep at a single space between sentences as `S S`, given `S    S`
     """
 
     if keepSpaceSepators:
@@ -335,7 +345,7 @@ def getCleanSpaces(inputText, minimumLength=0, lineCutTrigger="", keepSpaceSepat
     return clean_lines
 
 
-def wrap_text(text, wrap=0, trim_tabs=False, trim_spaces=False, trim_lines=False,indent=""):
+def wrap_text(text, wrap=0, trim_tabs=False, trim_spaces=False, trim_lines=False, indent=""):
     """
         1. Remove input text leading common indentation, trailing white spaces
         2. If `wrap`, wraps big lists on 80 characters.

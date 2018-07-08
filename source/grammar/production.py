@@ -366,10 +366,10 @@ class Production(LockableType):
         # log( 1, "symbol: %s", symbol )
 
         if type( symbol ) not in ( Terminal, NonTerminal ):
-            raise RuntimeError( "You can only add Terminal's and NonTerminal's! %s (%s)" % ( symbol, type( symbol ) ) )
+            raise RuntimeError( "You can only add Terminal's and NonTerminal's! %s (%s)" % ( symbol.repr(), type( symbol ) ) )
 
         if symbol.locked:
-            raise RuntimeError( "You can only add `unlocked` symbols in a production! %s" % symbol )
+            raise RuntimeError( "You can only add `unlocked` symbols in a production! %s" % symbol.repr() )
 
         self.sequence += 1
         symbol.sequence = self.sequence

@@ -10,7 +10,7 @@ import cProfile
 
 from io import StringIO
 
-cur_path = os.path.join( os.getcwd(), '..', 'source' )
+cur_path = os.path.abspath( os.path.join( os.getcwd(), '..', 'source' ) )
 sys.path.append( cur_path )
 
 from grammar.grammar import ChomskyGrammar
