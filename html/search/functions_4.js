@@ -1,7 +1,10 @@
 var searchData=
 [
-  ['discard',['discard',['../classgrammar_1_1dynamic__iteration_1_1_dynamic_iteration_dict.html#a968635c289ba517803b6bb468d82454c',1,'grammar::dynamic_iteration::DynamicIterationDict']]],
-  ['dollar',['dollar',['../classgrammar_1_1tree__transformer_1_1_chomsky_grammar_tree_transformer.html#a666b9cc985134c428a5ffdd0825fa581',1,'grammar::tree_transformer::ChomskyGrammarTreeTransformer']]],
-  ['dot',['dot',['../classgrammar_1_1tree__transformer_1_1_chomsky_grammar_tree_transformer.html#a01296d1d2c2c4958d13cda96645d014a',1,'grammar::tree_transformer::ChomskyGrammarTreeTransformer']]],
-  ['double_5fquote',['double_quote',['../classgrammar_1_1tree__transformer_1_1_chomsky_grammar_tree_transformer.html#a85033ca34e69fcefbc41d8e75fd989dd',1,'grammar::tree_transformer::ChomskyGrammarTreeTransformer']]]
+  ['eliminate_5fdirect_5ffactors',['eliminate_direct_factors',['../classgrammar_1_1grammar_1_1_chomsky_grammar.html#a5a078cc7b1578aebb8de35b8ab6d4b83',1,'grammar::grammar::ChomskyGrammar']]],
+  ['eliminate_5findirect_5ffactors',['eliminate_indirect_factors',['../classgrammar_1_1grammar_1_1_chomsky_grammar.html#a3a7fa579f0e1b77cf142349078913777',1,'grammar::grammar::ChomskyGrammar']]],
+  ['eliminate_5finfertile',['eliminate_infertile',['../classgrammar_1_1grammar_1_1_chomsky_grammar.html#a5c69bf8e27077b0b9950bd6a707fe677',1,'grammar::grammar::ChomskyGrammar']]],
+  ['eliminate_5fleft_5frecursion',['eliminate_left_recursion',['../classgrammar_1_1grammar_1_1_chomsky_grammar.html#a3e4b9395b0536be92e5caab06a015f96',1,'grammar::grammar::ChomskyGrammar']]],
+  ['eliminate_5fsimple_5fnon_5fterminals',['eliminate_simple_non_terminals',['../classgrammar_1_1grammar_1_1_chomsky_grammar.html#ae3b0ad2fd70a26849272711fbf0210a4',1,'grammar::grammar::ChomskyGrammar']]],
+  ['eliminate_5funreachable',['eliminate_unreachable',['../classgrammar_1_1grammar_1_1_chomsky_grammar.html#ade3ea2338d67f841a0d449c5b85c81b5',1,'grammar::grammar::ChomskyGrammar']]],
+  ['eliminate_5funuseful',['eliminate_unuseful',['../classgrammar_1_1grammar_1_1_chomsky_grammar.html#a5adfb8f7f20feb79411bf602fac452cb',1,'grammar::grammar::ChomskyGrammar']]]
 ];

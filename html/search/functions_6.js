@@ -1,14 +1,9 @@
 var searchData=
 [
-  ['factor_5fit',['factor_it',['../classgrammar_1_1grammar_1_1_chomsky_grammar.html#a798324cfdb5ce9241790e0ec062c89fd',1,'grammar::grammar::ChomskyGrammar']]],
-  ['factors',['factors',['../classgrammar_1_1grammar_1_1_chomsky_grammar.html#a4fcbcfec182c4d96f220ea5a2f85fa0e',1,'grammar::grammar::ChomskyGrammar']]],
-  ['fertile',['fertile',['../classgrammar_1_1grammar_1_1_chomsky_grammar.html#a10e2862553a9c3fee5c765f808c6d9f4',1,'grammar::grammar::ChomskyGrammar']]],
-  ['filter_5fnon_5fterminals',['filter_non_terminals',['../classgrammar_1_1production_1_1_production.html#ade7dca7b1f69676ba253d0e65536f06e',1,'grammar::production::Production']]],
-  ['first_5fnon_5fterminals',['first_non_terminals',['../classgrammar_1_1grammar_1_1_chomsky_grammar.html#aa81ca901977164f8ea0f4503e71a182f',1,'grammar::grammar::ChomskyGrammar']]],
-  ['first_5fnon_5fterminals_5ffrom',['first_non_terminals_from',['../classgrammar_1_1grammar_1_1_chomsky_grammar.html#a6e04c84a0d964fc767e4f54977249097',1,'grammar::grammar::ChomskyGrammar']]],
-  ['first_5fterminals',['first_terminals',['../classgrammar_1_1grammar_1_1_chomsky_grammar.html#a48948742c361c339687f841f110b16a8',1,'grammar::grammar::ChomskyGrammar']]],
-  ['first_5fterminals_5ffrom',['first_terminals_from',['../classgrammar_1_1grammar_1_1_chomsky_grammar.html#a63098f6715a3088f6ae09cbfc41a6e50',1,'grammar::grammar::ChomskyGrammar']]],
-  ['follow_5fterminals',['follow_terminals',['../classgrammar_1_1grammar_1_1_chomsky_grammar.html#ad102f6aeaacb74cf9eea5f2d03fc3be0',1,'grammar::grammar::ChomskyGrammar']]],
-  ['following_5fsymbols',['following_symbols',['../classgrammar_1_1production_1_1_production.html#aac48ff12fcb5fea45a6720343a71c60a',1,'grammar::production::Production']]],
-  ['fromkeys',['fromkeys',['../classgrammar_1_1dynamic__iteration_1_1_dynamic_iteration_dict.html#a6728b47b7be786d78310e220d6768326',1,'grammar::dynamic_iteration::DynamicIterationDict']]]
+  ['get_5ffactoring_5fduplicated_5felements',['get_factoring_duplicated_elements',['../classgrammar_1_1grammar_1_1_chomsky_grammar.html#a810a3bbcbe575068db2807d1a6c7480f',1,'grammar::grammar::ChomskyGrammar']]],
+  ['get_5fiterator',['get_iterator',['../classgrammar_1_1dynamic__iteration_1_1_dynamic_iteration_dict.html#a396c8120e8d7ce8561e724bdbc0f5d52',1,'grammar::dynamic_iteration::DynamicIterationDict']]],
+  ['get_5fkey',['get_key',['../classgrammar_1_1dynamic__iteration_1_1_dynamic_iteration_dict.html#a452c25f93d89e5f7982272e501aea514',1,'grammar::dynamic_iteration::DynamicIterationDict']]],
+  ['get_5fkey_5fvalue',['get_key_value',['../classgrammar_1_1dynamic__iteration_1_1_dynamic_iteration_dict.html#a19d36126582766a23e1644b4aa783fc5',1,'grammar::dynamic_iteration::DynamicIterationDict']]],
+  ['get_5foperation_5fhistory',['get_operation_history',['../classgrammar_1_1grammar_1_1_chomsky_grammar.html#a819e2046645bcfbcc44d4a39f450456a',1,'grammar::grammar::ChomskyGrammar']]],
+  ['get_5fvalue',['get_value',['../classgrammar_1_1dynamic__iteration_1_1_dynamic_iteration_dict.html#a08f0b8d2f770047c1b57085c6607742f',1,'grammar::dynamic_iteration::DynamicIterationDict']]]
 ];

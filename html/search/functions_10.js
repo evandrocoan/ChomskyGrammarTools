@@ -1,5 +1,4 @@
 var searchData=
 [
-  ['question',['question',['../classgrammar_1_1tree__transformer_1_1_chomsky_grammar_tree_transformer.html#a416da10458ef6d2f62e745a9cdcca66c',1,'grammar::tree_transformer::ChomskyGrammarTreeTransformer']]],
-  ['quote',['quote',['../classgrammar_1_1tree__transformer_1_1_chomsky_grammar_tree_transformer.html#a38391d7028ed5abb327ec74b4010fd7b',1,'grammar::tree_transformer::ChomskyGrammarTreeTransformer']]]
+  ['unidiff_5foutput',['unidiff_output',['../classgrammar_1_1testing__utilities_1_1_testing_utilities.html#a03375a876a25707b84120f8f66e03599',1,'grammar::testing_utilities::TestingUtilities']]]
 ];

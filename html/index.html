@@ -94,14 +94,15 @@ $(document).ready(function(){initNavTree('index.html','');});
 <p>An application, with graphical interface to manipulate CFG, involving the following checks / operations:</p><ol type="1">
 <li>Edit CFG's verbatim;</li>
 <li>Check whether L (G) is empty, finite or infinite;</li>
-<li>Transform a CFG into Own CFG, providing: Intermediate grammars, NF, Vi, Ne and NA;</li>
+<li>Transform a CFG into Proper CFG, providing: Intermediate grammars, Nf, Vi, Ne and Na;</li>
 <li>Calculate First (A), Follow (A) and First-NT (A) (defined as the set of symbols of Vn that can start sequences derived from A) for all A ∈ Vn;</li>
 <li>Check if G is factored or if it is factorial in n steps;</li>
 <li>Check whether or not G has Rec. the Left - identifying the recursive non-terminals on the left and the type of recursions (direct and / or indirect) and, if it has, eliminate recursions.</li>
 </ol>
 <h2>II - Observations:</h2>
 <ol type="1">
-<li><p class="startli">Represent the CFG in a textual way, following the pattern of the examples below: <b>a)</b> </p><div class="fragment"><div class="line">E -&gt; E + T | E-T | T</div><div class="line">T -&gt; T * F | T / F | F</div><div class="line">F -&gt; (E) | id</div></div><!-- fragment --><p class="startli"><b>b)</b> </p><div class="fragment"><div class="line"> E -&gt; T E1</div><div class="line">E1 -&gt; + T E1 | &amp;</div><div class="line"> T -&gt; F T1</div><div class="line">T1 -&gt; * F T1 | &amp;</div><div class="line"> F -&gt; (E) | id</div></div><!-- fragment --></li>
+<li><p class="startli">Represent the CFG in a textual way, following the pattern of the examples below:</p>
+<p class="startli"><b>a)</b> </p><div class="fragment"><div class="line">E -&gt; E + T | E-T | T</div><div class="line">T -&gt; T * F | T / F | F</div><div class="line">F -&gt; (E) | id</div></div><!-- fragment --><p class="startli"><b>b)</b> </p><div class="fragment"><div class="line"> E -&gt; T E1</div><div class="line">E1 -&gt; + T E1 | &amp;</div><div class="line"> T -&gt; F T1</div><div class="line">T1 -&gt; * F T1 | &amp;</div><div class="line"> F -&gt; (E) | id</div></div><!-- fragment --></li>
 <li>Leave a blank space between the symbols on the right.</li>
 <li>Represent non-terminals by capital letter (followed by 0 or + digits).</li>
 <li>Represent terminals with one or more contiguous characters (any characters, except uppercase letters).</li>

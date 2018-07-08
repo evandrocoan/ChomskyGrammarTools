@@ -5,6 +5,5 @@ var searchData=
   ['append',['append',['../classgrammar_1_1dynamic__iteration_1_1_dynamic_iteration_dict.html#ad2f3b02114b52f5bcf1a9a178d65611b',1,'grammar::dynamic_iteration::DynamicIterationDict']]],
   ['asserttextequal',['assertTextEqual',['../classgrammar_1_1testing__utilities_1_1_testing_utilities.html#aaf620f8b6e43310e574cc9ccad0f2e6e',1,'grammar::testing_utilities::TestingUtilities']]],
   ['assure_5fcorrect_5fstart_5fsymbol',['assure_correct_start_symbol',['../classgrammar_1_1grammar_1_1_chomsky_grammar.html#aad4d6876f422fea3c14b8c608c99cabe',1,'grammar::grammar::ChomskyGrammar']]],
-  ['assure_5fexisting_5fsymbols',['assure_existing_symbols',['../classgrammar_1_1grammar_1_1_chomsky_grammar.html#ae0725c85458ada9e4278506ce27ac9c6',1,'grammar::grammar::ChomskyGrammar']]],
-  ['at_5fsign',['at_sign',['../classgrammar_1_1tree__transformer_1_1_chomsky_grammar_tree_transformer.html#a885f798765b9155d13a2824713da1250',1,'grammar::tree_transformer::ChomskyGrammarTreeTransformer']]]
+  ['assure_5fexisting_5fsymbols',['assure_existing_symbols',['../classgrammar_1_1grammar_1_1_chomsky_grammar.html#ae0725c85458ada9e4278506ce27ac9c6',1,'grammar::grammar::ChomskyGrammar']]]
 ];
