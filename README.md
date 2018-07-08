@@ -1,5 +1,12 @@
 # Chomsky Grammar Tools for Context Free Grammars (CFG)
 
+[![Build Status](https://travis-ci.org/evandrocoan/ContextFreeGrammars.svg?branch=master)](https://travis-ci.org/evandrocoan/ContextFreeGrammars)
+[![Build status](https://ci.appveyor.com/api/projects/status/github/evandrocoan/ContextFreeGrammars?branch=master&svg=true)](https://ci.appveyor.com/project/evandrocoan/ContextFreeGrammars/branch/master)
+[![codecov](https://codecov.io/gh/evandrocoan/ContextFreeGrammars/branch/master/graph/badge.svg)](https://codecov.io/gh/evandrocoan/ContextFreeGrammars)
+[![Coverage Status](https://coveralls.io/repos/github/evandrocoan/ContextFreeGrammars/badge.svg?branch=master)](https://coveralls.io/github/evandrocoan/ContextFreeGrammars?branch=master)
+[![Codacy Badge](https://api.codacy.com/project/badge/Grade/9191d17b91814f8caf17c9e537a22904)](https://www.codacy.com/app/evandrocoan/ContextFreeGrammars?utm_source=github.com&utm_medium=referral&utm_content=evandrocoan/ContextFreeGrammars&utm_campaign=badger)
+[![Latest Release](https://img.shields.io/github/tag/evandrocoan/ContextFreeGrammars.svg?label=version)](https://github.com/evandrocoan/ContextFreeGrammars/releases)
+
 
 ## I - Definition:
 

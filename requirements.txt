@@ -2,5 +2,5 @@ PyQt5 >= 5.9.2
 pydot >= 1.2.4
 natsort >= 5.3.2
 lark-parser >= 0.5.6
-debug_tools >= 2.14
+debug_tools >= 2.1.6
 fastnumbers >= 2.0.0
