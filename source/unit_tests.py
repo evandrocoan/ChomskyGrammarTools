@@ -225,6 +225,14 @@ class TestChomskyGrammar(TestingUtilities):
 
         self.assertTrue( firstGrammar.is_infinite() )
 
+    def test_grammarHasIndirectFactorsStoSorEpsilon(self):
+        firstGrammar = ChomskyGrammar.load_from_text_lines( wrap_text(
+        r"""
+            S -> aS | &
+        """ ) )
+
+        self.assertFalse( firstGrammar.has_indirect_factors() )
+
 
 class TestGrammarFactoringAndRecursionSymbols(TestingUtilities):
 
