@@ -853,36 +853,8 @@ class ChomskyGrammar():
             If the list contains duplicated entries, it means this grammar is non factored, i.e.,
             non deterministic.
         """
-        non_terminal_factors = self.non_terminal_factors()
-        non_terminal_factors.extend( self.terminal_factors() )
-        return non_terminal_factors
-
-    def non_terminal_factors(self):
-        """
-            Return all factors which start with a NonTerminal symbol.
-        """
-        non_terminal_factors = []
-        productions_keys = self.productions
-
-        for start_symbol in productions_keys:
-            productions = productions_keys[start_symbol]
-            biggest_common_factors = {}
-
-            for production in productions:
-                first_symbol = production[0]
-
-                if type( first_symbol ) is NonTerminal:
-                    common_production = self.get_biggest_factor_serie( first_symbol, production, productions, biggest_common_factors )
-                    non_terminal_factors.append( ( start_symbol, common_production ) )
-
-        return non_terminal_factors
-
-    def terminal_factors(self):
-        """
-            Return all factors which start with a Terminal symbol.
-        """
+        factors = []
         first_terminals = self.first_terminals()
-        terminal_factors = []
         productions_keys = self.productions
 
         for start_symbol in productions_keys:
@@ -891,25 +863,21 @@ class ChomskyGrammar():
 
             for production in productions:
                 first_symbol = production[0]
-                indirect_factors = []
 
-                first_terminals_from = self.first_terminals_from( production, first_terminals )
-                # log( 1, "first_terminals_from: %-6s -> %s", production, first_terminals_from )
+                if len( first_symbol ):
+                    common_production = self.get_biggest_factor_serie( first_symbol, production, productions, biggest_common_factors )
+                    factors.append( ( start_symbol, common_production ) )
 
-                if len( first_symbol ) and type( first_symbol ) is Terminal:
+                    if type( first_symbol ) is NonTerminal:
+                        first_terminals_from = self.first_terminals_from( production, first_terminals )
+                        # log( 1, "first_terminals_from: %-6s -> %s", production, first_terminals_from )
 
-                    for first_terminal in first_terminals_from:
-                        common_production = self.get_biggest_factor_serie( first_symbol, production, productions, biggest_common_factors )
-                        terminal_factors.append( ( start_symbol, common_production ) )
+                        for first_terminal in first_terminals_from:
 
-                else:
+                            if len( first_terminal ):
+                                factors.append( ( start_symbol, Production( [first_terminal.new()], lock=True ) ) )
 
-                    for first_terminal in first_terminals_from:
-
-                        if len( first_terminal ):
-                            terminal_factors.append( ( start_symbol, Production( [first_terminal.new()], lock=True ) ) )
-
-        return terminal_factors
+        return factors
 
     def get_biggest_factor_serie(self, first_symbol, production, productions, biggest_common_factors):
         """
