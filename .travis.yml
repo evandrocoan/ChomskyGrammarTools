@@ -11,25 +11,23 @@ matrix:
           language: generic
 
 
-before_install:
+script:
 
     - if [ "$TRAVIS_OS_NAME" == "linux" ]; then
+            pip install --upgrade pip;
+            python -m pip install coverage;
+            python -m pip install -U coverage;
+            pip install coverage;
+            pip install -U coverage;
             pip install codecov;
             pip install codacy-coverage;
             pip install python-coveralls;
             pip install -r requirements.txt;
-      fi
-
-    - if [ "$TRAVIS_OS_NAME" == "osx" ]; then
-            brew update;
-            brew upgrade python;
-            pip3 install --user -r requirements.txt;
-      fi
-
-
-script:
-
-    - if [ "$TRAVIS_OS_NAME" == "linux" ]; then
+            python --version;
+            ls;
+            pwd;
+            coverage help;
+            coverage --version;
             coverage run source/unit_tests.py;
             codecov;
             coveralls;
@@ -37,6 +35,9 @@ script:
       fi
 
     - if [ "$TRAVIS_OS_NAME" == "osx" ]; then
+            brew update;
+            brew upgrade python;
+            pip3 install --user -r requirements.txt;
             python3 source/unit_tests.py;
       fi
 
