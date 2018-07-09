@@ -2107,10 +2107,10 @@ class TestGrammarEpsilonConversion(TestingUtilities):
 
         self.assertTextEqual(
         r"""
-            + [Production locked: True, str: A, symbols: [NonTerminal locked: True, str: A, sequence: 1, len: 1;],
-            + sequence: 1, len: 1;
-            + , Production locked: True, str: B, symbols: [NonTerminal locked: True, str: B, sequence: 1, len:
-            + 1;], sequence: 1, len: 1;
+            + [Production locked: True, str: A, len: 1, symbols: [NonTerminal locked: True, str: A, len: 1,
+            + sequence: 1;], sequence: 1;
+            + , Production locked: True, str: B, len: 1, symbols: [NonTerminal locked: True, str: B, len: 1,
+            + sequence: 1;], sequence: 1;
             + ]
         """, wrap_text( sort_alphabetically_and_by_length( firstGrammar.non_terminal_epsilon() ), wrap=100 ) )
 
@@ -2125,12 +2125,12 @@ class TestGrammarEpsilonConversion(TestingUtilities):
 
         self.assertTextEqual(
         r"""
-            + [Production locked: True, str: A, symbols: [NonTerminal locked: True, str: A, sequence: 1, len: 1;],
-            + sequence: 1, len: 1;
-            + , Production locked: True, str: B, symbols: [NonTerminal locked: True, str: B, sequence: 1, len:
-            + 1;], sequence: 1, len: 1;
-            + , Production locked: True, str: S, symbols: [NonTerminal locked: True, str: S, sequence: 1, len:
-            + 1;], sequence: 1, len: 1;
+            + [Production locked: True, str: A, len: 1, symbols: [NonTerminal locked: True, str: A, len: 1,
+            + sequence: 1;], sequence: 1;
+            + , Production locked: True, str: B, len: 1, symbols: [NonTerminal locked: True, str: B, len: 1,
+            + sequence: 1;], sequence: 1;
+            + , Production locked: True, str: S, len: 1, symbols: [NonTerminal locked: True, str: S, len: 1,
+            + sequence: 1;], sequence: 1;
             + ]
         """, wrap_text( sort_alphabetically_and_by_length( firstGrammar.non_terminal_epsilon() ), wrap=100 ) )
 
@@ -2153,10 +2153,10 @@ class TestGrammarFertileSymbols(TestingUtilities):
 
         self.assertTextEqual(
         r"""
-            + [Production locked: True, str: A, symbols: [NonTerminal locked: True, str: A, sequence: 1, len: 1;], sequence: 1, len: 1;
-            + , Production locked: True, str: B, symbols: [NonTerminal locked: True, str: B, sequence: 1, len: 1;], sequence: 1, len: 1;
-            + , Production locked: True, str: C, symbols: [NonTerminal locked: True, str: C, sequence: 1, len: 1;], sequence: 1, len: 1;
-            + , Production locked: True, str: S, symbols: [NonTerminal locked: True, str: S, sequence: 1, len: 1;], sequence: 1, len: 1;
+            + [Production locked: True, str: A, len: 1, symbols: [NonTerminal locked: True, str: A, len: 1, sequence: 1;], sequence: 1;
+            + , Production locked: True, str: B, len: 1, symbols: [NonTerminal locked: True, str: B, len: 1, sequence: 1;], sequence: 1;
+            + , Production locked: True, str: C, len: 1, symbols: [NonTerminal locked: True, str: C, len: 1, sequence: 1;], sequence: 1;
+            + , Production locked: True, str: S, len: 1, symbols: [NonTerminal locked: True, str: S, len: 1, sequence: 1;], sequence: 1;
             + ]
         """, sort_alphabetically_and_by_length( fertile ) )
 
@@ -2172,9 +2172,9 @@ class TestGrammarFertileSymbols(TestingUtilities):
 
         self.assertTextEqual(
         r"""
-            + [Production locked: True, str: B, symbols: [NonTerminal locked: True, str: B, sequence: 1, len: 1;], sequence: 1, len: 1;
-            + , Production locked: True, str: C, symbols: [NonTerminal locked: True, str: C, sequence: 1, len: 1;], sequence: 1, len: 1;
-            + , Production locked: True, str: S, symbols: [NonTerminal locked: True, str: S, sequence: 1, len: 1;], sequence: 1, len: 1;
+            + [Production locked: True, str: B, len: 1, symbols: [NonTerminal locked: True, str: B, len: 1, sequence: 1;], sequence: 1;
+            + , Production locked: True, str: C, len: 1, symbols: [NonTerminal locked: True, str: C, len: 1, sequence: 1;], sequence: 1;
+            + , Production locked: True, str: S, len: 1, symbols: [NonTerminal locked: True, str: S, len: 1, sequence: 1;], sequence: 1;
             + ]
         """, sort_alphabetically_and_by_length( fertile ) )
 
@@ -2191,11 +2191,11 @@ class TestGrammarFertileSymbols(TestingUtilities):
 
         self.assertTextEqual(
         r"""
-            + [Production locked: True, str: E, symbols: [NonTerminal locked: True, str: E, sequence: 1, len: 1;], sequence: 1, len: 1;
-            + , Production locked: True, str: F, symbols: [NonTerminal locked: True, str: F, sequence: 1, len: 1;], sequence: 1, len: 1;
-            + , Production locked: True, str: T, symbols: [NonTerminal locked: True, str: T, sequence: 1, len: 1;], sequence: 1, len: 1;
-            + , Production locked: True, str: E', symbols: [NonTerminal locked: True, str: E', sequence: 1, len: 1;], sequence: 1, len: 1;
-            + , Production locked: True, str: T', symbols: [NonTerminal locked: True, str: T', sequence: 1, len: 1;], sequence: 1, len: 1;
+            + [Production locked: True, str: E, len: 1, symbols: [NonTerminal locked: True, str: E, len: 1, sequence: 1;], sequence: 1;
+            + , Production locked: True, str: F, len: 1, symbols: [NonTerminal locked: True, str: F, len: 1, sequence: 1;], sequence: 1;
+            + , Production locked: True, str: T, len: 1, symbols: [NonTerminal locked: True, str: T, len: 1, sequence: 1;], sequence: 1;
+            + , Production locked: True, str: E', len: 1, symbols: [NonTerminal locked: True, str: E', len: 1, sequence: 1;], sequence: 1;
+            + , Production locked: True, str: T', len: 1, symbols: [NonTerminal locked: True, str: T', len: 1, sequence: 1;], sequence: 1;
             + ]
         """, sort_alphabetically_and_by_length( fertile ) )
 
@@ -2212,8 +2212,8 @@ class TestGrammarFertileSymbols(TestingUtilities):
 
         self.assertTextEqual(
         r"""
-            + [Production locked: True, str: E', symbols: [NonTerminal locked: True, str: E', sequence: 1, len: 1;], sequence: 1, len: 1;
-            + , Production locked: True, str: T', symbols: [NonTerminal locked: True, str: T', sequence: 1, len: 1;], sequence: 1, len: 1;
+            + [Production locked: True, str: E', len: 1, symbols: [NonTerminal locked: True, str: E', len: 1, sequence: 1;], sequence: 1;
+            + , Production locked: True, str: T', len: 1, symbols: [NonTerminal locked: True, str: T', len: 1, sequence: 1;], sequence: 1;
             + ]
         """, sort_alphabetically_and_by_length( fertile ) )
 
@@ -2230,9 +2230,9 @@ class TestGrammarFertileSymbols(TestingUtilities):
 
         self.assertTextEqual(
         r"""
-            + [Production locked: True, str: B, symbols: [NonTerminal locked: True, str: B, sequence: 1, len: 1;], sequence: 1, len: 1;
-            + , Production locked: True, str: D, symbols: [NonTerminal locked: True, str: D, sequence: 1, len: 1;], sequence: 1, len: 1;
-            + , Production locked: True, str: S, symbols: [NonTerminal locked: True, str: S, sequence: 1, len: 1;], sequence: 1, len: 1;
+            + [Production locked: True, str: B, len: 1, symbols: [NonTerminal locked: True, str: B, len: 1, sequence: 1;], sequence: 1;
+            + , Production locked: True, str: D, len: 1, symbols: [NonTerminal locked: True, str: D, len: 1, sequence: 1;], sequence: 1;
+            + , Production locked: True, str: S, len: 1, symbols: [NonTerminal locked: True, str: S, len: 1, sequence: 1;], sequence: 1;
             + ]
         """, sort_alphabetically_and_by_length( fertile ) )
 
@@ -2307,14 +2307,14 @@ class TestGrammarFertileSymbols(TestingUtilities):
 
         self.assertTextEqual(
         r"""
-            + Terminal locked: True, str: &, sequence: 1, len: 0;
-            + Terminal locked: True, str: a, sequence: 1, len: 1;
-            + Terminal locked: True, str: b, sequence: 1, len: 1;
-            + Terminal locked: True, str: bb, sequence: 1, len: 1;
-            + Terminal locked: True, str: d, sequence: 1, len: 1;
-            + NonTerminal locked: True, str: B, sequence: 2, len: 1;
-            + NonTerminal locked: True, str: D, sequence: 2, len: 1;
-            + NonTerminal locked: True, str: S, sequence: 1, len: 1;
+            + Terminal locked: True, str: &, len: 0, sequence: 1;
+            + Terminal locked: True, str: a, len: 1, sequence: 1;
+            + Terminal locked: True, str: b, len: 1, sequence: 1;
+            + Terminal locked: True, str: bb, len: 1, sequence: 1;
+            + Terminal locked: True, str: d, len: 1, sequence: 1;
+            + NonTerminal locked: True, str: B, len: 1, sequence: 2;
+            + NonTerminal locked: True, str: D, len: 1, sequence: 2;
+            + NonTerminal locked: True, str: S, len: 1, sequence: 1;
         """, convert_to_text_lines( reachable, sort=sort_correctly ) )
 
     def test_grammarEliminateUneachableSymbolsChapter4Item1Example2(self):
@@ -2400,9 +2400,9 @@ class TestGrammarFertileSymbols(TestingUtilities):
 
         self.assertTextEqual(
         r"""
-            + Production locked: True, str: A, symbols: [NonTerminal locked: True, str: A, sequence: 1, len: 1;], sequence: 1, len: 1;
-            + Production locked: True, str: C, symbols: [NonTerminal locked: True, str: C, sequence: 1, len: 1;], sequence: 1, len: 1;
-            + Production locked: True, str: D, symbols: [NonTerminal locked: True, str: D, sequence: 1, len: 1;], sequence: 1, len: 1;
+            + Production locked: True, str: A, len: 1, symbols: [NonTerminal locked: True, str: A, len: 1, sequence: 1;], sequence: 1;
+            + Production locked: True, str: C, len: 1, symbols: [NonTerminal locked: True, str: C, len: 1, sequence: 1;], sequence: 1;
+            + Production locked: True, str: D, len: 1, symbols: [NonTerminal locked: True, str: D, len: 1, sequence: 1;], sequence: 1;
         """, wrap_text( convert_to_text_lines( non_terminal_epsilon, new_line=False ), wrap=120 ) )
 
         self.assertTextEqual(
@@ -3422,9 +3422,9 @@ class TestProduction(TestingUtilities):
 
         self.assertTextEqual(
         r"""
-            + Production locked: True, str: A B C D, symbols: [NonTerminal locked: True, str: A, sequence: 1, len:
-            + 1;, NonTerminal locked: True, str: B, sequence: 2, len: 1;, NonTerminal locked: True, str: C,
-            + sequence: 3, len: 1;, NonTerminal locked: True, str: D, sequence: 4, len: 1;], sequence: 4, len: 4;
+            + Production locked: True, str: A B C D, len: 4, symbols: [NonTerminal locked: True, str: A, len: 1,
+            + sequence: 1;, NonTerminal locked: True, str: B, len: 1, sequence: 2;, NonTerminal locked: True, str:
+            + C, len: 1, sequence: 3;, NonTerminal locked: True, str: D, len: 1, sequence: 4;], sequence: 4;
         """, wrap_text( repr( production ), wrap=100 ) )
 
     def test_combinationNonTerminalRemovalSymbolFromABCD(self):
@@ -3433,40 +3433,40 @@ class TestProduction(TestingUtilities):
 
         self.assertTextEqual(
         r"""
-            + [Production locked: True, str: &, symbols: [Terminal locked: True, str: &, sequence: 1, len: 0;],
-            + sequence: 1, len: 0;
-            + , Production locked: True, str: A, symbols: [NonTerminal locked: True, str: A, sequence: 1, len:
-            + 1;], sequence: 1, len: 1;
-            + , Production locked: True, str: B, symbols: [NonTerminal locked: True, str: B, sequence: 1, len:
-            + 1;], sequence: 1, len: 1;
-            + , Production locked: True, str: C, symbols: [NonTerminal locked: True, str: C, sequence: 1, len:
-            + 1;], sequence: 1, len: 1;
-            + , Production locked: True, str: D, symbols: [NonTerminal locked: True, str: D, sequence: 1, len:
-            + 1;], sequence: 1, len: 1;
-            + , Production locked: True, str: A B, symbols: [NonTerminal locked: True, str: A, sequence: 1, len:
-            + 1;, NonTerminal locked: True, str: B, sequence: 2, len: 1;], sequence: 2, len: 2;
-            + , Production locked: True, str: A C, symbols: [NonTerminal locked: True, str: A, sequence: 1, len:
-            + 1;, NonTerminal locked: True, str: C, sequence: 2, len: 1;], sequence: 2, len: 2;
-            + , Production locked: True, str: A D, symbols: [NonTerminal locked: True, str: A, sequence: 1, len:
-            + 1;, NonTerminal locked: True, str: D, sequence: 2, len: 1;], sequence: 2, len: 2;
-            + , Production locked: True, str: B C, symbols: [NonTerminal locked: True, str: B, sequence: 1, len:
-            + 1;, NonTerminal locked: True, str: C, sequence: 2, len: 1;], sequence: 2, len: 2;
-            + , Production locked: True, str: B D, symbols: [NonTerminal locked: True, str: B, sequence: 1, len:
-            + 1;, NonTerminal locked: True, str: D, sequence: 2, len: 1;], sequence: 2, len: 2;
-            + , Production locked: True, str: C D, symbols: [NonTerminal locked: True, str: C, sequence: 1, len:
-            + 1;, NonTerminal locked: True, str: D, sequence: 2, len: 1;], sequence: 2, len: 2;
-            + , Production locked: True, str: A B C, symbols: [NonTerminal locked: True, str: A, sequence: 1, len:
-            + 1;, NonTerminal locked: True, str: B, sequence: 2, len: 1;, NonTerminal locked: True, str: C,
-            + sequence: 3, len: 1;], sequence: 3, len: 3;
-            + , Production locked: True, str: A B D, symbols: [NonTerminal locked: True, str: A, sequence: 1, len:
-            + 1;, NonTerminal locked: True, str: B, sequence: 2, len: 1;, NonTerminal locked: True, str: D,
-            + sequence: 3, len: 1;], sequence: 3, len: 3;
-            + , Production locked: True, str: A C D, symbols: [NonTerminal locked: True, str: A, sequence: 1, len:
-            + 1;, NonTerminal locked: True, str: C, sequence: 2, len: 1;, NonTerminal locked: True, str: D,
-            + sequence: 3, len: 1;], sequence: 3, len: 3;
-            + , Production locked: True, str: B C D, symbols: [NonTerminal locked: True, str: B, sequence: 1, len:
-            + 1;, NonTerminal locked: True, str: C, sequence: 2, len: 1;, NonTerminal locked: True, str: D,
-            + sequence: 3, len: 1;], sequence: 3, len: 3;
+            + [Production locked: True, str: &, len: 0, symbols: [Terminal locked: True, str: &, len: 0, sequence:
+            + 1;], sequence: 1;
+            + , Production locked: True, str: A, len: 1, symbols: [NonTerminal locked: True, str: A, len: 1,
+            + sequence: 1;], sequence: 1;
+            + , Production locked: True, str: B, len: 1, symbols: [NonTerminal locked: True, str: B, len: 1,
+            + sequence: 1;], sequence: 1;
+            + , Production locked: True, str: C, len: 1, symbols: [NonTerminal locked: True, str: C, len: 1,
+            + sequence: 1;], sequence: 1;
+            + , Production locked: True, str: D, len: 1, symbols: [NonTerminal locked: True, str: D, len: 1,
+            + sequence: 1;], sequence: 1;
+            + , Production locked: True, str: A B, len: 2, symbols: [NonTerminal locked: True, str: A, len: 1,
+            + sequence: 1;, NonTerminal locked: True, str: B, len: 1, sequence: 2;], sequence: 2;
+            + , Production locked: True, str: A C, len: 2, symbols: [NonTerminal locked: True, str: A, len: 1,
+            + sequence: 1;, NonTerminal locked: True, str: C, len: 1, sequence: 2;], sequence: 2;
+            + , Production locked: True, str: A D, len: 2, symbols: [NonTerminal locked: True, str: A, len: 1,
+            + sequence: 1;, NonTerminal locked: True, str: D, len: 1, sequence: 2;], sequence: 2;
+            + , Production locked: True, str: B C, len: 2, symbols: [NonTerminal locked: True, str: B, len: 1,
+            + sequence: 1;, NonTerminal locked: True, str: C, len: 1, sequence: 2;], sequence: 2;
+            + , Production locked: True, str: B D, len: 2, symbols: [NonTerminal locked: True, str: B, len: 1,
+            + sequence: 1;, NonTerminal locked: True, str: D, len: 1, sequence: 2;], sequence: 2;
+            + , Production locked: True, str: C D, len: 2, symbols: [NonTerminal locked: True, str: C, len: 1,
+            + sequence: 1;, NonTerminal locked: True, str: D, len: 1, sequence: 2;], sequence: 2;
+            + , Production locked: True, str: A B C, len: 3, symbols: [NonTerminal locked: True, str: A, len: 1,
+            + sequence: 1;, NonTerminal locked: True, str: B, len: 1, sequence: 2;, NonTerminal locked: True, str:
+            + C, len: 1, sequence: 3;], sequence: 3;
+            + , Production locked: True, str: A B D, len: 3, symbols: [NonTerminal locked: True, str: A, len: 1,
+            + sequence: 1;, NonTerminal locked: True, str: B, len: 1, sequence: 2;, NonTerminal locked: True, str:
+            + D, len: 1, sequence: 3;], sequence: 3;
+            + , Production locked: True, str: A C D, len: 3, symbols: [NonTerminal locked: True, str: A, len: 1,
+            + sequence: 1;, NonTerminal locked: True, str: C, len: 1, sequence: 2;, NonTerminal locked: True, str:
+            + D, len: 1, sequence: 3;], sequence: 3;
+            + , Production locked: True, str: B C D, len: 3, symbols: [NonTerminal locked: True, str: B, len: 1,
+            + sequence: 1;, NonTerminal locked: True, str: C, len: 1, sequence: 2;, NonTerminal locked: True, str:
+            + D, len: 1, sequence: 3;], sequence: 3;
             + ]
         """, wrap_text( sort_alphabetically_and_by_length( production.combinations( symbols ) ), wrap=100 ) )
 
@@ -3476,20 +3476,20 @@ class TestProduction(TestingUtilities):
 
         self.assertTextEqual(
         r"""
-            + [Production locked: True, str: &, symbols: [Terminal locked: True, str: &, sequence: 1, len: 0;],
-            + sequence: 1, len: 0;
-            + , Production locked: True, str: A, symbols: [NonTerminal locked: True, str: A, sequence: 1, len:
-            + 1;], sequence: 1, len: 1;
-            + , Production locked: True, str: B, symbols: [NonTerminal locked: True, str: B, sequence: 1, len:
-            + 1;], sequence: 1, len: 1;
-            + , Production locked: True, str: C, symbols: [NonTerminal locked: True, str: C, sequence: 1, len:
-            + 1;], sequence: 1, len: 1;
-            + , Production locked: True, str: A B, symbols: [NonTerminal locked: True, str: A, sequence: 1, len:
-            + 1;, NonTerminal locked: True, str: B, sequence: 2, len: 1;], sequence: 2, len: 2;
-            + , Production locked: True, str: A C, symbols: [NonTerminal locked: True, str: A, sequence: 1, len:
-            + 1;, NonTerminal locked: True, str: C, sequence: 2, len: 1;], sequence: 2, len: 2;
-            + , Production locked: True, str: B C, symbols: [NonTerminal locked: True, str: B, sequence: 1, len:
-            + 1;, NonTerminal locked: True, str: C, sequence: 2, len: 1;], sequence: 2, len: 2;
+            + [Production locked: True, str: &, len: 0, symbols: [Terminal locked: True, str: &, len: 0, sequence:
+            + 1;], sequence: 1;
+            + , Production locked: True, str: A, len: 1, symbols: [NonTerminal locked: True, str: A, len: 1,
+            + sequence: 1;], sequence: 1;
+            + , Production locked: True, str: B, len: 1, symbols: [NonTerminal locked: True, str: B, len: 1,
+            + sequence: 1;], sequence: 1;
+            + , Production locked: True, str: C, len: 1, symbols: [NonTerminal locked: True, str: C, len: 1,
+            + sequence: 1;], sequence: 1;
+            + , Production locked: True, str: A B, len: 2, symbols: [NonTerminal locked: True, str: A, len: 1,
+            + sequence: 1;, NonTerminal locked: True, str: B, len: 1, sequence: 2;], sequence: 2;
+            + , Production locked: True, str: A C, len: 2, symbols: [NonTerminal locked: True, str: A, len: 1,
+            + sequence: 1;, NonTerminal locked: True, str: C, len: 1, sequence: 2;], sequence: 2;
+            + , Production locked: True, str: B C, len: 2, symbols: [NonTerminal locked: True, str: B, len: 1,
+            + sequence: 1;, NonTerminal locked: True, str: C, len: 1, sequence: 2;], sequence: 2;
             + ]
         """, wrap_text( sort_alphabetically_and_by_length( production.combinations( symbols ) ), wrap=100 ) )
 
@@ -3499,12 +3499,12 @@ class TestProduction(TestingUtilities):
 
         self.assertTextEqual(
         r"""
-            + [Production locked: True, str: &, symbols: [Terminal locked: True, str: &, sequence: 1, len: 0;],
-            + sequence: 1, len: 0;
-            + , Production locked: True, str: A, symbols: [NonTerminal locked: True, str: A, sequence: 1, len:
-            + 1;], sequence: 1, len: 1;
-            + , Production locked: True, str: B, symbols: [NonTerminal locked: True, str: B, sequence: 1, len:
-            + 1;], sequence: 1, len: 1;
+            + [Production locked: True, str: &, len: 0, symbols: [Terminal locked: True, str: &, len: 0, sequence:
+            + 1;], sequence: 1;
+            + , Production locked: True, str: A, len: 1, symbols: [NonTerminal locked: True, str: A, len: 1,
+            + sequence: 1;], sequence: 1;
+            + , Production locked: True, str: B, len: 1, symbols: [NonTerminal locked: True, str: B, len: 1,
+            + sequence: 1;], sequence: 1;
             + ]
         """, wrap_text( sort_alphabetically_and_by_length( production.combinations( symbols ) ), wrap=100 ) )
 
@@ -3514,8 +3514,8 @@ class TestProduction(TestingUtilities):
 
         self.assertTextEqual(
         r"""
-            + [Production locked: True, str: &, symbols: [Terminal locked: True, str: &, sequence: 1, len: 0;],
-            + sequence: 1, len: 0;
+            + [Production locked: True, str: &, len: 0, symbols: [Terminal locked: True, str: &, len: 0, sequence:
+            + 1;], sequence: 1;
             + ]
         """, wrap_text( sort_alphabetically_and_by_length( production.combinations( symbols ) ), wrap=100 ) )
 
@@ -3525,8 +3525,8 @@ class TestProduction(TestingUtilities):
 
         self.assertTextEqual(
         r"""
-            + [Production locked: True, str: a, symbols: [Terminal locked: True, str: a, sequence: 1, len: 1;],
-            + sequence: 1, len: 1;
+            + [Production locked: True, str: a, len: 1, symbols: [Terminal locked: True, str: a, len: 1, sequence:
+            + 1;], sequence: 1;
             + ]
         """, wrap_text( sort_alphabetically_and_by_length( production.combinations( symbols ) ), wrap=100 ) )
 
@@ -3536,12 +3536,12 @@ class TestProduction(TestingUtilities):
 
         self.assertTextEqual(
         r"""
-            + [Production locked: True, str: a, symbols: [Terminal locked: True, str: a, sequence: 1, len: 1;],
-            + sequence: 1, len: 1;
-            + , Production locked: True, str: A a, symbols: [NonTerminal locked: True, str: A, sequence: 1, len:
-            + 1;, Terminal locked: True, str: a, sequence: 2, len: 1;], sequence: 2, len: 2;
-            + , Production locked: True, str: B a, symbols: [NonTerminal locked: True, str: B, sequence: 1, len:
-            + 1;, Terminal locked: True, str: a, sequence: 2, len: 1;], sequence: 2, len: 2;
+            + [Production locked: True, str: a, len: 1, symbols: [Terminal locked: True, str: a, len: 1, sequence:
+            + 1;], sequence: 1;
+            + , Production locked: True, str: A a, len: 2, symbols: [NonTerminal locked: True, str: A, len: 1,
+            + sequence: 1;, Terminal locked: True, str: a, len: 1, sequence: 2;], sequence: 2;
+            + , Production locked: True, str: B a, len: 2, symbols: [NonTerminal locked: True, str: B, len: 1,
+            + sequence: 1;, Terminal locked: True, str: a, len: 1, sequence: 2;], sequence: 2;
             + ]
         """, wrap_text( sort_alphabetically_and_by_length( production.combinations( symbols ) ), wrap=100 ) )
 
@@ -3551,8 +3551,8 @@ class TestProduction(TestingUtilities):
 
         self.assertTextEqual(
         r"""
-            + [Production locked: True, str: a a, symbols: [Terminal locked: True, str: a, sequence: 1, len: 1;,
-            + Terminal locked: True, str: a, sequence: 2, len: 1;], sequence: 2, len: 2;
+            + [Production locked: True, str: a a, len: 2, symbols: [Terminal locked: True, str: a, len: 1,
+            + sequence: 1;, Terminal locked: True, str: a, len: 1, sequence: 2;], sequence: 2;
             + ]
         """, wrap_text( sort_alphabetically_and_by_length( production.combinations( symbols ) ), wrap=100 ) )
 
@@ -3563,7 +3563,7 @@ class TestProduction(TestingUtilities):
 
         self.assertTextEqual(
         r"""
-            + [Terminal locked: True, str: a, sequence: 1, len: 1;, Terminal locked: True, str: a, sequence: 2, len: 1;]
+            + [Terminal locked: True, str: a, len: 1, sequence: 1;, Terminal locked: True, str: a, len: 1, sequence: 2;]
         """, sort_alphabetically_and_by_length( production ) )
 
     def test_combinationFilterNonTerminalsFromAa(self):
@@ -3573,7 +3573,7 @@ class TestProduction(TestingUtilities):
 
         self.assertTextEqual(
         r"""
-            + [Terminal locked: True, str: a, sequence: 1, len: 1;]
+            + [Terminal locked: True, str: a, len: 1, sequence: 1;]
         """, sort_alphabetically_and_by_length( production ) )
 
 

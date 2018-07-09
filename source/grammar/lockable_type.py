@@ -58,6 +58,9 @@ class LockableType(object):
         ## Caches the string representation of this object, after locking its attributes changes with `lock()`
         self.str = ""
 
+        ## The caches the length of this object, used while this object is in locked state
+        self.len = 0
+
         ## An unique identifier for any LockableType object
         self._hash = get_unique_hash()
 
@@ -166,7 +169,6 @@ class LockableType(object):
         self.str = str( self )
         self._str = lambda: self.str
 
-        ## The cached length of this object, used while this object is in locked state
         self.len = len( self )
         self._len = lambda: self.len
 
