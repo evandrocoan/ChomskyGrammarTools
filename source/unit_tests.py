@@ -62,7 +62,7 @@ log( 1, "Importing " + __name__ )
 class TestChomskyGrammar(TestingUtilities):
 
     def test_grammarProductionsDictionaryKeyError(self):
-        LockableType._USE_STRING = False
+        LockableType.USE_STRING = False
 
         non_terminal_A = NonTerminal( 'A' )
         production_A = Production( [non_terminal_A], True )
@@ -2096,7 +2096,7 @@ class TestGrammarEpsilonConversion(TestingUtilities):
         self.assertTrue( firstGrammar.is_epsilon_free() )
 
     def test_grammarGetNonTerminalEpsilonSimpleCaseChapter5Example1First(self):
-        LockableType._USE_STRING = False
+        LockableType.USE_STRING = False
         firstGrammar = ChomskyGrammar.load_from_text_lines( wrap_text(
         r"""
             S -> Ab | A Bc
@@ -2115,7 +2115,7 @@ class TestGrammarEpsilonConversion(TestingUtilities):
         """, wrap_text( sort_alphabetically_and_by_length( firstGrammar.non_terminal_epsilon() ), wrap=100 ) )
 
     def test_grammarGetNonTerminalEpsilonChapter5Example1FirstMutated(self):
-        LockableType._USE_STRING = False
+        LockableType.USE_STRING = False
         firstGrammar = ChomskyGrammar.load_from_text_lines( wrap_text(
         r"""
             S -> Ab | A Bc | A B
@@ -2139,7 +2139,7 @@ class TestGrammarFertileSymbols(TestingUtilities):
 
     def setUp(self):
         super().setUp()
-        LockableType._USE_STRING = False
+        LockableType.USE_STRING = False
 
     def test_grammarFertileNonTerminalsChapter5Example1Follow(self):
         firstGrammar = ChomskyGrammar.load_from_text_lines( wrap_text(
@@ -3404,7 +3404,7 @@ class TestProduction(TestingUtilities):
             Creates basic non terminal's for usage.
         """
         super().setUp()
-        LockableType._USE_STRING = False
+        LockableType.USE_STRING = False
 
         self.ntA = NonTerminal( "A" )
         self.ntB = NonTerminal( "B" )

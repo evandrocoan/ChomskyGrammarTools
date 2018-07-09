@@ -92,10 +92,10 @@ class Production(LockableType):
     def __repr__(self):
         """
             Return a more complete and precise string representation of this object, useful for
-            debugging purposes. But requires the `_USE_STRING` constant to be set to False.
+            debugging purposes. But requires the `USE_STRING` constant to be set to False.
         """
 
-        if self._USE_STRING:
+        if self.USE_STRING:
             return super().__repr__()
 
         return super().__repr__() + '\n'

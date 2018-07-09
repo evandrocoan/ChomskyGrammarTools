@@ -49,7 +49,7 @@ class TestingUtilities(unittest.TestCase):
         """
             Called right after each Unit Test finish its execution, to clean up settings values.
         """
-        LockableType._USE_STRING = True
+        LockableType.USE_STRING = True
 
     def assertTextEqual(self, goal, results):
         """
