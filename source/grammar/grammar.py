@@ -24,14 +24,10 @@
 import os
 import re
 
-from threading import Lock
 from debug_tools import getLogger
 
 import lark
 from lark import Tree
-
-from typing import Set
-from typing import Dict
 
 from .symbols import Terminal
 from .symbols import NonTerminal

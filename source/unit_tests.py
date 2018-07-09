@@ -30,7 +30,6 @@ import profile
 import cProfile
 
 from natsort import natsorted
-from collections import OrderedDict
 from debug_tools import getLogger
 
 from grammar.grammar import ChomskyGrammar

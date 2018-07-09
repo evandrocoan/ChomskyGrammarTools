@@ -26,12 +26,10 @@ import PyQt5
 from PyQt5.QtGui import QKeySequence
 
 from PyQt5.QtCore import Qt
-from PyQt5.QtCore import QDateTime
 from PyQt5.QtCore import QEventLoop
 
 from PyQt5.QtWidgets import QDialog
 from PyQt5.QtWidgets import QDialogButtonBox
-from PyQt5.QtWidgets import QDateTimeEdit
 from PyQt5.QtWidgets import QApplication
 from PyQt5.QtWidgets import QMainWindow
 from PyQt5.QtWidgets import QWidget
