@@ -55,6 +55,8 @@ from grammar.tree_transformer import ChomskyGrammarTreeTransformer
 from grammar.testing_utilities import TestingUtilities
 from grammar.dynamic_iteration import DynamicIterationDict
 
+from grammar.intermediate_grammar import IntermediateGrammar
+
 log = getLogger( 127, os.path.basename( os.path.dirname( os.path.abspath ( __file__ ) ) ) )
 log( 1, "Importing " + __name__ )
 
@@ -224,6 +226,38 @@ class TestChomskyGrammar(TestingUtilities):
         """ ) )
 
         self.assertTrue( firstGrammar.is_infinite() )
+
+    def test_grammarHistoryBeginningIntroReplacement(self):
+        firstGrammar = ChomskyGrammar.load_from_text_lines( wrap_text(
+        r"""
+            S -> aS | &
+        """ ) )
+
+        firstGrammar._save_history( "Function 1", IntermediateGrammar.BEGINNING )
+        firstGrammar._save_data( "Info 1: %s", "a" )
+        firstGrammar._save_history( "Function 1", IntermediateGrammar.END )
+        firstGrammar._save_data( "Info 1: %s", "b" )
+
+        firstGrammar._save_history( "Function 2", IntermediateGrammar.BEGINNING )
+        firstGrammar._save_data( "Info 2: %s", "c" )
+        firstGrammar._save_history( "Function 1", IntermediateGrammar.END )
+        firstGrammar._save_data( "Info 2: %s", "d" )
+
+        self.assertTextEqual(
+        r"""
+            + # 1. Function 1, Beginning
+            + #    Info 1: a
+            +  S -> & | a S
+            +
+            + # 2. Function 1, End
+            + #    Info 1: b
+            +  S -> & | a S
+            +
+            + # 3. Function 1, End
+            + #    Info 2: c
+            + #    Info 2: d
+            +  S -> & | a S
+        """, firstGrammar.get_operation_history() )
 
 
 class TestGrammarLeftRecursionEliminationSymbols(TestingUtilities):
