@@ -214,7 +214,6 @@ class DynamicIterationDict(object):
 
         else:
             values_list = self.values_list
-            items_dictionary = self.items_dictionary
 
             for index in range( 0, len( keys_list ) ):
 
