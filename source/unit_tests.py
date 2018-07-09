@@ -1104,7 +1104,7 @@ class TestGrammarFactoringElimination(TestingUtilities):
             +
             + # 2. Converting to Epsilon Free, End
             + #    Non Terminal's Deriving Epsilon: M -> &; L -> &; C -> &; P -> &
-            +  S' -> & | d | L | M | d P | M L
+            +  P' -> & | d | L | M | d P | M L
             +   C -> b e | # id | b P e | C # id | id = E | id ( E )
             +   E -> id | E + id
             +   L -> ; a | ; L a | C ; a | C ; L a
@@ -1120,7 +1120,7 @@ class TestGrammarFactoringElimination(TestingUtilities):
             + # 5. Eliminating Left Recursion, End
             + #    Direct recursion eliminated: {C # id} -> {id ( E ) C', id = E C', b P e C', b e C', # id C'} @ C' -> {# id C', &}
             + #    Direct recursion eliminated: {E + id} -> {id E'} @ E' -> {+ id E', &}
-            +  S' -> & | d | L | M | d P | M L
+            +  P' -> & | d | L | M | d P | M L
             +   C -> b e C' | # id C' | b P e C' | id = E C' | id ( E ) C'
             +   E -> id E'
             +   L -> ; a | ; L a | C ; a | C ; L a
@@ -1130,8 +1130,8 @@ class TestGrammarFactoringElimination(TestingUtilities):
             +  E' -> & | + id E'
             +
             + # 6. Eliminating Direct Factors, End
-            + #    Direct factors eliminated: {P: [M, d], M: [m ;], L: [;, C ;], C: [b, id], S': [M, d]}
-            +   S' -> & | L | d S'2 | M S'1
+            + #    Direct factors eliminated: {P: [M, d], M: [m ;], L: [;, C ;], C: [b, id], P': [M, d]}
+            +   P' -> & | L | d P'2 | M P'1
             +    C -> b C1 | id C2 | # id C'
             +    E -> id E'
             +    L -> ; L1 | C ; L2
@@ -1146,8 +1146,8 @@ class TestGrammarFactoringElimination(TestingUtilities):
             +   M1 -> & | M
             +   P1 -> & | L
             +   P2 -> & | P
-            +  S'1 -> & | L
-            +  S'2 -> & | P
+            +  P'1 -> & | L
+            +  P'2 -> & | P
         """, firstGrammar.get_operation_history() )
 
         self.assertTrue( factor_it )

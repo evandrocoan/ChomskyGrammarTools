@@ -532,7 +532,7 @@ class ChomskyGrammar():
         if initial_symbol in non_terminal_epsilon:
 
             if self.has_recursion_on_the_non_terminal( initial_symbol ):
-                new_initial_symbol = self.new_symbol()
+                new_initial_symbol = self.new_symbol( initial_symbol )
                 self.copy_productions_for_one_non_terminal( initial_symbol, new_initial_symbol )
                 self.initial_symbol = new_initial_symbol
 
@@ -600,7 +600,7 @@ class ChomskyGrammar():
 
         if self.initial_symbol == start_symbol:
             # log( 1, "WARNING: Removing the grammar initial symbol!" )
-            new_initial_symbol = self.new_symbol()
+            new_initial_symbol = self.new_symbol( "S" )
             self.add_production( new_initial_symbol, new_initial_symbol )
 
             self.initial_symbol = new_initial_symbol
