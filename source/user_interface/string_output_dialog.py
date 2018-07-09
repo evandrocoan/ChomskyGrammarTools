@@ -70,9 +70,7 @@ class StringOutputDialog(QMainWindow):
 
     def __init__(self, parent, settings, fontOptions, fileDialogOptions, isToStop):
         super().__init__( parent )
-        inputString = ""
         self.settings = settings
-
         self.isToStop = isToStop
         self.fileDialogOptions = fileDialogOptions
 
