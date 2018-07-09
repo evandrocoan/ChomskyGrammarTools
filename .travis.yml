@@ -1,0 +1,44 @@
+
+# mutliple os matrix
+# https://docs.travis-ci.com/user/multi-os/#Python-example-(unsupported-languages)
+matrix:
+    include:
+        - os: linux
+          language: python
+          python: 3.6
+
+        - os: osx
+          language: generic
+
+
+before_install:
+
+    - if [ "$TRAVIS_OS_NAME" == "linux" ]; then
+            pip install codecov;
+            pip install python-coveralls;
+            pip install -r requirements.txt;
+      fi
+
+    - if [ "$TRAVIS_OS_NAME" == "osx" ]; then
+            brew update;
+            brew upgrade python;
+            pip3 install --user -r requirements.txt;
+      fi
+
+
+script:
+
+    - if [ "$TRAVIS_OS_NAME" == "linux" ]; then
+            coverage run source/unit_tests.py;
+            codecov;
+            coveralls;
+      fi
+
+    - if [ "$TRAVIS_OS_NAME" == "osx" ]; then
+            python3 source/unit_tests.py;
+      fi
+
+
+notifications:
+    email: false
+

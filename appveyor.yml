@@ -1,0 +1,19 @@
+
+
+install:
+    - "SET PYTHON=C:\\Python36"
+    - "SET PATH=%PYTHON%;%PYTHON%\\Scripts;%PATH%"
+    - pip install -r requirements.txt
+
+
+build: off
+
+
+test_script:
+    - "python source/unit_tests.py"
+
+
+on_finish:
+    - python --version
+    - echo %PATH%
+

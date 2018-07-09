@@ -39,6 +39,7 @@ from PyQt5 import QtCore
 from PyQt5 import QtWidgets
 
 from PyQt5.QtCore import Qt
+from PyQt5.QtCore import QSettings
 
 from PyQt5.QtWidgets import QWidget
 from PyQt5.QtWidgets import QFrame
@@ -61,6 +62,7 @@ from grammar.utilities import sort_correctly
 from grammar.utilities import ignore_exceptions
 from grammar.utilities import convert_to_text_lines
 from grammar.utilities import setTextWithoutCleaningHistory
+from grammar.utilities import get_screen_center
 from grammar.utilities import trimMessage
 from grammar.utilities import getCleanSpaces
 from grammar.utilities import get_relative_path
@@ -135,10 +137,27 @@ class ProgramWindow(QtWidgets.QMainWindow):
         self.set_window_layout()
 
     def setup_main_window(self):
+        """
+            How to remember last geometry of PyQt application?
+            https://stackoverflow.com/questions/33869721/how-to-remember-last-geometry-of-pyqt-application
+        """
+        self.setWindowTitle( "Chomsky Grammar Tools for Context Free Grammars (CFG)" )
+        self.settings = QSettings( 'Open Source GPL v3 Application', 'Chomsky Grammar Tools for Context Free Grammars (CFG)' )
         self.largestFirstCollumn = 0
 
-        self.resize( 800, 600 )
-        self.setWindowTitle( "Chomsky Grammar Tools for Context Free Grammars (CFG) by Evandro Coan" )
+        # Initial window size/pos last saved. Use default values for first time
+        windowScreenGeometry = self.settings.value( "mainWindowScreenGeometry" )
+        windowScreenState = self.settings.value( "mainWindowScreenState" )
+
+        if windowScreenGeometry:
+            self.restoreGeometry( windowScreenGeometry )
+
+        else:
+            self.resize( 800, 600 )
+            # self.move( get_screen_center( self ) )
+
+        if windowScreenState:
+            self.restoreState( windowScreenState )
 
         # https://github.com/GNOME/adwaita-icon-theme
         # https://code.google.com/archive/p/faenza-icon-theme/
@@ -163,11 +182,11 @@ class ProgramWindow(QtWidgets.QMainWindow):
         self.grammarTextEditWidget.setStyleSheet( self.getMainFontOptions() )
 
         # Set initial value of text
-        self.grammarTextEditWidget.document().setPlainText( wrap_text( """
+        self.grammarTextEditWidget.document().setPlainText( self.settings.value( "mainWindowGrammarTextEditWidget", wrap_text( """
             # Write your Grammar here
             S -> a A | a
             A -> b S | b
-        """ ) )
+        """ ) ) )
 
         self.redoGrammarButton        = QPushButton( "Redo Operations" )
         self.undoGrammarButton        = QPushButton( "Undo Operations" )
@@ -269,6 +288,16 @@ class ProgramWindow(QtWidgets.QMainWindow):
         if event.key() == PyQt5.QtCore.Qt.Key_Escape:
             self.close()
 
+    def closeEvent(self, event=None):
+        """
+            Write window size and position to config file
+        """
+        # log( 1, "closeEvent" )
+        self.settings.setValue( "mainWindowScreenGeometry", self.saveGeometry() )
+        self.settings.setValue( "mainWindowScreenState", self.saveState() )
+        self.settings.setValue( "mainWindowGrammarTextEditWidget", self.grammarTextEditWidget.toPlainText() )
+        super().closeEvent( event )
+
     def handleUndoGrammarTextEdit(self):
         self.grammarTextEditWidget.document().undo()
 
@@ -330,7 +359,7 @@ class ProgramWindow(QtWidgets.QMainWindow):
     @ignore_exceptions
     def _handleFunctionAsync(self, target_function, initial_message):
         isToStop = [False]
-        results_dialog = StringOutputDialog( self, self.getMainFontOptions(), self._getFileDialogOptions(), isToStop )
+        results_dialog = StringOutputDialog( self, self.settings, self.getMainFontOptions(), self._getFileDialogOptions(), isToStop )
 
         target_function.results = ""
         target_function.isToStop = isToStop
@@ -389,7 +418,7 @@ class ProgramWindow(QtWidgets.QMainWindow):
     @ignore_exceptions
     def handleTryToFactorGrammar(self, qt_decorator_bug):
         fontOptions = self.getMainFontOptions()
-        ( maximumSteps, isAccepted ) = IntegerInputDialog.getNewUserInput( self, fontOptions )
+        ( maximumSteps, isAccepted ) = IntegerInputDialog.getNewUserInput( self, self.settings, fontOptions )
 
         if not isAccepted:
             return

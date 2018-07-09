@@ -32,6 +32,7 @@ import textwrap
 
 from PyQt5 import QtWidgets
 from PyQt5 import QtGui
+from PyQt5.QtCore import QPoint
 from PyQt5.QtCore import QCoreApplication
 
 from natsort import natsorted
@@ -62,6 +63,15 @@ def get_relative_path(relative_path, script_file):
     basepath = os.path.dirname( script_file )
     filepath = os.path.abspath( os.path.join( basepath, relative_path ) )
     return filepath
+
+
+def assure_existing_key(dictionary, key, default_value):
+    """
+        If the given `key` is not present on the `dictionary`, then add it with the `default_value`.
+    """
+
+    if key not in dictionary:
+        dictionary[key] = default_value
 
 
 def get_duplicated_elements(elements_list):
@@ -272,6 +282,17 @@ def set_scroll_to_maximum(textEditWidget, to_bottom=False):
 
     textEditWidget.repaint()
     QCoreApplication.processEvents()
+
+
+def get_screen_center(self):
+    """
+        PyQt4 what is the best way to center dialog windows?
+        https://stackoverflow.com/questions/12432740/pyqt4-what-is-the-best-way-to-center-dialog-windows
+    """
+    screenGeometry = QtWidgets.QApplication.desktop().screenGeometry()
+    x = ( screenGeometry.width() - self.width() ) / 2
+    y = ( screenGeometry.height() - self.height() ) / 2
+    return QPoint( x, y )
 
 
 def setTextWithoutCleaningHistory(textEditWidget, textToSet):

@@ -1,21 +1,31 @@
 # Chomsky Grammar Tools for Context Free Grammars (CFG)
 
+[![Build Status](https://travis-ci.org/evandrocoan/ContextFreeGrammars.svg?branch=master)](https://travis-ci.org/evandrocoan/ContextFreeGrammars)
+[![Build status](https://ci.appveyor.com/api/projects/status/github/evandrocoan/ContextFreeGrammars?branch=master&svg=true)](https://ci.appveyor.com/project/evandrocoan/ContextFreeGrammars/branch/master)
+[![codecov](https://codecov.io/gh/evandrocoan/ContextFreeGrammars/branch/master/graph/badge.svg)](https://codecov.io/gh/evandrocoan/ContextFreeGrammars)
+[![Coverage Status](https://coveralls.io/repos/github/evandrocoan/ContextFreeGrammars/badge.svg?branch=master)](https://coveralls.io/github/evandrocoan/ContextFreeGrammars?branch=master)
+[![Codacy Badge](https://api.codacy.com/project/badge/Grade/9191d17b91814f8caf17c9e537a22904)](https://www.codacy.com/app/evandrocoan/ContextFreeGrammars?utm_source=github.com&utm_medium=referral&utm_content=evandrocoan/ContextFreeGrammars&utm_campaign=badger)
+[![Latest Release](https://img.shields.io/github/tag/evandrocoan/ContextFreeGrammars.svg?label=version)](https://github.com/evandrocoan/ContextFreeGrammars/releases)
+
 
 ## I - Definition:
 
 An application,
 with graphical interface to manipulate CFG,
-involving the following checks / operations:
+involving the following operations:
 1. Edit CFG's verbatim;
 2. Check whether L (G) is empty, finite or infinite;
 3. Transform a CFG into Proper CFG,
    providing: Intermediate grammars, Nf, Vi, Ne and Na;
 4. Calculate First (A),
    Follow (A) and First-NT (A) (defined as the set of symbols of Vn that can start sequences derived from A) for all A ∈ Vn;
-5. Check if G is factored or if it is factorial in n steps;
-6. Check whether or not G has Rec.
-   the Left - identifying the recursive non-terminals on the left and the type of recursions (direct and / or indirect) and, if it has,
+5. Check if G is factored or if it is factored in n steps;
+6. Check whether or not G has Left Recursion - identifying the recursive non-terminals
+   on the left and the type of recursions (direct and / or indirect) and,
+   if it has left recursions,
    eliminate recursions.
+
+![Imgur](https://i.imgur.com/5LDYWab.png)
 
 
 ## II - Observations:
@@ -42,15 +52,6 @@ involving the following checks / operations:
    except uppercase letters).
 5. Use & to represent epsilon.
 6. Present the intermediate results obtained.
-7. The work should be done in pairs and the programming language is of free choice (however it must be dominated by the 2 members of the team).
-8. The work must be sent by email until **27/06**,
-   in a single zipped file,
-   containing report (describing implementation), source (documented),
-   executable and testing.
-   Use the file name of the team components (ex.
-   JoaoF-MariaG.zip).
-9. In addition to the correctness,
-   aspects of usability and robustness of the application will be evaluated.
 
 
 ## Licensing

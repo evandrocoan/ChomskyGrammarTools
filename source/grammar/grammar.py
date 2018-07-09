@@ -37,6 +37,7 @@ from .symbols import Terminal
 from .symbols import NonTerminal
 from .symbols import epsilon_terminal
 from .symbols import HISTORY_KEY_LINE
+from .symbols import NO_GRAMMAR_CHANGES
 
 from .production import Production
 from .production import epsilon_production
@@ -46,6 +47,7 @@ from .intermediate_grammar import IntermediateGrammar
 
 from .utilities import getCleanSpaces
 from .utilities import dictionary_to_string
+from .utilities import assure_existing_key
 from .utilities import convert_to_text_lines
 from .utilities import get_relative_path
 from .utilities import get_duplicated_elements
@@ -210,7 +212,7 @@ class ChomskyGrammar():
             if stage == IntermediateGrammar.END or len( operations_history ) == 1:
 
                 if not operation.extra_text:
-                    operation.extra_text.append( "No changes required/performed here." )
+                    operation.extra_text.append( NO_GRAMMAR_CHANGES )
 
             counter += 1
             history_list.append( "# %s. %s" % ( counter, operation ) )
@@ -517,9 +519,9 @@ class ChomskyGrammar():
         non_terminal_epsilon = self.non_terminal_epsilon()
 
         for start_symbol in productions_keys:
-            start_production = productions_keys[start_symbol]
+            productions = productions_keys[start_symbol]
 
-            for production in start_production(1):
+            for production in productions(1):
 
                 for combination in production.combinations( non_terminal_epsilon ):
                     # log( 1, "combination: %s", combination )
@@ -530,7 +532,7 @@ class ChomskyGrammar():
         if initial_symbol in non_terminal_epsilon:
 
             if self.has_recursion_on_the_non_terminal( initial_symbol ):
-                new_initial_symbol = self.new_symbol()
+                new_initial_symbol = self.new_symbol( initial_symbol )
                 self.copy_productions_for_one_non_terminal( initial_symbol, new_initial_symbol )
                 self.initial_symbol = new_initial_symbol
 
@@ -575,9 +577,9 @@ class ChomskyGrammar():
                 if start_symbol == start_non_terminal:
                     continue
 
-                start_productions = productions_keys[start_symbol]
+                productions = productions_keys[start_symbol]
 
-                for production in start_productions:
+                for production in productions:
 
                     for symbol in production:
 
@@ -598,7 +600,7 @@ class ChomskyGrammar():
 
         if self.initial_symbol == start_symbol:
             # log( 1, "WARNING: Removing the grammar initial symbol!" )
-            new_initial_symbol = self.new_symbol()
+            new_initial_symbol = self.new_symbol( "S" )
             self.add_production( new_initial_symbol, new_initial_symbol )
 
             self.initial_symbol = new_initial_symbol
@@ -843,28 +845,10 @@ class ChomskyGrammar():
         self._save_history( "Eliminating Left Recursion", IntermediateGrammar.END )
         _flush_left_recursion_history( True )
 
-    def has_indirect_factors(self):
-        """
-            Checks whether there are indirect factors on this grammar.
-        """
-        productions_keys = self.productions
-
-        for start_symbol in productions_keys:
-            start_productions = productions_keys[start_symbol]
-
-            for start_production in start_productions:
-                first_symbol = start_production[0]
-
-                if type( first_symbol ) is NonTerminal:
-                    return True
-
-        return False
-
     def factors(self):
         """
-            Call `eliminate_indirect_factors()` then returns a list with tuple on the format
-            (NonTerminal, Terminal) representing this grammar nondeterministic factors for each non
-            deterministic non terminal start symbol.
+            Returns a list with tuple on the format (Production, Production) representing this
+            grammar nondeterministic factors for each start symbol.
 
             If the list contains duplicated entries, it means this grammar is non factored, i.e.,
             non deterministic.
@@ -875,24 +859,75 @@ class ChomskyGrammar():
 
         for start_symbol in productions_keys:
             productions = productions_keys[start_symbol]
+            biggest_common_factors = {}
 
             for production in productions:
-                first_terminals_from = self.first_terminals_from( production, first_terminals )
-                # log( 1, "first_terminals_from: %-6s -> %s", production, first_terminals_from )
+                first_symbol = production[0]
 
-                for first_terminal in first_terminals_from:
+                if len( first_symbol ):
+                    common_production = self.get_biggest_factor_serie( first_symbol, production, productions, biggest_common_factors )
+                    factors.append( ( start_symbol, common_production ) )
 
-                    if len( first_terminal ):
-                        factors.append( ( start_symbol, Production( [first_terminal.new()], lock=True ) ) )
+                    if type( first_symbol ) is NonTerminal:
+                        first_terminals_from = self.first_terminals_from( production, first_terminals )
+                        # log( 1, "first_terminals_from: %-6s -> %s", production, first_terminals_from )
 
-                # Also add NonTerminal common factors
-                if len( production ) and type( production[0] ) is NonTerminal:
-                    production_new = production.new()
-                    production_new.remove_everything_after( 0 )
-                    production_new.lock()
-                    factors.append( ( start_symbol, production_new ) )
+                        for first_terminal in first_terminals_from:
+
+                            if len( first_terminal ):
+                                factors.append( ( start_symbol, Production( [first_terminal.new()], lock=True ) ) )
 
         return factors
+
+    def get_biggest_factor_serie(self, first_symbol, production, productions, biggest_common_factors):
+        """
+            Determines and return the biggest production with common direct factors in a given `production`.
+        """
+        assure_existing_key( biggest_common_factors, first_symbol, [] )
+        biggest_common_factor = biggest_common_factors[first_symbol]
+
+        if not biggest_common_factor:
+            biggest_common_factor.append( first_symbol )
+
+            for other_production in productions:
+                other_first_symbol = other_production[0]
+
+                # Initialize the first symbol or skip the other unrelated production
+                if production != other_production and first_symbol == other_first_symbol:
+
+                    if len( biggest_common_factor ) > 1:
+                        maximum_index = min( len( biggest_common_factor ), len( other_production ) )
+
+                        for index in range( 1, maximum_index ):
+
+                            if biggest_common_factor[index] != other_production[index]:
+                                del biggest_common_factor[index:]
+                                break
+
+                    else:
+                        maximum_index = min( len( production ), len( other_production ) )
+
+                        for index in range( 1, maximum_index ):
+                            current_element = production[index]
+
+                            if current_element != other_production[index]:
+                                break
+
+                            else:
+                                # log( 1, "append: %s", current_element )
+                                biggest_common_factor.append( current_element )
+
+                    # There is nothing else to do, as we are on the minimum acceptable length
+                    if len( biggest_common_factor ) == 1:
+                        break
+
+            # log( 1, "production: %s", production )
+            # log( 1, "productions: %s", productions )
+            # log( 1, "biggest_common_factor: %s", biggest_common_factor )
+
+        common_production = Production( [item.new() for item in biggest_common_factor], lock=True )
+        biggest_common_factors[first_symbol] = common_production
+        return common_production
 
     def has_duplicated_factors(self):
         """
@@ -902,8 +937,18 @@ class ChomskyGrammar():
             https://stackoverflow.com/questions/1541797/how-do-i-check-if-there-are-duplicates-in-a-flat-list
         """
         factors = self.factors()
-        factors_length = len( factors )
-        return factors_length and factors_length != len( set( factors ) )
+        clean_factors = set()
+        clean_factors_add = clean_factors.add
+
+        for factor in factors:
+
+            if factor in clean_factors:
+                return True
+
+            else:
+                clean_factors_add( factor )
+
+        return False
 
     def is_factored(self):
         """
@@ -920,112 +965,143 @@ class ChomskyGrammar():
         self._save_history( "Factoring", IntermediateGrammar.BEGINNING )
 
         was_factored = False
-        self.last_factoring_step = 0
+        last_factoring_step = 0
 
         if self.has_left_recursion():
             self.eliminate_left_recursion()
 
         while True:
-            self.last_factoring_step += 1
-            is_factored = not self.has_duplicated_factors()
+            last_factoring_step += 1
+            non_deterministic_factors_dictionary, has_direct_factors, is_factored = self.get_duplicated_factors()
 
             if is_factored:
-                was_factored = True
                 break
 
-            if self.last_factoring_step > maximum_steps:
+            if last_factoring_step > maximum_steps:
                 break
 
-            non_deterministic_factors_dictionary, is_non_terminal_factored = self.get_factoring_duplicated_elements()
+            while True:
 
-            if is_non_terminal_factored:
-                self.eliminate_direct_factors( non_deterministic_factors_dictionary )
-
-                non_deterministic_factors_dictionary, _ = self.get_factoring_duplicated_elements()
-
-                if non_deterministic_factors_dictionary:
+                if has_direct_factors:
                     self.eliminate_direct_factors( non_deterministic_factors_dictionary )
+                    last_factoring_step += 1
+                    non_deterministic_factors_dictionary, has_direct_factors, is_factored = self.get_duplicated_factors()
+
+                    if last_factoring_step > maximum_steps:
+                        break
+
+                else:
+                    break
+
+            if is_factored:
+                break
 
             else:
-                self.eliminate_direct_factors( non_deterministic_factors_dictionary )
-
-            non_deterministic_factors_dictionary, _ = self.get_factoring_duplicated_elements()
-
-            if non_deterministic_factors_dictionary:
                 self.eliminate_indirect_factors( non_deterministic_factors_dictionary )
 
+        self.last_factoring_step = last_factoring_step
         self._save_history( "Factoring", IntermediateGrammar.END )
-        return was_factored
+        return is_factored
 
-    def get_factoring_duplicated_elements(self):
+    def get_duplicated_factors(self):
         """
-            Creates a dictionary with the non deterministic factors and returns it with
-            (dictionary, True) if it is composed only with NonTerminal's, otherwise (dictionary, False).
+            Creates a dictionary with the non deterministic factors and returns it with a tuple with
+            the following information (dictionary, has_direct_factors).
         """
+        is_factored = True
+        has_direct_factors = False
         duplicated_elements = get_duplicated_elements( self.factors() )
-        is_non_terminal_factored = False
-
-        non_deterministic_factors_list = []
         non_deterministic_factors_dictionary = {}
 
-        if not duplicated_elements:
-            return non_deterministic_factors_dictionary, is_non_terminal_factored
+        if duplicated_elements:
+            is_factored = False
+
+        else:
+            return non_deterministic_factors_dictionary, has_direct_factors, is_factored
 
         for item in duplicated_elements:
 
-            if type( item[1][0] ) is NonTerminal:
-                is_non_terminal_factored = True
-                non_deterministic_factors_list.append( item )
+            if not has_direct_factors:
+                production = item[1]
 
-        if not is_non_terminal_factored:
-            non_deterministic_factors_list = duplicated_elements
+                if type( production[0] ) is NonTerminal:
+                    has_direct_factors = True
+
+                elif len( production ) > 1:
+                    has_direct_factors = True
+
+                else:
+                    has_direct_factors = self.has_direct_factors( item[0] )
 
         productions_keys = self.productions
+        non_deterministic_factors_list = sorted( sorted( duplicated_elements, reverse=True ), key=len, reverse=True )
 
         for start_symbol in productions_keys:
             non_deterministic_factors_dictionary[start_symbol]  = []
 
-        for factor_symbol, factor_terminal in sorted( non_deterministic_factors_list, reverse=True ) :
+        for factor_symbol, factor_terminal in non_deterministic_factors_list:
             non_deterministic_factors_dictionary[factor_symbol].append( factor_terminal )
 
-        return non_deterministic_factors_dictionary, is_non_terminal_factored
+        return non_deterministic_factors_dictionary, has_direct_factors, is_factored
+
+    def has_direct_factors(self, start_symbol):
+        """
+            Checks whether there are direct factors on the given `start_symbol` from this grammar.
+        """
+        productions = self.productions[start_symbol]
+        first_symbols = set()
+        first_symbols_add = first_symbols.add
+
+        for production in productions:
+            first_symbol = production[0]
+
+            if first_symbol in first_symbols:
+                return True
+
+            else:
+                first_symbols_add( first_symbol )
+
+        return False
 
     def eliminate_indirect_factors(self, non_deterministic_factors_dictionary):
         """
-            Converts all indirect factors on this grammar to direct factors.
+            Try to convert indirect factors on this grammar to direct factors.
+
+            The elimination may not eliminate all indirect factors. Therefore, it is required to
+            keep calling this function until no indirect factors are remaining.
         """
         self._save_history( "Eliminating Indirect Factors", IntermediateGrammar.BEGINNING )
         old_counter = -1
-        current_counter = 0
 
         productions_keys = self.productions
         _save_data_factors_list = DynamicIterationDict()
 
-        while old_counter != current_counter:
-            old_counter = current_counter
+        for start_symbol in productions_keys:
+            productions = productions_keys[start_symbol]
+            start_symbol_non_deterministic_factors = non_deterministic_factors_dictionary[start_symbol]
 
-            for start_symbol in productions_keys:
-                start_productions = productions_keys[start_symbol]
-                start_symbol_non_deterministic_factors = non_deterministic_factors_dictionary[start_symbol]
-                # log( 1, "start_productions: %s", start_productions )
-                log( 16, "start_symbol: %s, start_symbol_non_deterministic_factors: %s", start_symbol, start_symbol_non_deterministic_factors )
+            # log( 1, "productions: %s", productions )
+            log( 16, "start_symbol: %s, start_symbol_non_deterministic_factors: %s", start_symbol, start_symbol_non_deterministic_factors )
 
-                for start_production in start_productions(1):
-                    first_symbol = start_production[0]
+            for production in productions(1):
+                first_symbol = production[0]
 
-                    if type( first_symbol ) is NonTerminal and start_symbol_non_deterministic_factors:
-                        remove_production = False
-                        first_symbol_productions = productions_keys[first_symbol]
-                        _save_data_factors_list.append( "%s => %s" % ( start_symbol, start_production ) )
+                if type( first_symbol ) is NonTerminal and start_symbol_non_deterministic_factors:
+                    remove_production = False
+                    first_symbol_productions = productions_keys[first_symbol]
+                    replaced_productions = []
 
-                        for first_symbol_production in first_symbol_productions(1):
-                            remove_production = True
-                            new_production = start_production.replace( 0, first_symbol_production )
-                            self.add_production( start_symbol, new_production )
+                    for first_symbol_production in first_symbol_productions(1):
+                        remove_production = True
+                        new_production = production.replace( 0, first_symbol_production )
+                        self.add_production( start_symbol, new_production )
+                        replaced_productions.append( str( new_production ) )
 
-                        if remove_production:
-                            current_counter += 1
-                            self.remove_production( start_symbol, start_production )
+                    if remove_production:
+                        self.remove_production( start_symbol, production )
+
+                    _save_data_factors_list.append( "%s: %s => %s" % (
+                            start_symbol, production, " | ".join( replaced_productions ) ) )
 
         self._save_history( "Eliminating Indirect Factors", IntermediateGrammar.END )
         self._save_data( "Indirect factors eliminated: %s", _save_data_factors_list.keys() )
@@ -1041,18 +1117,15 @@ class ChomskyGrammar():
         non_deterministic_factors_eliminated = DynamicIterationDict()
 
         for start_symbol in productions_keys:
-            start_productions = self.productions[start_symbol]
+            productions = self.productions[start_symbol]
             log( 16, "start_symbol: %s", start_symbol )
-            log( 16, "start_productions: %s", start_productions )
+            log( 16, "productions: %s", productions )
 
             if start_symbol in non_deterministic_factors_dictionary:
                 start_symbol_non_deterministic_factors = non_deterministic_factors_dictionary[start_symbol]
 
                 log( 16, "non_deterministic_factors: %s", start_symbol_non_deterministic_factors )
-                start_productions.not_iterate_over_new_items( len( start_symbol_non_deterministic_factors ) )
-
-                if start_symbol_non_deterministic_factors:
-                    non_deterministic_factors_eliminated.add( "%s -> %s" % ( start_symbol, start_symbol_non_deterministic_factors ) )
+                productions.not_iterate_over_new_items( len( start_symbol_non_deterministic_factors ) )
 
                 while True:
 
@@ -1063,45 +1136,50 @@ class ChomskyGrammar():
                     else:
                         break
 
+                    direct_factors_count = 0
                     new_factor_start_symbol = self.new_symbol( start_symbol, True )
                     direct_factors_productions = {}
-                    direct_factors_count = 0
                     log( 16, "non_deterministic_factor: %s", non_deterministic_factor )
                     log( 16, "new_factor_start_symbol: %s", new_factor_start_symbol )
 
-                    for start_production in start_productions:
+                    for production in productions:
 
-                            if start_production[0] == non_deterministic_factor[0]:
+                            if production[0] == non_deterministic_factor[0]:
                                 direct_factors_count += 1
-                                direct_factors_productions[start_production] = non_deterministic_factor
+                                direct_factors_productions[production] = non_deterministic_factor
 
                     direct_factors_productions = direct_factors_productions
                     log( 16, "direct_factors_productions: %s", direct_factors_productions )
 
                     if direct_factors_count > 1:
+                        assure_existing_key( non_deterministic_factors_eliminated, start_symbol, [] )
+                        non_deterministic_factors_eliminated[start_symbol].append( non_deterministic_factor )
                         has_eliminated_any_factor = True
                         has_added_first_production = False
 
-                        for start_production in start_productions(1):
+                        for production in productions(1):
 
-                            if start_production in direct_factors_productions:
+                            if production in direct_factors_productions:
+                                start_production_factors = direct_factors_productions[production]
 
+                                # We see to add it first because if it was the last production, then
+                                # the start symbol will be removed by `remove_production()`
                                 if not has_added_first_production:
                                     has_added_first_production = True
-                                    new_start_production = direct_factors_productions[start_production].new()
+                                    new_start_production = start_production_factors.new()
                                     new_start_production.add( new_factor_start_symbol[0].new() )
                                     self.add_production( start_symbol, new_start_production )
 
-                                new_factor_production = start_production.new()
-                                new_factor_production.remove( 0 )
+                                new_factor_production = production.new()
+                                new_factor_production.remove_everything_before( len( start_production_factors ) )
 
                                 self.add_production( new_factor_start_symbol, new_factor_production )
-                                self.remove_production( start_symbol, start_production )
+                                self.remove_production( start_symbol, production )
 
         self._save_history( "Eliminating Direct Factors", IntermediateGrammar.END )
 
         if has_eliminated_any_factor:
-            self._save_data( "Direct factors eliminated: %s", non_deterministic_factors_eliminated.keys() )
+            self._save_data( "Direct factors eliminated: %s", non_deterministic_factors_eliminated )
 
         log( 16, "exiting: \n%s", self )
 
@@ -1128,9 +1206,9 @@ class ChomskyGrammar():
             old_counter = current_counter
 
             for start_symbol in productions_keys:
-                start_productions = productions_keys[start_symbol]
+                productions = productions_keys[start_symbol]
 
-                for production in start_productions:
+                for production in productions:
                     all_fertile = True
 
                     for symbol in production:
@@ -1163,9 +1241,9 @@ class ChomskyGrammar():
         productions_keys = self.productions
 
         for start_symbol in productions_keys(1):
-            start_productions = productions_keys[start_symbol]
+            productions = productions_keys[start_symbol]
 
-            for production in start_productions(1):
+            for production in productions(1):
                 all_fertile = True
 
                 for symbol in production:
@@ -1183,7 +1261,7 @@ class ChomskyGrammar():
                     infertile.append( "%s -> %s" % ( start_symbol, production ) )
                     self.remove_production( start_symbol, production, False )
 
-                    if not start_productions:
+                    if not productions:
                         self.remove_start_non_terminal( start_symbol, False )
 
         self._save_history( "Eliminating Infertile Symbols", IntermediateGrammar.END )
@@ -1198,9 +1276,9 @@ class ChomskyGrammar():
         reachable_non_terminals = DynamicIterationDict( [self.initial_symbol.non_terminals(0)] )
 
         for start_symbol in reachable_non_terminals:
-            start_productions = productions_keys[start_symbol]
+            productions = productions_keys[start_symbol]
 
-            for production in start_productions:
+            for production in productions:
 
                 for symbol in production:
 
@@ -1222,16 +1300,16 @@ class ChomskyGrammar():
         productions_keys = self.productions
 
         for start_symbol in productions_keys(1):
-            start_productions = productions_keys[start_symbol]
+            productions = productions_keys[start_symbol]
             # log( 1, "1. start_symbol: %s, productions_keys: %s", start_symbol, productions_keys )
-            # log( 1, "2. start_productions: %s", start_productions )
+            # log( 1, "2. productions: %s", productions )
 
             if start_symbol not in reachable:
-                unreachable.append( "%s -> %s" % ( start_symbol, start_productions.keys() ) )
+                unreachable.append( "%s -> %s" % ( start_symbol, productions.keys() ) )
                 self.remove_start_non_terminal( start_symbol )
                 continue
 
-            for production in start_productions:
+            for production in productions:
                 # log( 1, "2. production: %s", production )
                 all_reachable = True
 
@@ -1248,7 +1326,7 @@ class ChomskyGrammar():
                     unreachable.append( "%s -> %s" % ( start_symbol, production ) )
                     self.remove_production( start_symbol, production, False )
 
-                    if not start_productions:
+                    if not productions:
                         self.remove_start_non_terminal( start_symbol, False )
 
         # log( 1, "productions: %s", self.productions )
@@ -1287,9 +1365,9 @@ class ChomskyGrammar():
             old_counter = current_counter
 
             for start_symbol in productions_keys:
-                start_productions = productions_keys[start_symbol]
+                productions = productions_keys[start_symbol]
 
-                for production in start_productions:
+                for production in productions:
 
                     if len( production ) == 1:
                         non_terminal = production.non_terminals( 0 )
@@ -1347,9 +1425,9 @@ class ChomskyGrammar():
                 self.copy_productions_for_one_non_terminal( production, start_symbol )
 
         for start_symbol in productions_keys:
-            start_productions = productions_keys[start_symbol]
+            productions = productions_keys[start_symbol]
 
-            for production in start_productions:
+            for production in productions:
 
                 if production in simple_non_terminals:
                     self.remove_production( start_symbol, production )
@@ -1439,9 +1517,9 @@ class ChomskyGrammar():
             old_counter = current_counter
 
             for start_symbol in productions_keys:
-                start_productions = productions_keys[start_symbol]
+                productions = productions_keys[start_symbol]
 
-                for production in start_productions:
+                for production in productions:
                     following_first = first_non_terminals[start_symbol]
                     old_length = len( following_first )
 
@@ -1504,9 +1582,9 @@ class ChomskyGrammar():
             old_counter = current_counter
 
             for start_symbol in productions_keys:
-                start_productions = productions_keys[start_symbol]
+                productions = productions_keys[start_symbol]
 
-                for production in start_productions:
+                for production in productions:
                     following_first = first_terminals[start_symbol]
                     old_length = len( following_first )
 
@@ -1583,9 +1661,9 @@ class ChomskyGrammar():
             old_counter = current_counter
 
             for start_symbol in productions_keys:
-                start_productions = productions_keys[start_symbol]
+                productions = productions_keys[start_symbol]
 
-                for production in start_productions:
+                for production in productions:
                     # log( 1, "1. production: %s", production )
 
                     for symbol in production:

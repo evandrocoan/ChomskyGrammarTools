@@ -51,6 +51,7 @@ log( 1, "Importing " + __name__ )
 
 from grammar.utilities import wrap_text
 from grammar.utilities import ignore_exceptions
+from grammar.utilities import get_screen_center
 
 from grammar.utilities import getCleanSpaces
 from grammar.utilities import setTextWithoutCleaningHistory
@@ -65,18 +66,32 @@ class IntegerInputDialog(QMainWindow):
         https://stackoverflow.com/questions/27420338/how-to-clear-child-window-reference-stored-in-parent-application-when-child-wind
     """
 
-    def __init__(self, parent, fontOptions):
+    def __init__(self, parent, settings, fontOptions):
         super().__init__( parent )
         self.result = 0
+
+        self.settings = settings
         self.setAttribute( Qt.WA_DeleteOnClose )
 
         # QWidget::setLayout: Attempting to set QLayout “” on ProgramWindow “”, which already has a layout
         # https://stackoverflow.com/questions/50176661/qwidgetsetlayout-attempting-to-set-qlayout-on-programwindow-which-alre
         self.centralwidget = QWidget()
         self.setCentralWidget( self.centralwidget )
-
-        self.resize( 600, 400  )
         self.setWindowTitle( "Input a Integer value" )
+
+        # Initial window size/pos last saved. Use default values for first time
+        windowScreenGeometry = self.settings.value( "integerInputWindowScreenGeometry" )
+        windowScreenState = self.settings.value( "integerInputWindowScreenState" )
+
+        if windowScreenGeometry:
+            self.restoreGeometry( windowScreenGeometry )
+
+        else:
+            self.resize( 600, 400 )
+            # self.move( get_screen_center( self ) )
+
+        if windowScreenState:
+            self.restoreState( windowScreenState )
 
         # nice widget for editing the date
         self.textEditWidget = QPlainTextEdit( self )
@@ -136,6 +151,10 @@ class IntegerInputDialog(QMainWindow):
 
     def closeEvent(self, event=None):
         # log( 1, "closeEvent " )
+        self.settings.setValue( "integerInputWindowScreenGeometry", self.saveGeometry() )
+        self.settings.setValue( "integerInputWindowScreenState", self.saveState() )
+
+        # super().closeEvent( event )
         self.event.quit()
 
     def keyPressEvent(self, event):
@@ -170,12 +189,12 @@ class IntegerInputDialog(QMainWindow):
 
     # static method to create the dialog and return ( date, time, accepted )
     @classmethod
-    def getNewUserInput(cls, parent, fontOptions):
+    def getNewUserInput(cls, parent, settings, fontOptions):
         result = 1
         integer = 5
 
         while result:
-            dialog = IntegerInputDialog( parent, fontOptions )
+            dialog = IntegerInputDialog( parent, settings, fontOptions )
             result = dialog.exec_()
 
             if result:

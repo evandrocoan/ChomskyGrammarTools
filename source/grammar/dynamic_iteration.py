@@ -222,7 +222,7 @@ class DynamicIterationDict(object):
                     key = keys_list[index]
                     representation.append( "%s: %s" % ( get_index(), values_list[index] ) )
 
-        return "[%s]" % ", ".join( representation )
+        return "{%s}" % ", ".join( representation )
 
     def __contains__(self, key):
         """
