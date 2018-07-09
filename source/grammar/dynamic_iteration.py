@@ -297,7 +297,6 @@ class DynamicIterationDict(object):
         """
         # log( 1, "key: %s, self: %s", key, self )
         items_dictionary = self.items_dictionary
-        keys_list = self.keys_list
         item_index = items_dictionary[key]
 
         self.empty_slots.add( item_index )
