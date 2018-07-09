@@ -45,7 +45,7 @@ class Production(LockableType):
         A full featured Chomsky Grammar production.
     """
 
-    def __init__(self, symbols=[], lock=False):
+    def __init__(self, symbols=None, lock=False):
         """
             Creates a new fresh production.
 
