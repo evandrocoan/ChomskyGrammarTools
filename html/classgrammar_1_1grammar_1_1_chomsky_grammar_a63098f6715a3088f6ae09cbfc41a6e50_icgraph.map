@@ -1,9 +1,9 @@
 <map id="first_terminals_from" name="first_terminals_from">
-<area shape="rect" id="node2" href="$classgrammar_1_1grammar_1_1_chomsky_grammar.html#a4fcbcfec182c4d96f220ea5a2f85fa0e" title="factors" alt="" coords="365,42,427,69"/>
-<area shape="rect" id="node7" href="$classgrammar_1_1grammar_1_1_chomsky_grammar.html#a48948742c361c339687f841f110b16a8" title="first_terminals" alt="" coords="188,79,291,106"/>
-<area shape="rect" id="node8" href="$classgrammar_1_1grammar_1_1_chomsky_grammar.html#ad102f6aeaacb74cf9eea5f2d03fc3be0" title="follow_terminals" alt="" coords="339,105,453,131"/>
-<area shape="rect" id="node3" href="$classgrammar_1_1grammar_1_1_chomsky_grammar.html#a810a3bbcbe575068db2807d1a6c7480f" title="get_factoring_duplicated\l_elements" alt="" coords="501,5,664,47"/>
-<area shape="rect" id="node5" href="$classgrammar_1_1grammar_1_1_chomsky_grammar.html#a2c4caaadb1f478618c3d41050ebdcfea" title="has_duplicated_factors" alt="" coords="505,71,660,98"/>
-<area shape="rect" id="node4" href="$classgrammar_1_1grammar_1_1_chomsky_grammar.html#a798324cfdb5ce9241790e0ec062c89fd" title="factor_it" alt="" coords="721,17,789,43"/>
-<area shape="rect" id="node6" href="$classgrammar_1_1grammar_1_1_chomsky_grammar.html#afa4ae045cd230102cf7d375cbee35125" title="is_factored" alt="" coords="712,71,797,98"/>
+<area shape="rect" id="node2" href="$classgrammar_1_1grammar_1_1_chomsky_grammar.html#a4fcbcfec182c4d96f220ea5a2f85fa0e" title="factors" alt="" coords="365,31,427,57"/>
+<area shape="rect" id="node7" href="$classgrammar_1_1grammar_1_1_chomsky_grammar.html#a48948742c361c339687f841f110b16a8" title="first_terminals" alt="" coords="188,56,291,83"/>
+<area shape="rect" id="node8" href="$classgrammar_1_1grammar_1_1_chomsky_grammar.html#ad102f6aeaacb74cf9eea5f2d03fc3be0" title="follow_terminals" alt="" coords="339,93,453,120"/>
+<area shape="rect" id="node3" href="$classgrammar_1_1grammar_1_1_chomsky_grammar.html#a3cf87954802f5881368fbb3936a081ec" title="get_duplicated_factors" alt="" coords="503,5,655,32"/>
+<area shape="rect" id="node5" href="$classgrammar_1_1grammar_1_1_chomsky_grammar.html#a2c4caaadb1f478618c3d41050ebdcfea" title="has_duplicated_factors" alt="" coords="501,56,656,83"/>
+<area shape="rect" id="node4" href="$classgrammar_1_1grammar_1_1_chomsky_grammar.html#a798324cfdb5ce9241790e0ec062c89fd" title="factor_it" alt="" coords="713,5,781,32"/>
+<area shape="rect" id="node6" href="$classgrammar_1_1grammar_1_1_chomsky_grammar.html#afa4ae045cd230102cf7d375cbee35125" title="is_factored" alt="" coords="704,56,789,83"/>
 </map>

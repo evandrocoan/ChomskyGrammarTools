@@ -1,4 +1,5 @@
 <map id="factors" name="factors">
-<area shape="rect" id="node2" href="$classgrammar_1_1grammar_1_1_chomsky_grammar.html#a48948742c361c339687f841f110b16a8" title="first_terminals" alt="" coords="115,5,217,32"/>
-<area shape="rect" id="node3" href="$classgrammar_1_1grammar_1_1_chomsky_grammar.html#a63098f6715a3088f6ae09cbfc41a6e50" title="first_terminals_from" alt="" coords="265,31,400,57"/>
+<area shape="rect" id="node2" href="$classgrammar_1_1grammar_1_1_chomsky_grammar.html#a48948742c361c339687f841f110b16a8" title="first_terminals" alt="" coords="127,5,230,32"/>
+<area shape="rect" id="node3" href="$classgrammar_1_1grammar_1_1_chomsky_grammar.html#a63098f6715a3088f6ae09cbfc41a6e50" title="first_terminals_from" alt="" coords="291,31,425,57"/>
+<area shape="rect" id="node4" href="$classgrammar_1_1grammar_1_1_chomsky_grammar.html#adcd69da0d9f1d234fc14d5934a301f5d" title="get_biggest_factor\l_serie" alt="" coords="115,107,243,149"/>
 </map>

@@ -1,0 +1,7 @@
+<map id="get_biggest_factor_serie" name="get_biggest_factor_serie">
+<area shape="rect" id="node2" href="$classgrammar_1_1grammar_1_1_chomsky_grammar.html#a4fcbcfec182c4d96f220ea5a2f85fa0e" title="factors" alt="" coords="181,31,243,57"/>
+<area shape="rect" id="node3" href="$classgrammar_1_1grammar_1_1_chomsky_grammar.html#a3cf87954802f5881368fbb3936a081ec" title="get_duplicated_factors" alt="" coords="292,5,444,32"/>
+<area shape="rect" id="node5" href="$classgrammar_1_1grammar_1_1_chomsky_grammar.html#a2c4caaadb1f478618c3d41050ebdcfea" title="has_duplicated_factors" alt="" coords="291,56,445,83"/>
+<area shape="rect" id="node4" href="$classgrammar_1_1grammar_1_1_chomsky_grammar.html#a798324cfdb5ce9241790e0ec062c89fd" title="factor_it" alt="" coords="502,5,570,32"/>
+<area shape="rect" id="node6" href="$classgrammar_1_1grammar_1_1_chomsky_grammar.html#afa4ae045cd230102cf7d375cbee35125" title="is_factored" alt="" coords="493,56,579,83"/>
+</map>
