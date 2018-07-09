@@ -168,7 +168,7 @@ class Production(LockableType):
 
         raise StopIteration
 
-    def combinations(self, non_terminal_epsilon=[]):
+    def combinations(self, non_terminal_epsilon):
         """
             Return a new set within all its non terminal's removal combinations, accordingly with
             the non terminal's set on `non_terminal_epsilon`.
