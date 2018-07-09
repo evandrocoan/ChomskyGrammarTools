@@ -207,7 +207,7 @@ class DynamicIterationDict(object):
             get_index = lambda: "{}, {}".format( get_key(), index )
 
         else:
-            get_index = lambda: get_key()
+            get_index = get_key
 
         if self._is_set:
             return str( self.keys() )
