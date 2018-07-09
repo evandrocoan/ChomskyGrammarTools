@@ -15,6 +15,7 @@ before_install:
 
     - if [ "$TRAVIS_OS_NAME" == "linux" ]; then
             pip install codecov;
+            pip install codacy-coverage;
             pip install python-coveralls;
             pip install -r requirements.txt;
       fi
@@ -32,6 +33,7 @@ script:
             coverage run source/unit_tests.py;
             codecov;
             coveralls;
+            python-codacy-coverage -r coverage.xml;
       fi
 
     - if [ "$TRAVIS_OS_NAME" == "osx" ]; then
