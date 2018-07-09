@@ -189,7 +189,7 @@ def get_largest_item_size(iterable):
     return largest_key
 
 
-def dictionary_to_string(dictionary, sort=None):
+def dictionary_to_string(dictionary):
     """
         Given a dictionary with a list for each string key, call `sort_dictionary_lists()` and
         return a string representation by line of its entries.
@@ -197,9 +197,6 @@ def dictionary_to_string(dictionary, sort=None):
 
     if not len( dictionary ):
         return " No elements found."
-
-    if sort:
-        iterable = sort( iterable )
 
     strings = []
     elements_strings = []
