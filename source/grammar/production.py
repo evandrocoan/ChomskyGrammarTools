@@ -77,18 +77,6 @@ class Production(LockableType):
         if lock:
             self.lock()
 
-    def __setattr__(self, name, value):
-        """
-            Block attributes from being changed after it is activated.
-            https://stackoverflow.com/questions/17020115/how-to-use-setattr-correctly-avoiding-infinite-recursion
-        """
-
-        if self.locked:
-            raise AttributeError( "Attributes cannot be changed after `locked` is set to True! %s" % self )
-
-        else:
-            super().__setattr__( name, value )
-
     def __repr__(self):
         """
             Return a more complete and precise string representation of this object, useful for
