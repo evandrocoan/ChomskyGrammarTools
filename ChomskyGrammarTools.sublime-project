@@ -16,7 +16,7 @@
             [
                 "python", "main.py"
             ],
-            "file_regex": "^[ ]*File \"(...*?)\", line ([0-9]*)",
+            "file_regex": "^[ ]*File \"(...*?)\", line ([0-9]*)(.*)",
             "name": "Run Project",
             "quiet": true,
             "shell": true,
@@ -50,6 +50,12 @@
                     [
                         "python", "unit_tests.py", "-v", "{test_class}", "-f",
                     ],
+                },
+                {
+                    // pip install vulture
+                    "name": "Vulture Dead Imports",
+                    "shell_cmd": "vulture . | grep -e 'import'",
+                    "file_regex": "(.*\\.py):([0-9]*):(.*)",
                 }
             ]
         },
