@@ -47,10 +47,11 @@ from debug_tools import getLogger
 log = getLogger( 127, __name__ )
 log( 1, "Importing " + __name__ )
 
-from grammar.utilities import get_screen_center
 from grammar.utilities import wrap_text
-from grammar.utilities import ignore_exceptions
-from grammar.utilities import setTextWithoutCleaningHistory
+
+from .utilities import get_screen_center
+from .utilities import ignore_exceptions
+from .utilities import setTextWithoutCleaningHistory
 
 
 class StringInputDialog(QMainWindow):

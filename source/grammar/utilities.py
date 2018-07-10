@@ -99,28 +99,6 @@ def get_duplicated_elements(elements_list):
     return visited_and_duplicated
 
 
-def trimMessage(message):
-    """
-        Cuts a message maximum width and length and add an ellipsis (...) when it exceeds 30 lines
-        or 150 characters of line size.
-    """
-    message_lines = message.split( '\n' )
-    clean_message = []
-
-    if len( message_lines ) > 30:
-        message_lines = message_lines[:30]
-        message_lines.append( '\n...' )
-
-    for line in message_lines:
-
-        if len( line ) > 150:
-            line = line[:150] + '...'
-
-        clean_message.append( line )
-
-    return "\n".join( clean_message )
-
-
 def emquote_string(string):
     """
         Return a string escape into single or double quotes accordingly to its contents.
@@ -240,83 +218,6 @@ def convert_to_text_lines(iterable, use_repr=True, new_line=True, sort=None):
         strings.append( " {}".format( repr( item ) ) )
 
     return ( "\n" if new_line else "" ).join( strings )
-
-
-def ignore_exceptions(function_to_decorate):
-    """
-        Decorator to catch any exceptions threw and show them to the user on a dialog/message box.
-    """
-
-    def wrapper(*args, **kargs):
-
-        try:
-            return function_to_decorate( *args, **kargs )
-
-        except Exception as error:
-            log.exception( "" )
-            ignore_exceptions.send_string_signal.emit( str( error ) )
-
-    return wrapper
-
-
-def set_scroll_to_maximum(textEditWidget, to_bottom=False):
-    """
-        Given a text edit area, set its scrolling completely to the bottom.
-    """
-
-    # Autoscroll PyQT QTextWidget
-    # https://stackoverflow.com/questions/7778726/autoscroll-pyqt-qtextwidget
-    verticalScrollBar = textEditWidget.verticalScrollBar()
-    horizontalScrollBar = textEditWidget.horizontalScrollBar()
-
-    if to_bottom:
-        textEditWidget.moveCursor( QtGui.QTextCursor.End )
-        verticalScrollBar.setValue( verticalScrollBar.maximum() )
-        horizontalScrollBar.setValue( horizontalScrollBar.minimum() )
-
-    textEditWidget.moveCursor( QtGui.QTextCursor.StartOfLine )
-    textEditWidget.ensureCursorVisible()
-
-    textEditWidget.repaint()
-    QCoreApplication.processEvents()
-
-
-def get_screen_center(self):
-    """
-        PyQt4 what is the best way to center dialog windows?
-        https://stackoverflow.com/questions/12432740/pyqt4-what-is-the-best-way-to-center-dialog-windows
-    """
-    screenGeometry = QtWidgets.QApplication.desktop().screenGeometry()
-    x = ( screenGeometry.width() - self.width() ) / 2
-    y = ( screenGeometry.height() - self.height() ) / 2
-    return QPoint( x, y )
-
-
-def setTextWithoutCleaningHistory(textEditWidget, textToSet):
-    """
-        Making changes to a QTextEdit without adding an undo command to the undo stack
-        https://stackoverflow.com/questions/27113262/making-changes-to-a-qtextedit-without-adding-an-undo-command-to-the-undo-stack
-
-        http://doc.qt.io/qt-5/qtextcursor.html#SelectionType-enum
-        http://doc.qt.io/qt-5/qtextdocument.html#clearUndoRedoStacks
-        http://www.qtcentre.org/threads/43268-Setting-Text-in-QPlainTextEdit-without-Clearing-Undo-Redo-History
-    """
-    textCursor = textEditWidget.textCursor()
-    position = textCursor.position()
-
-    textCursor.beginEditBlock()
-    textCursor.select( PyQt5.QtGui.QTextCursor.Document );
-    textCursor.removeSelectedText();
-    textCursor.insertText( textToSet );
-    textCursor.endEditBlock()
-
-    # textCursor.setPosition( position );
-    # textEditWidget.setTextCursor( textCursor )
-
-    # PyQT force update textEdit before calling other function
-    # https://stackoverflow.com/questions/47654327/pyqt-force-update-textedit-before-calling-other-function
-    textEditWidget.repaint()
-    QCoreApplication.processEvents()
 
 
 def getCleanSpaces(inputText, minimumLength=0, lineCutTrigger="", keepSpaceSepators=False):

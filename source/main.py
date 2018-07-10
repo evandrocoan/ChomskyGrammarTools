@@ -30,10 +30,6 @@ import PyQt5
 # from PyQt5.QtCore import *
 # from PyQt5.QtWidgets import *
 
-from user_interface.string_input_dialog import StringInputDialog
-from user_interface.string_output_dialog import StringOutputDialog
-from user_interface.integer_input_dialog import IntegerInputDialog
-
 from PyQt5 import QtGui
 from PyQt5 import QtCore
 from PyQt5 import QtWidgets
@@ -54,20 +50,24 @@ from PyQt5.QtWidgets import QFileDialog
 from grammar.grammar import ChomskyGrammar
 from grammar.symbols import HISTORY_KEY_LINE
 
-from grammar.run_function_async import run_function_async
-
 from grammar.utilities import wrap_text
 from grammar.utilities import sort_correctly
-from grammar.utilities import ignore_exceptions
 from grammar.utilities import convert_to_text_lines
-from grammar.utilities import setTextWithoutCleaningHistory
-from grammar.utilities import get_screen_center
-from grammar.utilities import trimMessage
 from grammar.utilities import getCleanSpaces
 from grammar.utilities import get_relative_path
 from grammar.utilities import dictionary_to_string
 from grammar.utilities import get_duplicated_elements
 
+from user_interface.string_input_dialog import StringInputDialog
+from user_interface.string_output_dialog import StringOutputDialog
+from user_interface.integer_input_dialog import IntegerInputDialog
+
+from user_interface.utilities import trimMessage
+from user_interface.utilities import ignore_exceptions
+from user_interface.utilities import get_screen_center
+from user_interface.utilities import setTextWithoutCleaningHistory
+
+from user_interface.run_function_async import run_function_async
 from debug_tools import getLogger
 
 # Enable debug messages: ( bitwise )
