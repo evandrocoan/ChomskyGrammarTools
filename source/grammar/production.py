@@ -45,7 +45,7 @@ class Production(LockableType):
         A full featured Chomsky Grammar production.
     """
 
-    def __init__(self, symbols=[], lock=False):
+    def __init__(self, symbols=None, lock=False):
         """
             Creates a new fresh production.
 
@@ -77,25 +77,13 @@ class Production(LockableType):
         if lock:
             self.lock()
 
-    def __setattr__(self, name, value):
-        """
-            Block attributes from being changed after it is activated.
-            https://stackoverflow.com/questions/17020115/how-to-use-setattr-correctly-avoiding-infinite-recursion
-        """
-
-        if self.locked:
-            raise AttributeError( "Attributes cannot be changed after `locked` is set to True! %s" % self )
-
-        else:
-            super().__setattr__( name, value )
-
     def __repr__(self):
         """
             Return a more complete and precise string representation of this object, useful for
-            debugging purposes. But requires the `_USE_STRING` constant to be set to False.
+            debugging purposes. But requires the `USE_STRING` constant to be set to False.
         """
 
-        if self._USE_STRING:
+        if self.USE_STRING:
             return super().__repr__()
 
         return super().__repr__() + '\n'
@@ -168,7 +156,7 @@ class Production(LockableType):
 
         raise StopIteration
 
-    def combinations(self, non_terminal_epsilon=[]):
+    def combinations(self, non_terminal_epsilon):
         """
             Return a new set within all its non terminal's removal combinations, accordingly with
             the non terminal's set on `non_terminal_epsilon`.
@@ -194,7 +182,7 @@ class Production(LockableType):
 
                 except RuntimeError as error:
 
-                    if error.startswith( "Invalid production creation! Production with no length: [&]" ):
+                    if str( error ).startswith( "Invalid production creation! Production with no length: [&]" ):
                         new_production = epsilon_production.new()
 
                     else:

@@ -26,12 +26,10 @@ import PyQt5
 from PyQt5.QtGui import QKeySequence
 
 from PyQt5.QtCore import Qt
-from PyQt5.QtCore import QDateTime
 from PyQt5.QtCore import QEventLoop
 
 from PyQt5.QtWidgets import QDialog
 from PyQt5.QtWidgets import QDialogButtonBox
-from PyQt5.QtWidgets import QDateTimeEdit
 from PyQt5.QtWidgets import QApplication
 from PyQt5.QtWidgets import QMainWindow
 from PyQt5.QtWidgets import QWidget
@@ -50,11 +48,12 @@ log = getLogger( 127, __name__ )
 log( 1, "Importing " + __name__ )
 
 from grammar.utilities import wrap_text
-from grammar.utilities import ignore_exceptions
-from grammar.utilities import get_screen_center
 
 from grammar.utilities import getCleanSpaces
-from grammar.utilities import setTextWithoutCleaningHistory
+
+from .utilities import get_screen_center
+from .utilities import ignore_exceptions
+from .utilities import setTextWithoutCleaningHistory
 
 
 class IntegerInputDialog(QMainWindow):

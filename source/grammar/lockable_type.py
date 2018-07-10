@@ -42,8 +42,8 @@ class LockableType(object):
         returned when needed.
     """
 
-    _USE_STRING = True
-    _EMQUOTE_STRING = False
+    USE_STRING = True
+    EMQUOTE_STRING = False
 
     def __init__(self):
         """
@@ -57,6 +57,9 @@ class LockableType(object):
 
         ## Caches the string representation of this object, after locking its attributes changes with `lock()`
         self.str = ""
+
+        ## The caches the length of this object, used while this object is in locked state
+        self.len = 0
 
         ## An unique identifier for any LockableType object
         self._hash = get_unique_hash()
@@ -98,14 +101,14 @@ class LockableType(object):
         """
             See `__repr__()` for details.
         """
-        return get_representation( self, ignore={'hash'}, emquote=self._EMQUOTE_STRING )
+        return get_representation( self, ignore={'hash'}, emquote=self.EMQUOTE_STRING )
 
     def __repr__(self):
         """
             Prints a representation of this object within all its attributes.
         """
 
-        if self._USE_STRING:
+        if self.USE_STRING:
             return self.__str__()
 
         return self.repr()
@@ -122,10 +125,10 @@ class LockableType(object):
             Caches the string representation of this object, after locking its attributes changes with `lock()`
         """
 
-        if self._USE_STRING:
+        if self.USE_STRING:
             return super().__str__()
 
-        return get_representation( self, ignore={'hash'}, emquote=self._EMQUOTE_STRING )
+        return get_representation( self, ignore={'hash'}, emquote=self.EMQUOTE_STRING )
 
     def __len__(self):
         """
@@ -166,7 +169,6 @@ class LockableType(object):
         self.str = str( self )
         self._str = lambda: self.str
 
-        ## The cached length of this object, used while this object is in locked state
         self.len = len( self )
         self._len = lambda: self.len
 

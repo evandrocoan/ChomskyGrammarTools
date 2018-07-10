@@ -207,14 +207,13 @@ class DynamicIterationDict(object):
             get_index = lambda: "{}, {}".format( get_key(), index )
 
         else:
-            get_index = lambda: get_key()
+            get_index = get_key
 
         if self._is_set:
             return str( self.keys() )
 
         else:
             values_list = self.values_list
-            items_dictionary = self.items_dictionary
 
             for index in range( 0, len( keys_list ) ):
 
@@ -298,7 +297,6 @@ class DynamicIterationDict(object):
         """
         # log( 1, "key: %s, self: %s", key, self )
         items_dictionary = self.items_dictionary
-        keys_list = self.keys_list
         item_index = items_dictionary[key]
 
         self.empty_slots.add( item_index )

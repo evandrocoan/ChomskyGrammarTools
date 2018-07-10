@@ -27,13 +27,11 @@ import PyQt5
 from PyQt5.QtGui import QKeySequence
 
 from PyQt5.QtCore import Qt
-from PyQt5.QtCore import QDateTime
 from PyQt5.QtCore import QCoreApplication
 
 from PyQt5.QtWidgets import QDialog
 from PyQt5.QtWidgets import QWidget
 from PyQt5.QtWidgets import QDialogButtonBox
-from PyQt5.QtWidgets import QDateTimeEdit
 from PyQt5.QtWidgets import QApplication
 from PyQt5.QtWidgets import QMainWindow
 from PyQt5.QtWidgets import QFileDialog
@@ -52,11 +50,12 @@ from debug_tools import getLogger
 log = getLogger( 127, __name__ )
 log( 1, "Importing " + __name__ )
 
-from grammar.utilities import get_screen_center
 from grammar.utilities import wrap_text
-from grammar.utilities import ignore_exceptions
-from grammar.utilities import setTextWithoutCleaningHistory
-from grammar.utilities import set_scroll_to_maximum
+
+from .utilities import get_screen_center
+from .utilities import ignore_exceptions
+from .utilities import set_scroll_to_maximum
+from .utilities import setTextWithoutCleaningHistory
 
 
 class StringOutputDialog(QMainWindow):
@@ -70,9 +69,7 @@ class StringOutputDialog(QMainWindow):
 
     def __init__(self, parent, settings, fontOptions, fileDialogOptions, isToStop):
         super().__init__( parent )
-        inputString = ""
         self.settings = settings
-
         self.isToStop = isToStop
         self.fileDialogOptions = fileDialogOptions
 

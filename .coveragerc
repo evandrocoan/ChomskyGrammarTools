@@ -1,0 +1,6 @@
+[run]
+omit =
+    */home/travis/virtualenv/*
+    */source/user_interface/*
+    */source/main.py
+    */source/unit_tests.py

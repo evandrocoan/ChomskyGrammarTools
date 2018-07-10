@@ -24,14 +24,10 @@
 import os
 import re
 
-from threading import Lock
 from debug_tools import getLogger
 
 import lark
 from lark import Tree
-
-from typing import Set
-from typing import Dict
 
 from .symbols import Terminal
 from .symbols import NonTerminal
@@ -925,9 +921,10 @@ class ChomskyGrammar():
             # log( 1, "productions: %s", productions )
             # log( 1, "biggest_common_factor: %s", biggest_common_factor )
 
-        common_production = Production( [item.new() for item in biggest_common_factor], lock=True )
-        biggest_common_factors[first_symbol] = common_production
-        return common_production
+            biggest_common_factor = Production( [item.new() for item in biggest_common_factor], lock=True )
+            biggest_common_factors[first_symbol] = biggest_common_factor
+
+        return biggest_common_factor
 
     def has_duplicated_factors(self):
         """
