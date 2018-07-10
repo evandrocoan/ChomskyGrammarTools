@@ -14,9 +14,6 @@ var hierarchy =
         ] ]
       ] ]
     ] ],
-    [ "QThread", null, [
-      [ "RunFunctionAsyncThread", "classgrammar_1_1run__function__async_1_1_run_function_async_thread.html", null ]
-    ] ],
     [ "TestCase", null, [
       [ "TestingUtilities", "classgrammar_1_1testing__utilities_1_1_testing_utilities.html", null ]
     ] ],

@@ -6,7 +6,6 @@ var files_dup =
     [ "intermediate_grammar.py", "intermediate__grammar_8py_source.html", null ],
     [ "lockable_type.py", "lockable__type_8py_source.html", null ],
     [ "production.py", "production_8py_source.html", null ],
-    [ "run_function_async.py", "run__function__async_8py_source.html", null ],
     [ "symbols.py", "symbols_8py_source.html", null ],
     [ "testing_utilities.py", "testing__utilities_8py_source.html", null ],
     [ "tree_transformer.py", "tree__transformer_8py_source.html", null ],

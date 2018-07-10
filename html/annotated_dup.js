@@ -18,9 +18,6 @@ var annotated_dup =
       [ "production", null, [
         [ "Production", "classgrammar_1_1production_1_1_production.html", "classgrammar_1_1production_1_1_production" ]
       ] ],
-      [ "run_function_async", null, [
-        [ "RunFunctionAsyncThread", "classgrammar_1_1run__function__async_1_1_run_function_async_thread.html", "classgrammar_1_1run__function__async_1_1_run_function_async_thread" ]
-      ] ],
       [ "symbols", null, [
         [ "ChomskyGrammarSymbol", "classgrammar_1_1symbols_1_1_chomsky_grammar_symbol.html", "classgrammar_1_1symbols_1_1_chomsky_grammar_symbol" ],
         [ "NonTerminal", "classgrammar_1_1symbols_1_1_non_terminal.html", "classgrammar_1_1symbols_1_1_non_terminal" ],

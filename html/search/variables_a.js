@@ -1,6 +1,6 @@
 var searchData=
 [
-  ['maxdiff',['maxDiff',['../classgrammar_1_1testing__utilities_1_1_testing_utilities.html#a7171f411f70e42d412f8cf9311cdb953',1,'grammar::testing_utilities::TestingUtilities']]],
-  ['maximum_5fiterable_5findex',['maximum_iterable_index',['../classgrammar_1_1dynamic__iteration_1_1_dynamic_iteration_dict.html#a3fb27584eea8a6754f5ba83929cf7151',1,'grammar::dynamic_iteration::DynamicIterationDict']]],
-  ['middle',['MIDDLE',['../classgrammar_1_1intermediate__grammar_1_1_intermediate_grammar.html#a27734ce9b1ef874273851cb649e62b83',1,'grammar::intermediate_grammar::IntermediateGrammar']]]
+  ['name',['name',['../classgrammar_1_1intermediate__grammar_1_1_intermediate_grammar.html#ab74e6bf80237ddc4109968cedc58c151',1,'grammar::intermediate_grammar::IntermediateGrammar']]],
+  ['new_5fitems_5fskip_5fcount',['new_items_skip_count',['../classgrammar_1_1dynamic__iteration_1_1_dynamic_iteration_dict.html#ae8354b9fec9929e801842d764f959a94',1,'grammar::dynamic_iteration::DynamicIterationDict']]],
+  ['new_5fitems_5fskip_5fstack',['new_items_skip_stack',['../classgrammar_1_1dynamic__iteration_1_1_dynamic_iteration_dict.html#a934b9418c0ca4c96ed4bc8e46b78a75b',1,'grammar::dynamic_iteration::DynamicIterationDict']]]
 ];
