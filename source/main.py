@@ -431,7 +431,7 @@ class ProgramWindow(QtWidgets.QMainWindow):
             was_factored = firstGrammar.factor_it( maximumSteps )
 
             if was_factored:
-                results.append( "\n\n# It was be successfully factored in `%s` steps!" % firstGrammar.last_factoring_step )
+                results.append( "\n\n# It was successfully factored in `%s` steps!" % firstGrammar.last_factoring_step )
                 results.append( "\n\n# The new factored grammar is:" )
 
             else:
