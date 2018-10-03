@@ -28,6 +28,15 @@ from debug_tools import getLogger
 
 import lark
 from lark import Tree
+from debug_tools.dynamic_iteration import DynamicIterationDict
+
+from debug_tools.utilities import getCleanSpaces
+from debug_tools.utilities import dictionary_to_string
+from debug_tools.utilities import assure_existing_key
+from debug_tools.utilities import convert_to_text_lines
+from debug_tools.utilities import get_relative_path
+from debug_tools.utilities import get_duplicated_elements
+from debug_tools.utilities import sort_alphabetically_and_by_length
 
 from .symbols import Terminal
 from .symbols import NonTerminal
@@ -40,16 +49,6 @@ from .production import epsilon_production
 from .production import end_of_string_terminal
 
 from .intermediate_grammar import IntermediateGrammar
-
-from debug_tools.utilities import getCleanSpaces
-from debug_tools.utilities import dictionary_to_string
-from debug_tools.utilities import assure_existing_key
-from debug_tools.utilities import convert_to_text_lines
-from debug_tools.utilities import get_relative_path
-from debug_tools.utilities import get_duplicated_elements
-from debug_tools.utilities import sort_alphabetically_and_by_length
-
-from .dynamic_iteration import DynamicIterationDict
 from .tree_transformer import ChomskyGrammarTreeTransformer
 
 # level 2 - Add and remove productions

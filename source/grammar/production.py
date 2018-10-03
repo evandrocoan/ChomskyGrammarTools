@@ -27,14 +27,13 @@ import copy
 import itertools
 
 from debug_tools import getLogger
+from debug_tools.lockable_type import LockableType
 
 from .symbols import Terminal
 from .symbols import NonTerminal
 
 from .symbols import epsilon_terminal
 from .symbols import end_of_string_terminal
-
-from .lockable_type import LockableType
 
 # level 4 - Abstract Syntax Tree Parsing
 log = getLogger( 127-4, __name__ )

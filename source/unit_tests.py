@@ -32,7 +32,6 @@ import cProfile
 from natsort import natsorted
 from debug_tools import getLogger
 
-from grammar.grammar import ChomskyGrammar
 from debug_tools.utilities import wrap_text
 from debug_tools.utilities import getCleanSpaces
 from debug_tools.utilities import sort_correctly
@@ -41,6 +40,11 @@ from debug_tools.utilities import convert_to_text_lines
 from debug_tools.utilities import get_duplicated_elements
 from debug_tools.utilities import sort_alphabetically_and_by_length
 
+from debug_tools.lockable_type import LockableType
+from debug_tools.testing_utilities import TestingUtilities
+from debug_tools.dynamic_iteration import DynamicIterationDict
+
+from grammar.grammar import ChomskyGrammar
 from grammar.symbols import Terminal
 from grammar.symbols import NonTerminal
 
@@ -48,11 +52,7 @@ from grammar.production import Production
 from grammar.production import epsilon_production
 from grammar.production import epsilon_terminal
 
-from grammar.lockable_type import LockableType
 from grammar.tree_transformer import ChomskyGrammarTreeTransformer
-
-from grammar.testing_utilities import TestingUtilities
-from grammar.dynamic_iteration import DynamicIterationDict
 
 from grammar.intermediate_grammar import IntermediateGrammar
 
