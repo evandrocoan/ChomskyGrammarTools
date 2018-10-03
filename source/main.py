@@ -187,8 +187,8 @@ class ProgramWindow(QtWidgets.QMainWindow):
             A -> b S | b
         """ ) ) )
 
-        self.redoGrammarButton        = QPushButton( "Redo Operations" )
-        self.undoGrammarButton        = QPushButton( "Undo Operations" )
+        self.redoGrammarButton        = QPushButton( "Redo Operation" )
+        self.undoGrammarButton        = QPushButton( "Undo Operation" )
         self.calculateFirstAndFollow  = QPushButton( "Compute First and Follow" )
         self.convertToProperGrammar   = QPushButton( "Convert to Proper" )
         self.isGrammarFactored        = QPushButton( "Is Factored" )
