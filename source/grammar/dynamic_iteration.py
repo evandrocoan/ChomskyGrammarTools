@@ -26,8 +26,8 @@ import copy
 from contextlib import suppress
 from debug_tools import getLogger
 
-from .utilities import emquote_string
-from .utilities import get_representation
+from debug_tools.utilities import emquote_string
+from debug_tools.utilities import get_representation
 
 # level 4 - Abstract Syntax Tree Parsing
 log = getLogger( 127-4, __name__ )

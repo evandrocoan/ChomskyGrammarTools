@@ -26,7 +26,7 @@ import time
 from debug_tools import getLogger
 
 from .symbols import NO_GRAMMAR_CHANGES
-from .utilities import wrap_text
+from debug_tools.utilities import wrap_text
 
 log = getLogger( 127, __name__ )
 

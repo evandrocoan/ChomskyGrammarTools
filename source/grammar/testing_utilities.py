@@ -28,7 +28,7 @@ import unittest
 from debug_tools import getLogger
 log = getLogger( 127, __name__ )
 
-from .utilities import wrap_text
+from debug_tools.utilities import wrap_text
 from grammar.lockable_type import LockableType
 
 

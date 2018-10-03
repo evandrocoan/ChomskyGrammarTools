@@ -47,9 +47,8 @@ from debug_tools import getLogger
 log = getLogger( 127, __name__ )
 log( 1, "Importing " + __name__ )
 
-from grammar.utilities import wrap_text
-
-from grammar.utilities import getCleanSpaces
+from debug_tools.utilities import wrap_text
+from debug_tools.utilities import getCleanSpaces
 
 from .utilities import get_screen_center
 from .utilities import ignore_exceptions

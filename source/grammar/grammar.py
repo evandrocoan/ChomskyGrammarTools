@@ -41,13 +41,13 @@ from .production import end_of_string_terminal
 
 from .intermediate_grammar import IntermediateGrammar
 
-from .utilities import getCleanSpaces
-from .utilities import dictionary_to_string
-from .utilities import assure_existing_key
-from .utilities import convert_to_text_lines
-from .utilities import get_relative_path
-from .utilities import get_duplicated_elements
-from .utilities import sort_alphabetically_and_by_length
+from debug_tools.utilities import getCleanSpaces
+from debug_tools.utilities import dictionary_to_string
+from debug_tools.utilities import assure_existing_key
+from debug_tools.utilities import convert_to_text_lines
+from debug_tools.utilities import get_relative_path
+from debug_tools.utilities import get_duplicated_elements
+from debug_tools.utilities import sort_alphabetically_and_by_length
 
 from .dynamic_iteration import DynamicIterationDict
 from .tree_transformer import ChomskyGrammarTreeTransformer

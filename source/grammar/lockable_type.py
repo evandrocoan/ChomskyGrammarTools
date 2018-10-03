@@ -24,8 +24,8 @@
 import os
 import copy
 
-from .utilities import get_unique_hash
-from .utilities import get_representation
+from debug_tools.utilities import get_unique_hash
+from debug_tools.utilities import get_representation
 
 from debug_tools import getLogger
 
