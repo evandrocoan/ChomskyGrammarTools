@@ -23,8 +23,8 @@
 
 import os
 
-from .lockable_type import LockableType
 from debug_tools import getLogger
+from debug_tools.lockable_type import LockableType
 
 # level 4 - Abstract Syntax Tree Parsing
 log = getLogger( 127-4, __name__ )

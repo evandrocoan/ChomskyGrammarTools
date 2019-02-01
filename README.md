@@ -8,6 +8,14 @@
 [![Latest Release](https://img.shields.io/github/tag/evandrocoan/ContextFreeGrammars.svg?label=version)](https://github.com/evandrocoan/ContextFreeGrammars/releases)
 
 
+## Installation/running
+
+1. Clone this project: `git clone https://github.com/evandrocoan/ContextFreeGrammars`
+1. Open a command line on the projects main folder: `cd ContextFreeGrammars`
+1. Install its dependencies: `python -m pip install -r requirements.txt`
+1. And run it with `python source/main.py`
+
+
 ## I - Definition:
 
 An application,

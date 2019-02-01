@@ -14,7 +14,7 @@ cur_path = os.path.abspath( os.path.join( os.getcwd(), '..', 'source' ) )
 sys.path.append( cur_path )
 
 from grammar.grammar import ChomskyGrammar
-from grammar.utilities import wrap_text
+from debug_tools.utilities import wrap_text
 
 arg = r"""
     S -> a A | a

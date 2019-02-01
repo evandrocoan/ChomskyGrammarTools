@@ -50,13 +50,13 @@ from PyQt5.QtWidgets import QFileDialog
 from grammar.grammar import ChomskyGrammar
 from grammar.symbols import HISTORY_KEY_LINE
 
-from grammar.utilities import wrap_text
-from grammar.utilities import sort_correctly
-from grammar.utilities import convert_to_text_lines
-from grammar.utilities import getCleanSpaces
-from grammar.utilities import get_relative_path
-from grammar.utilities import dictionary_to_string
-from grammar.utilities import get_duplicated_elements
+from debug_tools.utilities import wrap_text
+from debug_tools.utilities import sort_correctly
+from debug_tools.utilities import convert_to_text_lines
+from debug_tools.utilities import getCleanSpaces
+from debug_tools.utilities import get_relative_path
+from debug_tools.utilities import dictionary_to_string
+from debug_tools.utilities import get_duplicated_elements
 
 from user_interface.string_input_dialog import StringInputDialog
 from user_interface.string_output_dialog import StringOutputDialog
@@ -187,8 +187,8 @@ class ProgramWindow(QtWidgets.QMainWindow):
             A -> b S | b
         """ ) ) )
 
-        self.redoGrammarButton        = QPushButton( "Redo Operations" )
-        self.undoGrammarButton        = QPushButton( "Undo Operations" )
+        self.redoGrammarButton        = QPushButton( "Redo Operation" )
+        self.undoGrammarButton        = QPushButton( "Undo Operation" )
         self.calculateFirstAndFollow  = QPushButton( "Compute First and Follow" )
         self.convertToProperGrammar   = QPushButton( "Convert to Proper" )
         self.isGrammarFactored        = QPushButton( "Is Factored" )
@@ -431,7 +431,7 @@ class ProgramWindow(QtWidgets.QMainWindow):
             was_factored = firstGrammar.factor_it( maximumSteps )
 
             if was_factored:
-                results.append( "\n\n# It was be successfully factored in `%s` steps!" % firstGrammar.last_factoring_step )
+                results.append( "\n\n# It was successfully factored in `%s` steps!" % firstGrammar.last_factoring_step )
                 results.append( "\n\n# The new factored grammar is:" )
 
             else:
