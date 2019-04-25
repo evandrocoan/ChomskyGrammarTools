@@ -31,8 +31,6 @@ from lark import Tree
 from debug_tools.dynamic_iteration import DynamicIterationDict
 
 from debug_tools.utilities import getCleanSpaces
-from debug_tools.utilities import dictionary_to_string
-from debug_tools.utilities import assure_existing_key
 from debug_tools.utilities import convert_to_text_lines
 from debug_tools.utilities import get_relative_path
 from debug_tools.utilities import get_duplicated_elements
@@ -878,7 +876,7 @@ class ChomskyGrammar():
         """
             Determines and return the biggest production with common direct factors in a given `production`.
         """
-        assure_existing_key( biggest_common_factors, first_symbol, [] )
+        if first_symbol not in biggest_common_factors: biggest_common_factors[first_symbol] =  []
         biggest_common_factor = biggest_common_factors[first_symbol]
 
         if not biggest_common_factor:
@@ -1148,7 +1146,7 @@ class ChomskyGrammar():
                     log( 16, "direct_factors_productions: %s", direct_factors_productions )
 
                     if direct_factors_count > 1:
-                        assure_existing_key( non_deterministic_factors_eliminated, start_symbol, [] )
+                        if start_symbol not in non_deterministic_factors_eliminated: non_deterministic_factors_eliminated[start_symbol] = []
                         non_deterministic_factors_eliminated[start_symbol].append( non_deterministic_factor )
                         has_eliminated_any_factor = True
                         has_added_first_production = False
