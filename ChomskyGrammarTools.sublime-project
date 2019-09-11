@@ -7,8 +7,12 @@
             [
                 "__pycache__",
             ]
-		}
+		},
 	],
+    "settings":
+    {
+      "restore_output_view_scroll": true,
+    },
     "build_systems":
     [
         {
@@ -16,7 +20,9 @@
             [
                 "python", "main.py"
             ],
-            "file_regex": "^[ ]*File \"(...*?)\", line ([0-9]*)(.*)",
+            "full_regex": "^\\d\\d:\\d\\d:\\d\\d:\\d\\d\\d.\\d\\d\\d\\d\\d\\d \\d.\\d\\de-\\d\\d - (?P<file>\\w+(?:\\.\\w+(?!\\.\\w+:))*)[^:]+:(?P<line>\\d+) - (?P<message>.*)$",
+            "result_dir": "$project_path/source",
+            "replaceby": [ [ "\\.$", "" ], [ "(?<!\\.)\\.(?!\\.)", "\\\\" ], [ "(.*)", "\\1.py" ] ],
             "name": "Run Project",
             "quiet": true,
             "shell": true,
@@ -38,10 +44,7 @@
                 {
                     "name": "Single Test",
                     "target": "run_python_tests",
-                    "cmd":
-                    [
-                        "python", "unit_tests.py", "-v", "{test_class}.{test_func}", "-f",
-                    ],
+                    "shell_cmd": "python unit_tests.py -v {test_class}.{test_func} -f",
                 },
                 {
                     "name": "Single Test Class",
